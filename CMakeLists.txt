@@ -35,8 +35,20 @@ find_package(Threads REQUIRED)
 include(FindPkgConfig)
 include(GNUInstallDirs)
 
-# Try to find Boost via pkg-config, but not required immediately
-pkg_check_modules(BOOST boost)
+# Try to find Boost
+# First try standard CMake modules, then pkg-config
+find_package(Boost QUIET)
+if(NOT Boost_FOUND)
+    pkg_check_modules(BOOST boost)
+    # If still not found, try homebrew path on macOS
+    if(NOT BOOST_FOUND AND APPLE)
+        list(APPEND CMAKE_PREFIX_PATH /opt/homebrew/opt/boost)
+        find_package(Boost QUIET)
+        if(Boost_FOUND)
+            set(BOOST_INCLUDE_DIRS ${Boost_INCLUDE_DIRS})
+        endif()
+    endif()
+endif()
 
 # Find Cairo (optional for now)
 pkg_check_modules(CAIRO cairo>=1.16.0)
@@ -49,7 +61,7 @@ pkg_check_modules(PUGL_CAIRO pugl-cairo-0>=0.4.0)
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
 
 # Add subdirectories
-# add_subdirectory(src)
+add_subdirectory(src)
 
 # Demo
 option(LUI_BUILD_DEMO "Build the demo application" ON)

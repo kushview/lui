@@ -1,8 +1,8 @@
 # Generate font resources using bin2c.py
 set(RES_FONTS
-    res/Roboto-Regular.ttf
-    res/Roboto-Bold.ttf
-    res/Roboto-Light.ttf
+    ui/res/Roboto-Regular.ttf
+    ui/res/Roboto-Bold.ttf
+    ui/res/Roboto-Light.ttf
 )
 
 set(RES_GENERATED)
@@ -21,6 +21,7 @@ endforeach()
 
 # Main library sources
 set(LIBLUI_SOURCES
+    ui/pugl.cpp
     ui/button.cpp
     ui/embed.cpp
     ui/entry.cpp
@@ -37,7 +38,7 @@ set(LIBLUI_SOURCES
 
 # Platform-specific sources
 if(APPLE)
-    list(APPEND LIBLUI_SOURCES ui/embed_mac.mm)
+    list(APPEND LIBLUI_SOURCES ui/pugl.mm ui/embed_mac.mm)
 elseif(UNIX AND NOT APPLE)
     list(APPEND LIBLUI_SOURCES ui/embed_x11.cpp)
 elseif(WIN32)
@@ -61,7 +62,6 @@ set_target_properties(lui-${LUI_ABI_VERSION} PROPERTIES
 # Add compile definitions
 target_compile_definitions(lui-${LUI_ABI_VERSION} PRIVATE
     LUI_BUILD
-    PUGL_STATIC
 )
 
 # Include directories
@@ -72,25 +72,30 @@ target_include_directories(lui-${LUI_ABI_VERSION} PUBLIC
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
-# Link dependencies
+# Include pugl from subproject
 target_include_directories(lui-${LUI_ABI_VERSION} PRIVATE
-    ${PUGL_INCLUDE_DIRS}
+    ${CMAKE_SOURCE_DIR}/src/ui/pugl/include
 )
 
-target_link_directories(lui-${LUI_ABI_VERSION} PRIVATE
-    ${PUGL_LIBRARY_DIRS}
-)
+# Link dependencies
+target_include_directories(lui-${LUI_ABI_VERSION} PRIVATE)
+
+target_link_directories(lui-${LUI_ABI_VERSION} PRIVATE)
 
 target_link_libraries(lui-${LUI_ABI_VERSION} PRIVATE
-    ${PUGL_LIBRARIES}
     Threads::Threads
 )
 
 # Add Boost if found
-if(BOOST_FOUND)
-    target_include_directories(lui-${LUI_ABI_VERSION} PRIVATE ${BOOST_INCLUDE_DIRS})
-    target_link_directories(lui-${LUI_ABI_VERSION} PRIVATE ${BOOST_LIBRARY_DIRS})
-    target_link_libraries(lui-${LUI_ABI_VERSION} PRIVATE ${BOOST_LIBRARIES})
+if(Boost_FOUND OR BOOST_FOUND)
+    if(Boost_FOUND)
+        target_include_directories(lui-${LUI_ABI_VERSION} PRIVATE ${Boost_INCLUDE_DIRS})
+        target_link_libraries(lui-${LUI_ABI_VERSION} PRIVATE Boost::boost)
+    else()
+        target_include_directories(lui-${LUI_ABI_VERSION} PRIVATE ${BOOST_INCLUDE_DIRS})
+        target_link_directories(lui-${LUI_ABI_VERSION} PRIVATE ${BOOST_LIBRARY_DIRS})
+        target_link_libraries(lui-${LUI_ABI_VERSION} PRIVATE ${BOOST_LIBRARIES})
+    endif()
 endif()
 
 # Apple frameworks
@@ -104,45 +109,53 @@ if(APPLE)
 endif()
 
 # Cairo support
-add_library(lui-cairo-${LUI_ABI_VERSION}
-    ui/cairo.cpp
-)
+# Disabled for now - cairo not available
+# add_library(lui-cairo-${LUI_ABI_VERSION}
+#     ui/cairo.cpp
+# )
+#
+# set_target_properties(lui-cairo-${LUI_ABI_VERSION} PROPERTIES
+#     VERSION ${PROJECT_VERSION}
+#     SOVERSION ${LUI_ABI_VERSION}
+#     CXX_VISIBILITY_PRESET hidden
+#     VISIBILITY_INLINES_HIDDEN ON
+# )
+#
+# target_compile_definitions(lui-cairo-${LUI_ABI_VERSION} PRIVATE
+#     LUI_BUILD
+# )
+#
+# target_include_directories(lui-cairo-${LUI_ABI_VERSION} PUBLIC
+#     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
+#     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>
+#     $<INSTALL_INTERFACE:include>
+# )
+#
+# target_include_directories(lui-cairo-${LUI_ABI_VERSION} PRIVATE
+#     ${CAIRO_INCLUDE_DIRS}
+#     ${PUGL_CAIRO_INCLUDE_DIRS}
+# )
+#
+# target_link_directories(lui-cairo-${LUI_ABI_VERSION} PRIVATE
+#     ${CAIRO_LIBRARY_DIRS}
+#     ${PUGL_CAIRO_LIBRARY_DIRS}
+# )
+#
+# target_link_libraries(lui-cairo-${LUI_ABI_VERSION} PUBLIC
+#     lui-${LUI_ABI_VERSION}
+#     ${CAIRO_LIBRARIES}
+#     ${PUGL_CAIRO_LIBRARIES}
+# )
+#
+# # Install targets
+# install(TARGETS lui-${LUI_ABI_VERSION} lui-cairo-${LUI_ABI_VERSION}
+#     LIBRARY DESTINATION lib
+#     ARCHIVE DESTINATION lib
+#     RUNTIME DESTINATION bin
+# )
 
-set_target_properties(lui-cairo-${LUI_ABI_VERSION} PROPERTIES
-    VERSION ${PROJECT_VERSION}
-    SOVERSION ${LUI_ABI_VERSION}
-    CXX_VISIBILITY_PRESET hidden
-    VISIBILITY_INLINES_HIDDEN ON
-)
-
-target_compile_definitions(lui-cairo-${LUI_ABI_VERSION} PRIVATE
-    LUI_BUILD
-)
-
-target_include_directories(lui-cairo-${LUI_ABI_VERSION} PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
-    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>
-    $<INSTALL_INTERFACE:include>
-)
-
-target_include_directories(lui-cairo-${LUI_ABI_VERSION} PRIVATE
-    ${CAIRO_INCLUDE_DIRS}
-    ${PUGL_CAIRO_INCLUDE_DIRS}
-)
-
-target_link_directories(lui-cairo-${LUI_ABI_VERSION} PRIVATE
-    ${CAIRO_LIBRARY_DIRS}
-    ${PUGL_CAIRO_LIBRARY_DIRS}
-)
-
-target_link_libraries(lui-cairo-${LUI_ABI_VERSION} PUBLIC
-    lui-${LUI_ABI_VERSION}
-    ${CAIRO_LIBRARIES}
-    ${PUGL_CAIRO_LIBRARIES}
-)
-
-# Install targets
-install(TARGETS lui-${LUI_ABI_VERSION} lui-cairo-${LUI_ABI_VERSION}
+# Install just the main library for now
+install(TARGETS lui-${LUI_ABI_VERSION}
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
     RUNTIME DESTINATION bin
