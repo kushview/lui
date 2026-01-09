@@ -1,5 +1,6 @@
 *.pyc
 build/
+build-cmake/
 .cproject
 .lock-waf*
 lock-waf*
