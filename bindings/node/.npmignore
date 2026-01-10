@@ -1,0 +1,23 @@
+# Build artifacts (keep prebuilds/)
+build/
+node_modules/
+
+# Development files
+demo.js
+*.log
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.sublime-*
+
+# Git
+.git/
+.gitignore

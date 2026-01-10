@@ -20,6 +20,15 @@ if(APPLE)
     enable_language(OBJCXX)
 endif()
 
+# Option for Node.js bindings compatibility
+option(LUI_NODE "Build for Node.js bindings compatibility" OFF)
+
+# Set macOS deployment target for Node.js compatibility
+if(LUI_NODE AND APPLE)
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "13.3" CACHE STRING "Minimum macOS deployment version for Node.js" FORCE)
+    message(STATUS "Building for Node.js: macOS deployment target set to ${CMAKE_OSX_DEPLOYMENT_TARGET}")
+endif()
+
 # Set default build type
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)

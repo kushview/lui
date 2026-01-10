@@ -1,0 +1,112 @@
+name: Prebuild Node Bindings
+
+on:
+  push:
+    tags:
+      - 'node-v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            arch: x64
+          - os: macos-latest
+            arch: arm64
+          - os: ubuntu-latest
+            arch: x64
+          - os: windows-latest
+            arch: x64
+    
+    runs-on: ${{ matrix.os }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Install system dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: brew install boost ninja cmake
+      
+      - name: Install system dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libboost-dev libx11-dev libgl1-mesa-dev ninja-build cmake
+      
+      - name: Install system dependencies (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          choco install ninja cmake
+          vcpkg install boost:x64-windows
+        shell: powershell
+      
+      - name: Build lui library (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          cmake -B build -G Ninja -DLUI_BUILD_TESTS=OFF -DLUI_BUILD_DEMO=OFF -DLUI_NODE=ON
+          ninja -C build src/liblui-0.0.a
+          mkdir -p build/lib
+          cp build/src/liblui-0.0.a build/lib/
+      
+      - name: Build lui library (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          cmake -B build -G Ninja -DLUI_BUILD_TESTS=OFF -DLUI_BUILD_DEMO=OFF -DLUI_NODE=ON
+          ninja -C build src/lui-0.0.lib
+          mkdir -p build/lib
+          copy build/src/lui-0.0.lib build/lib/
+        shell: cmd
+      
+      - name: Install Node.js dependencies
+        working-directory: bindings/node
+        run: npm install --include=dev
+      
+      - name: Prebuild native addon
+        working-directory: bindings/node
+        run: npx prebuildify --napi --strip --arch ${{ matrix.arch }}
+      
+      - name: Upload prebuilds
+        uses: actions/upload-artifact@v4
+        with:
+          name: prebuilds-${{ matrix.os }}-${{ matrix.arch }}
+          path: bindings/node/prebuilds/
+          retention-days: 7
+  
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Download all prebuilds
+        uses: actions/download-artifact@v4
+        with:
+          path: bindings/node/prebuilds-temp/
+      
+      - name: Organize prebuilds
+        run: |
+          mkdir -p bindings/node/prebuilds
+          find bindings/node/prebuilds-temp -name "*.node" -exec cp {} bindings/node/prebuilds/ \;
+      
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: bindings/node/prebuilds/**
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

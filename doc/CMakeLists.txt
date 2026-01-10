@@ -1,7 +1,7 @@
 # Documentation build configuration
 
 find_package(Doxygen)
-find_package(Sphinx)
+# find_package(Sphinx)
 
 if(DOXYGEN_FOUND)
     # Configure Doxyfile

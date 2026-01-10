@@ -1,0 +1,38 @@
+{
+  "name": "lui",
+  "version": "0.0.1",
+  "description": "Native cross-platform GUI library for Node.js with OpenGL rendering",
+  "main": "index.js",
+  "scripts": {
+    "install": "node-gyp-build",
+    "build": "node-gyp configure && node-gyp build",
+    "rebuild": "cd ../.. && cmake -B build-node -G Ninja -DLUI_BUILD_TESTS=OFF -DLUI_BUILD_DEMO=OFF -DLUI_NODE=ON && ninja -C build-node src/liblui-0.0.a && mkdir -p build-node/lib && cp build-node/src/liblui-0.0.a build-node/lib/ && cd bindings/node && node-gyp rebuild",
+    "prebuildify": "npm run rebuild && prebuildify --napi --strip",
+    "clean": "node-gyp clean",
+    "demo": "node demo.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lvtk/lui.git",
+    "directory": "bindings/node"
+  },
+  "bugs": {
+    "url": "https://github.com/lvtk/lui/issues"
+  },
+  "homepage": "https://github.com/lvtk/lui#readme",
+  "keywords": ["gui", "ui", "native", "opengl", "widget", "window", "desktop", "cross-platform"],
+  "author": "Michael Fisher <mfisher@lvtk.org>",
+  "license": "ISC",
+  "gypfile": true,
+  "dependencies": {
+    "node-addon-api": "^8.0.0",
+    "node-gyp-build": "^4.8.0"
+  },
+  "devDependencies": {
+    "node-gyp": "^10.0.0",
+    "prebuildify": "^6.0.0"
+  },
+  "binary": {
+    "napi_versions": [3, 4, 5, 6, 7, 8, 9]
+  }
+}
