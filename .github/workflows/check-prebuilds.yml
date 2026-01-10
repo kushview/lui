@@ -83,9 +83,7 @@ jobs:
       
       - name: Prebuild native addon
         working-directory: bindings/node
-        env:
-          npm_config_arch: ${{ matrix.node_arch }}
-        run: npx prebuildify --napi --strip --arch ${{ matrix.node_arch }}
+        run: npx prebuildify --napi --strip --arch ${{ matrix.node_arch }} -- --arch=${{ matrix.node_arch }}
       
       - name: Upload prebuilds
         uses: actions/upload-artifact@v4
