@@ -29,6 +29,7 @@ set(LIBLUI_SOURCES
     ui/graphics.cpp
     ui/image.cpp
     ui/main.cpp
+    ui/nanovg.cpp
     ui/fitment.cpp
     ui/slider.cpp
     ui/style.cpp
@@ -62,6 +63,8 @@ set_target_properties(lui-${LUI_ABI_VERSION} PROPERTIES
 # Add compile definitions
 target_compile_definitions(lui-${LUI_ABI_VERSION} PRIVATE
     LUI_BUILD
+    PUGL_STATIC
+    NANOVG_GL2
 )
 
 # Include directories

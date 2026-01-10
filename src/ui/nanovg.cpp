@@ -5,17 +5,17 @@
 #include <unordered_map>
 #include <vector>
 
-#include <lui/ui/font.hpp>
+#include <lui/font.hpp>
 
 #include "gl.hpp"
 
 #include "../nanovg/nanovg.h"
 #include "../nanovg/nanovg_gl.h"
-#include "Roboto-Bold.ttf.h"
-#include "Roboto-Regular.ttf.h"
+#include "Roboto-Bold.h"
+#include "Roboto-Regular.h"
 #include "nanovg.hpp"
 
-namespace lvtk {
+namespace lui {
 namespace nvg {
 namespace detail {
 
@@ -199,7 +199,7 @@ void Context::end_frame() {
     nvgEndFrame (ctx->ctx);
 }
 
-double Context::scale_factor() const noexcept {
+double Context::device_scale() const noexcept {
     return ctx->internal_scale;
 }
 
@@ -333,7 +333,7 @@ FontMetrics Context::font_metrics() const noexcept {
 }
 
 TextMetrics Context::text_metrics (std::string_view text) const noexcept {
-    lvtk::Point<float> pt { 0.f, 0.f };
+    lui::Point<float> pt { 0.f, 0.f };
     TextMetrics te;
     float b[4] = { 0.f };
     float ascent, descent, lineheight;

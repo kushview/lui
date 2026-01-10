@@ -3,13 +3,13 @@
 
 #pragma once
 
-#include <lvtk/ui/graphics.hpp>
+#include <lui/graphics.hpp>
 
-namespace lvtk {
+namespace lui {
 namespace nvg {
 
 /** DrawingContext backed by a NanoVG context */
-class Context final : public lvtk::DrawingContext {
+class Context final : public lui::DrawingContext {
 public:
     Context();
     ~Context();
@@ -17,7 +17,7 @@ public:
     void begin_frame (int width, int height, double pixel_ratio);
     void end_frame();
 
-    double scale_factor() const noexcept override;
+    double device_scale() const noexcept override;
     void save() override;
     void restore() override;
 
