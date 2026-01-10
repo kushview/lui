@@ -19,6 +19,40 @@ foreach(font ${RES_FONTS})
     list(APPEND RES_GENERATED ${output})
 endforeach()
 
+# Create nanovg static library
+add_library(nanovg STATIC
+    nanovg/nanovg.c
+    nanovg/nanovg_gl.c
+)
+
+target_include_directories(nanovg PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/ui
+    ${CMAKE_SOURCE_DIR}/src/ui/pugl/include
+)
+
+target_include_directories(nanovg PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/nanovg
+    ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+target_compile_definitions(nanovg PRIVATE
+    NANOVG_GL2
+    NVG_NO_STB
+    GL_SILENCE_DEPRECATION
+    # PUGL_DISABLE_DEPRECATED
+)
+
+# Link OpenGL on macOS
+if(APPLE)
+    target_link_libraries(nanovg PRIVATE
+        "-framework OpenGL"
+    )
+endif()
+
+set_target_properties(nanovg PROPERTIES
+    C_VISIBILITY_PRESET hidden
+)
+
 # Main library sources
 set(LIBLUI_SOURCES
     ui/pugl.cpp
@@ -30,6 +64,7 @@ set(LIBLUI_SOURCES
     ui/image.cpp
     ui/main.cpp
     ui/nanovg.cpp
+    ui/opengl.cpp
     ui/fitment.cpp
     ui/slider.cpp
     ui/style.cpp
@@ -87,6 +122,7 @@ target_link_directories(lui-${LUI_ABI_VERSION} PRIVATE)
 
 target_link_libraries(lui-${LUI_ABI_VERSION} PRIVATE
     Threads::Threads
+    nanovg
 )
 
 # Add Boost if found
@@ -108,6 +144,7 @@ if(APPLE)
         "-framework CoreVideo"
         "-framework CoreGraphics"
         "-framework Cocoa"
+        "-framework OpenGL"
     )
 endif()
 
@@ -159,7 +196,7 @@ endif()
 
 # Install just the main library for now
 install(TARGETS lui-${LUI_ABI_VERSION}
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib
-    RUNTIME DESTINATION bin
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )

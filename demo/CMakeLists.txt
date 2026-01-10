@@ -5,7 +5,7 @@ set(DEMO_RES_FONTS
 
 set(DEMO_RES_GENERATED)
 foreach(resource ${DEMO_RES_FONTS})
-    get_filename_component(resource_name ${resource} NAME_WE)
+    get_filename_component(resource_name ${resource} NAME)
     set(output "${CMAKE_CURRENT_BINARY_DIR}/${resource_name}.h")
     add_custom_command(
         OUTPUT ${output}
@@ -31,8 +31,12 @@ set(LIBLUI_DEMO_SOURCES
 add_library(lui-demo STATIC ${LIBLUI_DEMO_SOURCES})
 
 target_include_directories(lui-demo PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/src
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CAIRO_INCLUDE_DIRS}
+    ${Boost_INCLUDE_DIRS}
+    ${BOOST_INCLUDE_DIRS}
 )
 
 target_link_directories(lui-demo PRIVATE
@@ -40,8 +44,7 @@ target_link_directories(lui-demo PRIVATE
 )
 
 target_link_libraries(lui-demo PRIVATE
-    lui-cairo-${LUI_ABI_VERSION}
-    ${CAIRO_LIBRARIES}
+    lui-${LUI_ABI_VERSION}
     Threads::Threads
 )
 
@@ -54,9 +57,16 @@ set_target_properties(lui-demo-exe PROPERTIES
     OUTPUT_NAME lui-demo
 )
 
+target_include_directories(lui-demo-exe PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/src
+    ${Boost_INCLUDE_DIRS}
+    ${BOOST_INCLUDE_DIRS}
+)
+
 target_compile_definitions(lui-demo-exe PRIVATE
     LUI_NO_SYMBOL_EXPORT
-    LUI_DEMO_CAIRO=1
+    LUI_DEMO_OPENGL=1
 )
 
 target_link_libraries(lui-demo-exe PRIVATE

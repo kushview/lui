@@ -65,8 +65,8 @@ add_subdirectory(src)
 
 # Demo
 option(LUI_BUILD_DEMO "Build the demo application" ON)
-if(LUI_BUILD_DEMO AND PUGL_CAIRO_FOUND)
-    # add_subdirectory(demo)
+if(LUI_BUILD_DEMO)
+    add_subdirectory(demo)
 endif()
 
 # Tests
