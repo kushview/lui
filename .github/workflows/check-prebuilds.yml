@@ -56,7 +56,16 @@ jobs:
       - name: Build lui library (Unix)
         if: runner.os != 'Windows'
         run: |
-          cmake -B build-node -G Ninja -DLUI_BUILD_TESTS=OFF -DLUI_BUILD_DEMO=OFF -DLUI_NODE=ON
+          if [ "${{ runner.os }}" = "macOS" ]; then
+            if [ "${{ matrix.arch }}" = "x64" ]; then
+              ARCH_FLAG="-DCMAKE_OSX_ARCHITECTURES=x86_64"
+            else
+              ARCH_FLAG="-DCMAKE_OSX_ARCHITECTURES=arm64"
+            fi
+          else
+            ARCH_FLAG=""
+          fi
+          cmake -B build-node -G Ninja -DLUI_BUILD_TESTS=OFF -DLUI_BUILD_DEMO=OFF -DLUI_NODE=ON $ARCH_FLAG
           ninja -C build-node src/liblui-0.0.a
           mkdir -p build-node/lib
           cp build-node/src/liblui-0.0.a build-node/lib/
