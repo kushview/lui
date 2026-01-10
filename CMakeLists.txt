@@ -82,7 +82,7 @@ endif()
 # Documentation
 option(LUI_BUILD_DOCS "Build documentation" ON)
 if(LUI_BUILD_DOCS)
-    # add_subdirectory(doc)
+    add_subdirectory(doc)
 endif()
 
 # Install headers
