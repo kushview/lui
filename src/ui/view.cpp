@@ -119,8 +119,10 @@ void View::render (DrawingContext& ctx) {
     impl->widget.render (g);
 }
 
+#if 0
 boost::signals2::connection View::connect_idle (const IdleSlot& slot) {
     return impl->sig_idle.connect (slot);
 }
+#endif
 
 } // namespace lui

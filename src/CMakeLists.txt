@@ -92,18 +92,6 @@ target_link_libraries(lui-${LUI_ABI_VERSION} PRIVATE
     Threads::Threads
 )
 
-# Add Boost if found
-if(Boost_FOUND OR BOOST_FOUND)
-    if(Boost_FOUND)
-        target_include_directories(lui-${LUI_ABI_VERSION} PRIVATE ${Boost_INCLUDE_DIRS})
-        target_link_libraries(lui-${LUI_ABI_VERSION} PRIVATE Boost::boost)
-    else()
-        target_include_directories(lui-${LUI_ABI_VERSION} PRIVATE ${BOOST_INCLUDE_DIRS})
-        target_link_directories(lui-${LUI_ABI_VERSION} PRIVATE ${BOOST_LIBRARY_DIRS})
-        target_link_libraries(lui-${LUI_ABI_VERSION} PRIVATE ${BOOST_LIBRARIES})
-    endif()
-endif()
-
 # Apple frameworks
 if(APPLE)
     target_link_libraries(lui-${LUI_ABI_VERSION} PRIVATE

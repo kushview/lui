@@ -19,7 +19,6 @@ public:
     }
 
     ~Embedding() {
-        conn_idle.disconnect();
         unload_volume();
     }
 
@@ -38,7 +37,6 @@ public:
     }
 
     void unload_volume() {
-        conn_idle.disconnect();
         f_idle = []() {};
         if (embed)
             remove (*embed);
@@ -99,13 +97,11 @@ protected:
         if (loaded())
             return;
         if (lui::ViewRef view = find_view()) {
-            conn_idle.disconnect();
-            conn_idle = view->connect_idle (std::bind (&Embedding::idle, this));
+            // TODO: connect idle handler
         }
     }
 
 private:
-    boost::signals2::connection conn_idle;
     std::function<void()> f_idle { []() {} };
     std::unique_ptr<Embed> embed;
 };

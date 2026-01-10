@@ -1,8 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
 
-# Suppress CMP0167 warning about FindBoost module removal
-cmake_policy(SET CMP0167 OLD)
-
 project(lui
     VERSION 0.0.1
     LANGUAGES CXX C
@@ -46,21 +43,6 @@ find_package(Threads REQUIRED)
 # Use pkgconfig to find dependencies
 include(FindPkgConfig)
 include(GNUInstallDirs)
-
-# Try to find Boost
-# First try standard CMake modules, then pkg-config
-find_package(Boost QUIET)
-if(NOT Boost_FOUND)
-    pkg_check_modules(BOOST boost)
-    # If still not found, try homebrew path on macOS
-    if(NOT BOOST_FOUND AND APPLE)
-        list(APPEND CMAKE_PREFIX_PATH /opt/homebrew/opt/boost)
-        find_package(Boost QUIET)
-        if(Boost_FOUND)
-            set(BOOST_INCLUDE_DIRS ${Boost_INCLUDE_DIRS})
-        endif()
-    endif()
-endif()
 
 # Find Cairo (optional for now)
 pkg_check_modules(CAIRO cairo>=1.16.0)
@@ -106,7 +88,6 @@ message(STATUS "  Build Tests: ${LUI_BUILD_TESTS}")
 message(STATUS "  Build Docs: ${LUI_BUILD_DOCS}")
 message(STATUS "  Cairo: ${CAIRO_FOUND}")
 message(STATUS "  Pugl: ${PUGL_FOUND}")
-message(STATUS "  Boost: ${BOOST_FOUND}")
 message(STATUS "  Python3: ${Python3_EXECUTABLE}")
 message(STATUS "")
 message(STATUS "  Build Type: ${CMAKE_BUILD_TYPE}")

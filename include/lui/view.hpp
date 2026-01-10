@@ -3,8 +3,6 @@
 
 #pragma once
 
-#include <boost/signals2/signal.hpp>
-
 #include <lui/graphics.hpp>
 #include <lui/lui.h>
 #include <lui/style.hpp>
@@ -95,8 +93,11 @@ public:
     void repaint (Bounds bounds);
 
     /** This is for testing. */
+#if 0
+    // TODO: don't use boost
     using IdleSlot = boost::signals2::signal<void()>::slot_type;
     boost::signals2::connection connect_idle (const IdleSlot& slot);
+#endif
 
 protected:
     View (Main& context, Widget& widget);

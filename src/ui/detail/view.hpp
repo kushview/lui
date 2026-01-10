@@ -428,8 +428,6 @@ private:
     int nconfigures   = 0;
     bool configure_pending { false };
 
-    boost::signals2::signal<void()> sig_idle;
-
     static PuglStatus configure (View& view, const PuglConfigureEvent& ev) {
         ScopedInc nconfigs (view.nconfigures);
 
@@ -687,7 +685,7 @@ private:
     static PuglStatus client (View& view, const PuglClientEvent& ev) { return PUGL_SUCCESS; }
 
     static PuglStatus timer (View& view, const PuglTimerEvent& ev) {
-        view.sig_idle();
+        // TODO: notify idle handlers.
         return PUGL_SUCCESS;
     }
 

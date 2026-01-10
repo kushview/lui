@@ -35,20 +35,18 @@ jobs:
       
       - name: Install system dependencies (macOS)
         if: runner.os == 'macOS'
-        run: brew install boost ninja cmake
+        run: brew install ninja cmake
       
       - name: Install system dependencies (Linux)
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libboost-dev libx11-dev libgl1-mesa-dev ninja-build cmake \
+          sudo apt-get install -y libx11-dev libgl1-mesa-dev ninja-build cmake \
             doxygen graphviz python3-sphinx python3-sphinx-rtd-theme
       
       - name: Install system dependencies (Windows)
         if: runner.os == 'Windows'
-        run: |
-          choco install ninja cmake
-          vcpkg install boost:x64-windows
+        run: choco install ninja cmake
         shell: powershell
       
       - name: Configure CMake (macOS)

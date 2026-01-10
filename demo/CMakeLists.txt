@@ -36,8 +36,6 @@ target_include_directories(lui-demo PRIVATE
     ${CMAKE_SOURCE_DIR}/src
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CAIRO_INCLUDE_DIRS}
-    ${Boost_INCLUDE_DIRS}
-    ${BOOST_INCLUDE_DIRS}
 )
 
 target_link_directories(lui-demo PRIVATE
@@ -61,8 +59,6 @@ set_target_properties(lui-demo-exe PROPERTIES
 target_include_directories(lui-demo-exe PRIVATE
     ${CMAKE_SOURCE_DIR}/include
     ${CMAKE_SOURCE_DIR}/src
-    ${Boost_INCLUDE_DIRS}
-    ${BOOST_INCLUDE_DIRS}
 )
 
 target_compile_definitions(lui-demo-exe PRIVATE
