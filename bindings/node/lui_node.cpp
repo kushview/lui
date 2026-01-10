@@ -9,6 +9,7 @@
 #include <lui/opengl.hpp>
 #include <memory>
 #include <iostream>
+#include <map>
 
 namespace lui_node {
 

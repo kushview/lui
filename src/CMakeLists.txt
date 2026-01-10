@@ -66,14 +66,8 @@ set_target_properties(lui-${LUI_ABI_VERSION} PROPERTIES
 target_compile_definitions(lui-${LUI_ABI_VERSION} PRIVATE
     LUI_BUILD
     PUGL_STATIC
+    NANOVG_GL2
 )
-
-# Platform-specific NanoVG definitions
-if(UNIX AND NOT APPLE)
-    target_compile_definitions(lui-${LUI_ABI_VERSION} PRIVATE NANOVG_GL3)
-else()
-    target_compile_definitions(lui-${LUI_ABI_VERSION} PRIVATE NANOVG_GL2)
-endif()
 
 # Include directories
 target_include_directories(lui-${LUI_ABI_VERSION} PUBLIC
