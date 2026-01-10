@@ -56,18 +56,18 @@ jobs:
       - name: Build lui library (Unix)
         if: runner.os != 'Windows'
         run: |
-          cmake -B build -G Ninja -DLUI_BUILD_TESTS=OFF -DLUI_BUILD_DEMO=OFF -DLUI_NODE=ON
-          ninja -C build src/liblui-0.0.a
-          mkdir -p build/lib
-          cp build/src/liblui-0.0.a build/lib/
+          cmake -B build-node -G Ninja -DLUI_BUILD_TESTS=OFF -DLUI_BUILD_DEMO=OFF -DLUI_NODE=ON
+          ninja -C build-node src/liblui-0.0.a
+          mkdir -p build-node/lib
+          cp build-node/src/liblui-0.0.a build-node/lib/
       
       - name: Build lui library (Windows)
         if: runner.os == 'Windows'
         run: |
-          cmake -B build -G Ninja -DLUI_BUILD_TESTS=OFF -DLUI_BUILD_DEMO=OFF -DLUI_NODE=ON
-          ninja -C build src/lui-0.0.lib
-          mkdir -p build/lib
-          copy build/src/lui-0.0.lib build/lib/
+          cmake -B build-node -G Ninja -DLUI_BUILD_TESTS=OFF -DLUI_BUILD_DEMO=OFF -DLUI_NODE=ON
+          ninja -C build-node src/lui-0.0.lib
+          mkdir -p build-node/lib
+          copy build-node/src/lui-0.0.lib build-node/lib/
         shell: cmd
       
       - name: Install Node.js dependencies
