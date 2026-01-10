@@ -40,18 +40,13 @@ jobs:
       
       - name: Install system dependencies (macOS)
         if: runner.os == 'macOS'
-        run: brew install ninja cmake
+        run: echo "CMake and Ninja pre-installed"
       
       - name: Install system dependencies (Linux)
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
           sudo apt-get install -y libx11-dev libgl1-mesa-dev ninja-build cmake
-      
-      - name: Install system dependencies (Windows)
-        if: runner.os == 'Windows'
-        run: choco install ninja cmake
-        shell: powershell
       
       - name: Build lui library (Unix)
         if: runner.os != 'Windows'

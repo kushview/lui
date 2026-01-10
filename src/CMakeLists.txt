@@ -66,8 +66,14 @@ set_target_properties(lui-${LUI_ABI_VERSION} PROPERTIES
 target_compile_definitions(lui-${LUI_ABI_VERSION} PRIVATE
     LUI_BUILD
     PUGL_STATIC
-    NANOVG_GL2
 )
+
+# Platform-specific NanoVG definitions
+if(UNIX AND NOT APPLE)
+    target_compile_definitions(lui-${LUI_ABI_VERSION} PRIVATE NANOVG_GL3)
+else()
+    target_compile_definitions(lui-${LUI_ABI_VERSION} PRIVATE NANOVG_GL2)
+endif()
 
 # Include directories
 target_include_directories(lui-${LUI_ABI_VERSION} PUBLIC
@@ -102,52 +108,6 @@ if(APPLE)
         "-framework OpenGL"
     )
 endif()
-
-# Cairo support
-# Disabled for now - cairo not available
-# add_library(lui-cairo-${LUI_ABI_VERSION}
-#     ui/cairo.cpp
-# )
-#
-# set_target_properties(lui-cairo-${LUI_ABI_VERSION} PROPERTIES
-#     VERSION ${PROJECT_VERSION}
-#     SOVERSION ${LUI_ABI_VERSION}
-#     CXX_VISIBILITY_PRESET hidden
-#     VISIBILITY_INLINES_HIDDEN ON
-# )
-#
-# target_compile_definitions(lui-cairo-${LUI_ABI_VERSION} PRIVATE
-#     LUI_BUILD
-# )
-#
-# target_include_directories(lui-cairo-${LUI_ABI_VERSION} PUBLIC
-#     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
-#     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>
-#     $<INSTALL_INTERFACE:include>
-# )
-#
-# target_include_directories(lui-cairo-${LUI_ABI_VERSION} PRIVATE
-#     ${CAIRO_INCLUDE_DIRS}
-#     ${PUGL_CAIRO_INCLUDE_DIRS}
-# )
-#
-# target_link_directories(lui-cairo-${LUI_ABI_VERSION} PRIVATE
-#     ${CAIRO_LIBRARY_DIRS}
-#     ${PUGL_CAIRO_LIBRARY_DIRS}
-# )
-#
-# target_link_libraries(lui-cairo-${LUI_ABI_VERSION} PUBLIC
-#     lui-${LUI_ABI_VERSION}
-#     ${CAIRO_LIBRARIES}
-#     ${PUGL_CAIRO_LIBRARIES}
-# )
-#
-# # Install targets
-# install(TARGETS lui-${LUI_ABI_VERSION} lui-cairo-${LUI_ABI_VERSION}
-#     LIBRARY DESTINATION lib
-#     ARCHIVE DESTINATION lib
-#     RUNTIME DESTINATION bin
-# )
 
 # Install just the main library for now
 install(TARGETS lui-${LUI_ABI_VERSION}
