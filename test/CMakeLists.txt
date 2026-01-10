@@ -44,3 +44,15 @@ target_link_libraries(lui-unit PRIVATE
 # Register tests with gtest
 gtest_discover_tests(lui-unit)
 
+# Add REUSE license compliance check
+find_program(REUSE_EXECUTABLE NAMES reuse)
+if(REUSE_EXECUTABLE)
+    add_test(
+        NAME reuse-lint
+        COMMAND ${REUSE_EXECUTABLE} lint
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    )
+    message(STATUS "REUSE found - license compliance test added")
+else()
+    message(STATUS "REUSE not found - license compliance test skipped")
+endif()

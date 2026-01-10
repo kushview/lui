@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2022 Michael Fisher <mfisher@lvtk.org>
+// SPDX-License-Identifier: ISC
+
 // Pugl Objective-C amalgamation - compile pugl Objective-C files
 
 #pragma clang diagnostic push

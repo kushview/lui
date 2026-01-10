@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2022 Michael Fisher <mfisher@lvtk.org>
+// SPDX-License-Identifier: ISC
+
 // Pugl amalgamation - compile pugl by including source files directly
 
 #include "pugl/src/common.c"

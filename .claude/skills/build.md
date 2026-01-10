@@ -1,3 +1,8 @@
+<!--
+SPDX-FileCopyrightText: 2026 Michael Fisher <mfisher@lvtk.org>
+SPDX-License-Identifier: ISC
+-->
+
 # Build Skills
 
 ## Building LUI

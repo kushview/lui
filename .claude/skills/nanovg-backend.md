@@ -1,3 +1,8 @@
+<!--
+SPDX-FileCopyrightText: 2026 Michael Fisher <mfisher@lvtk.org>
+SPDX-License-Identifier: ISC
+-->
+
 # NanoVG Backend Knowledge
 
 ## Critical Implementation Details
