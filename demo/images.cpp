@@ -3,8 +3,8 @@
 
 #include <cstdio>
 #include <functional>
-
-#include <boost/algorithm/string/trim.hpp>
+#include <algorithm>
+#include <cctype>
 
 #include "demo.hpp"
 #include <lui/button.hpp>
@@ -118,7 +118,14 @@ private:
                 filename = line;
                 break;
             }
-            boost::trim (filename);
+            // Trim whitespace
+            filename.erase(filename.begin(), std::find_if(filename.begin(), filename.end(), [](unsigned char ch) {
+                return !std::isspace(ch);
+            }));
+            filename.erase(std::find_if(filename.rbegin(), filename.rend(), [](unsigned char ch) {
+                return !std::isspace(ch);
+            }).base(), filename.end());
+            
             if (auto i = Image::load (filename)) {
                 _images.push_back (i);
                 _image = _images.size() - 1;
