@@ -63,10 +63,14 @@ if(SPHINX_EXECUTABLE)
     endforeach()
     
     # Copy subdirectories
-    file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/api 
-         DESTINATION ${CMAKE_BINARY_DIR}/doc)
-    file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/ui 
-         DESTINATION ${CMAKE_BINARY_DIR}/doc)
+    if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/api)
+        file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/api 
+             DESTINATION ${CMAKE_BINARY_DIR}/doc)
+    endif()
+    if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/ui)
+        file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/ui 
+             DESTINATION ${CMAKE_BINARY_DIR}/doc)
+    endif()
     
     # Add sphinx target
     add_custom_target(sphinx
