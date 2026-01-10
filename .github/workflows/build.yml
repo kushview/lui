@@ -1,0 +1,86 @@
+name: Build and Test
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            arch: x64
+            cmake_arch: x86_64
+          - os: macos-latest
+            arch: arm64
+            cmake_arch: arm64
+          - os: ubuntu-latest
+            arch: x64
+          - os: windows-latest
+            arch: x64
+    
+    runs-on: ${{ matrix.os }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      
+      - name: Install system dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: brew install boost ninja cmake
+      
+      - name: Install system dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libboost-dev libx11-dev libgl1-mesa-dev ninja-build cmake \
+            doxygen graphviz python3-sphinx python3-sphinx-rtd-theme
+      
+      - name: Install system dependencies (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          choco install ninja cmake
+          vcpkg install boost:x64-windows
+        shell: powershell
+      
+      - name: Configure CMake (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          cmake -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_OSX_ARCHITECTURES=${{ matrix.cmake_arch }} \
+            -DLUI_BUILD_TESTS=ON \
+            -DLUI_BUILD_DEMO=ON \
+            -DLUI_BUILD_DOCS=OFF
+      
+      - name: Configure CMake (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          cmake -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DLUI_BUILD_TESTS=ON \
+            -DLUI_BUILD_DEMO=ON \
+            -DLUI_BUILD_DOCS=ON
+      
+      - name: Configure CMake (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          cmake -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DLUI_BUILD_TESTS=ON \
+            -DLUI_BUILD_DEMO=ON \
+            -DLUI_BUILD_DOCS=OFF
+      
+      - name: Build
+        run: ninja -C build
+      
+      - name: Run Tests
+        run: ctest --test-dir build --output-on-failure

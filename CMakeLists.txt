@@ -65,10 +65,6 @@ endif()
 # Find Cairo (optional for now)
 pkg_check_modules(CAIRO cairo>=1.16.0)
 
-# Find Pugl (optional for now)
-pkg_check_modules(PUGL pugl-0>=0.4.0)
-pkg_check_modules(PUGL_CAIRO pugl-cairo-0>=0.4.0)
-
 # Python 3 for scripts
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
 
