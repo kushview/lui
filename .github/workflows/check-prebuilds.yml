@@ -15,9 +15,11 @@ jobs:
       matrix:
         include:
           - os: macos-latest
-            arch: x64
+            arch: x86_64
+            node_arch: x64
           - os: macos-latest
             arch: arm64
+            node_arch: arm64
           # - os: ubuntu-latest
           #   arch: x64
           # - os: windows-latest
@@ -57,11 +59,7 @@ jobs:
         if: runner.os != 'Windows'
         run: |
           if [ "${{ runner.os }}" = "macOS" ]; then
-            if [ "${{ matrix.arch }}" = "x64" ]; then
-              ARCH_FLAG="-DCMAKE_OSX_ARCHITECTURES=x86_64"
-            else
-              ARCH_FLAG="-DCMAKE_OSX_ARCHITECTURES=arm64"
-            fi
+            ARCH_FLAG="-DCMAKE_OSX_ARCHITECTURES=${{ matrix.arch }}"
           else
             ARCH_FLAG=""
           fi
@@ -85,7 +83,9 @@ jobs:
       
       - name: Prebuild native addon
         working-directory: bindings/node
-        run: npx prebuildify --napi --strip --arch ${{ matrix.arch }}
+        env:
+          npm_config_arch: ${{ matrix.node_arch }}
+        run: npx prebuildify --napi --strip --arch ${{ matrix.node_arch }}
       
       - name: Upload prebuilds
         uses: actions/upload-artifact@v4
