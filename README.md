@@ -32,20 +32,28 @@ Lui is intended to be used as a subproject by plugin developers.
 
 ## Building
 
-To build and install, run
-```
-$ meson setup build
-$ ninja -C build
-$ ninja -C test
-$ ninja install # optional
+To build and install, run:
+```bash
+cmake -B build -G Ninja
+ninja -C build
+ninja -C build test
+sudo ninja -C build install  # optional
 ```
 
-For MSVC on Windows, use:
+### Building Documentation
+
+```bash
+# Install dependencies first
+brew install doxygen graphviz  # macOS
+pip3 install sphinx sphinx-rtd-theme
+
+# Build docs
+ninja -C build docs
 ```
-meson setup build
-meson compile -C build
-meson test -C build
-```
+
+Documentation will be generated in `build/doc/`:
+- API Reference: `build/doc/api/index.html`
+- User Guide: `build/doc/html/index.html`
 
 ## Widgets Demo
 
