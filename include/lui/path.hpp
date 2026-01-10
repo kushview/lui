@@ -185,7 +185,7 @@ public:
         auto hh   = height * 0.5f;
         auto hh55 = hh * 0.55f;
         auto cx   = x + hw;
-        auto cy   = x + hh;
+        auto cy   = y + hh;
 
         move_to (cx, cy - hh);
         cubic_to (cx + hw55, cy - hh, cx + hw, cy - hh55, cx + hw, cy);

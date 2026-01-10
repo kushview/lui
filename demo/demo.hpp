@@ -22,6 +22,7 @@ enum ID {
     DIALS,
     BUTTONS,
     IMAGES,
+    CIRCLE_TEST,
     NUM_DEMOS,
     // disabled: move these above NUM_DEMOS and rebuild to enable.
     ENTRY,
@@ -44,6 +45,9 @@ static std::string name (int did) {
             break;
         case SLIDERS:
             return "Sliders";
+            break;
+        case CIRCLE_TEST:
+            return "Shapes";
             break;
         case EMBED:
             return "Embed";

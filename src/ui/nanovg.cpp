@@ -150,6 +150,7 @@ private:
     std::unordered_map<uint64_t, int> images;
 
     Point<float> last_pos;
+    bool has_geometry = false; // Track if we've added geometry since last clear_path
 
     struct State {
         NVGcolor color;
@@ -225,28 +226,39 @@ void Context::set_line_width (double width) {
 
 void Context::clear_path() {
     ctx->last_pos = {};
+    ctx->has_geometry = false;
     nvgBeginPath (ctx->ctx);
+    nvgPathWinding (ctx->ctx, NVG_SOLID);
 }
 
 void Context::move_to (double x1, double y1) {
+    // Skip spurious move_to(0,0) if we haven't added any geometry yet
+    // This prevents creating empty sub-paths in NanoVG
+    if (!ctx->has_geometry && x1 == 0.0 && y1 == 0.0) {
+        return;
+    }
+    
     ctx->last_pos.x = x1;
     ctx->last_pos.y = y1;
     nvgMoveTo (ctx->ctx, x1, y1);
 }
 
 void Context::line_to (double x1, double y1) {
+    ctx->has_geometry = true;
     ctx->last_pos.x = x1;
     ctx->last_pos.y = y1;
     nvgLineTo (ctx->ctx, x1, y1);
 }
 
 void Context::quad_to (double x1, double y1, double x2, double y2) {
+    ctx->has_geometry = true;
     ctx->last_pos.x = x2;
     ctx->last_pos.y = y2;
     nvgQuadTo (ctx->ctx, x1, y1, x2, y2);
 }
 
 void Context::cubic_to (double x1, double y1, double x2, double y2, double x3, double y3) {
+    ctx->has_geometry = true;
     ctx->last_pos.x = x3;
     ctx->last_pos.y = y3;
     nvgBezierTo (ctx->ctx, x1, y1, x2, y2, x3, y3);
@@ -258,12 +270,10 @@ void Context::close_path() {
 
 void Context::fill() {
     nvgFill (ctx->ctx);
-    clear_path();
 }
 
 void Context::stroke() {
     nvgStroke (ctx->ctx);
-    clear_path();
 }
 
 void Context::clip (const Rectangle<int>& r) {
@@ -317,13 +327,13 @@ void Context::restore() { ctx->restore(); }
 
 void Context::fill_rect (const Rectangle<double>& r) {
     nvgBeginPath (ctx->ctx);
+    nvgRect (ctx->ctx, (r.x), (r.y), r.width, r.height);
+    fill();
+}
 
-    nvgRect (ctx->ctx,
-             (r.x),
-             (r.y),
-             r.width,
-             r.height);
-
+void Context::fill_ellipse (double cx, double cy, double rx, double ry) {
+    nvgBeginPath (ctx->ctx);
+    nvgEllipse (ctx->ctx, cx, cy, rx, ry);
     fill();
 }
 

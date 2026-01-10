@@ -41,6 +41,7 @@ public:
     void set_fill (const Fill& fill) override;
 
     void fill_rect (const Rectangle<double>& r) override;
+    void fill_ellipse (double cx, double cy, double rx, double ry);
 
     FontMetrics font_metrics() const noexcept override;
     TextMetrics text_metrics (std::string_view text) const noexcept override;

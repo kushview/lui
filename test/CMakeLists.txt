@@ -38,7 +38,6 @@ target_compile_definitions(lui-unit PRIVATE
 
 target_link_libraries(lui-unit PRIVATE
     lui-${LUI_ABI_VERSION}
-    GTest::gtest
     GTest::gtest_main
 )
 

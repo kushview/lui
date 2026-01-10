@@ -24,6 +24,7 @@ set(LIBLUI_DEMO_SOURCES
     entry.cpp
     images.cpp
     sliders.cpp
+    shapes.cpp
     ${DEMO_RES_GENERATED}
 )
 

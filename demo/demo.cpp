@@ -12,6 +12,7 @@ extern std::unique_ptr<Widget> create_entry_demo();
 extern std::unique_ptr<Widget> create_sliders_demo();
 extern std::unique_ptr<Widget> create_images_demo();
 extern std::unique_ptr<Widget> create_dials_demo();
+extern std::unique_ptr<Widget> create_shapes_demo();
 
 Content::Content()
     : sidebar (*this) {
@@ -76,6 +77,9 @@ void Content::run_demo (int index) {
             break;
         case SLIDERS:
             demo = create_sliders_demo();
+            break;
+        case CIRCLE_TEST:
+            demo = create_shapes_demo();
             break;
         case EMBED:
             demo.reset (new Embedding());
