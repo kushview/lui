@@ -1,7 +1,7 @@
 // Copyright 2019 Michael Fisher <mfisher@lvtk.org>
 // SPDX-License-Identifier: ISC
 
-#include <boost/test/unit_test.hpp>
+#include <gtest/gtest.h>
 #include <lui/string.hpp>
 
 #define LOREM_IPSUM \
@@ -9,55 +9,51 @@
 
 using namespace lui;
 
-BOOST_AUTO_TEST_SUITE (String)
-
-BOOST_AUTO_TEST_CASE (ctors) {
+TEST(String, ctors) {
     using lui::String;
     auto a = String();
     a      = String ("lv2");
-    BOOST_REQUIRE_EQUAL (a, "lv2");
+    EXPECT_EQ (a, "lv2");
     a = String (String (std::string ("rules")));
-    BOOST_REQUIRE_EQUAL (a, "rules");
+    EXPECT_EQ (a, "rules");
 
     a = String ("test_1");
-    BOOST_REQUIRE_EQUAL (a, "test_1");
-    BOOST_REQUIRE_EQUAL (a, std::string ("test_1"));
-    BOOST_REQUIRE_EQUAL (a, String ("test_1"));
-    BOOST_REQUIRE_NE (a, "s df ");
-    BOOST_REQUIRE_NE (a, std::string ("seee"));
-    BOOST_REQUIRE_NE (a, String ("test_1 "));
+    EXPECT_EQ (a, "test_1");
+    EXPECT_EQ (a, std::string ("test_1"));
+    EXPECT_EQ (a, String ("test_1"));
+    EXPECT_NE (a, "s df ");
+    EXPECT_NE (a, std::string ("seee"));
+    EXPECT_NE (a, String ("test_1 "));
 }
 
-BOOST_AUTO_TEST_CASE (streams) {
+TEST(String, streams) {
     using lui::String;
     String s1 = "hello";
-    BOOST_REQUIRE_EQUAL (s1, "hello");
+    EXPECT_EQ (s1, "hello");
     s1 << " " << String ("world");
-    BOOST_REQUIRE_EQUAL (s1, "hello world");
+    EXPECT_EQ (s1, "hello world");
 
     s1.clear();
     s1 << int (1);
-    BOOST_REQUIRE_EQUAL (s1.str(), "1");
+    EXPECT_EQ (s1.str(), "1");
 
     s1.clear();
     s1 << char ('B');
-    BOOST_REQUIRE_EQUAL (s1.str(), "B");
+    EXPECT_EQ (s1.str(), "B");
 
     s1.clear();
     s1 << int64_t (100);
-    BOOST_REQUIRE_EQUAL (s1.str(), "100");
+    EXPECT_EQ (s1.str(), "100");
 
     s1.clear();
     s1 << double (1.555000);
-    BOOST_REQUIRE_EQUAL (s1.str(), "1.555000");
+    EXPECT_EQ (s1.str(), "1.555000");
 
     s1.clear();
     s1 << float (1.444000);
-    BOOST_REQUIRE_EQUAL (s1.str(), "1.444000");
+    EXPECT_EQ (s1.str(), "1.444000");
 
     s1.clear();
     s1 << LOREM_IPSUM;
-    BOOST_REQUIRE_EQUAL (s1, LOREM_IPSUM);
+    EXPECT_EQ (s1, LOREM_IPSUM);
 }
-
-BOOST_AUTO_TEST_SUITE_END()

@@ -3,5 +3,4 @@
 
 #pragma once
 
-#include <lui/lui.h>
-#include <lui/lui.hpp>
+#include <gtest/gtest.h>

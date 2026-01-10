@@ -75,8 +75,8 @@ endif()
 # Tests
 option(LUI_BUILD_TESTS "Build unit tests" ON)
 if(LUI_BUILD_TESTS)
-    # enable_testing()
-    # add_subdirectory(test)
+    enable_testing()
+    add_subdirectory(test)
 endif()
 
 # Documentation

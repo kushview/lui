@@ -1,58 +1,43 @@
 // Copyright 2019 Michael Fisher <mfisher@lvtk.org>
 // SPDX-License-Identifier: ISC
 
-#include "lui/weak_ref.hpp"
 #include "tests.hpp"
-#include <boost/test/unit_test.hpp>
+#include "lui/weak_ref.hpp"
 #include <memory>
 
-struct WeakRefTest {
-    void basics() {
-        auto uptr1   = std::make_unique<TestObject>();
-        TestRef ref1 = uptr1.get();
-        BOOST_REQUIRE (ref1.lock() != nullptr);
-        BOOST_REQUIRE (ref1.valid());
-        BOOST_REQUIRE (ref1 != nullptr);
-        uptr1.reset();
-        BOOST_REQUIRE (ref1.lock() == nullptr);
-        BOOST_REQUIRE (! ref1.valid());
-        BOOST_REQUIRE (ref1 == nullptr);
-    }
+class TestObject {
+public:
+    TestObject() { weak_status.reset (this); }
+    virtual ~TestObject() { weak_status.reset(); }
 
-    void subclass() {
-        auto uptr1   = std::make_unique<SubObject>();
-        TestRef ref1 = uptr1.get();
-        BOOST_REQUIRE (ref1.lock() != nullptr);
-        BOOST_REQUIRE (ref1.valid());
-        BOOST_REQUIRE (ref1.as<SubObject>() != nullptr);
-        uptr1.reset();
-        BOOST_REQUIRE (ref1.lock() == nullptr);
-        BOOST_REQUIRE (! ref1.valid());
-        BOOST_REQUIRE (ref1.as<SubObject>() == nullptr);
-    }
-
-    class TestObject {
-    public:
-        TestObject() { weak_status.reset (this); }
-        virtual ~TestObject() { weak_status.reset(); }
-
-    private:
-        LUI_WEAK_REFABLE_WITH_MEMBER (TestObject, weak_status)
-    };
-
-    class SubObject : public TestObject {};
-
-    using TestRef = lui::WeakRef<TestObject>;
+private:
+    LUI_WEAK_REFABLE_WITH_MEMBER (TestObject, weak_status)
 };
 
-BOOST_AUTO_TEST_SUITE (WeakRef)
+class SubObject : public TestObject {};
 
-BOOST_AUTO_TEST_CASE (basics) {
-    WeakRefTest().basics();
+using TestRef = lui::WeakRef<TestObject>;
+
+TEST(WeakRef, basics) {
+    auto uptr1   = std::make_unique<TestObject>();
+    TestRef ref1 = uptr1.get();
+    EXPECT_NE (ref1.lock(), nullptr);
+    EXPECT_TRUE (ref1.valid());
+    EXPECT_NE (ref1, nullptr);
+    uptr1.reset();
+    EXPECT_EQ (ref1.lock(), nullptr);
+    EXPECT_FALSE (ref1.valid());
+    EXPECT_EQ (ref1, nullptr);
 }
 
-BOOST_AUTO_TEST_CASE (subclass) {
-    WeakRefTest().subclass();
+TEST(WeakRef, subclass) {
+    auto uptr1   = std::make_unique<SubObject>();
+    TestRef ref1 = uptr1.get();
+    EXPECT_NE (ref1.lock(), nullptr);
+    EXPECT_TRUE (ref1.valid());
+    EXPECT_NE (ref1.as<SubObject>(), nullptr);
+    uptr1.reset();
+    EXPECT_EQ (ref1.lock(), nullptr);
+    EXPECT_FALSE (ref1.valid());
+    EXPECT_EQ (ref1.as<SubObject>(), nullptr);
 }
-
-BOOST_AUTO_TEST_SUITE_END()
