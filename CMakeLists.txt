@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.20)
 
+# Suppress CMP0167 warning about FindBoost module removal
+cmake_policy(SET CMP0167 OLD)
+
 project(lui
     VERSION 0.0.1
     LANGUAGES CXX C

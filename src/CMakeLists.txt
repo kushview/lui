@@ -19,40 +19,6 @@ foreach(font ${RES_FONTS})
     list(APPEND RES_GENERATED ${output})
 endforeach()
 
-# Create nanovg static library
-add_library(nanovg STATIC
-    nanovg/nanovg.c
-    nanovg/nanovg_gl.c
-)
-
-target_include_directories(nanovg PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/ui
-    ${CMAKE_SOURCE_DIR}/src/ui/pugl/include
-)
-
-target_include_directories(nanovg PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/nanovg
-    ${CMAKE_CURRENT_SOURCE_DIR}
-)
-
-target_compile_definitions(nanovg PRIVATE
-    NANOVG_GL2
-    NVG_NO_STB
-    GL_SILENCE_DEPRECATION
-    # PUGL_DISABLE_DEPRECATED
-)
-
-# Link OpenGL on macOS
-if(APPLE)
-    target_link_libraries(nanovg PRIVATE
-        "-framework OpenGL"
-    )
-endif()
-
-set_target_properties(nanovg PROPERTIES
-    C_VISIBILITY_PRESET hidden
-)
-
 # Main library sources
 set(LIBLUI_SOURCES
     ui/pugl.cpp
@@ -64,6 +30,7 @@ set(LIBLUI_SOURCES
     ui/image.cpp
     ui/main.cpp
     ui/nanovg.cpp
+    ui/nanovglib.cpp
     ui/opengl.cpp
     ui/fitment.cpp
     ui/slider.cpp
@@ -110,9 +77,10 @@ target_include_directories(lui-${LUI_ABI_VERSION} PUBLIC
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
-# Include pugl from subproject
+# Include pugl from subproject and nanovg sources
 target_include_directories(lui-${LUI_ABI_VERSION} PRIVATE
     ${CMAKE_SOURCE_DIR}/src/ui/pugl/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/nanovg
 )
 
 # Link dependencies
@@ -122,7 +90,6 @@ target_link_directories(lui-${LUI_ABI_VERSION} PRIVATE)
 
 target_link_libraries(lui-${LUI_ABI_VERSION} PRIVATE
     Threads::Threads
-    nanovg
 )
 
 # Add Boost if found
