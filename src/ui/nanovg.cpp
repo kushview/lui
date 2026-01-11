@@ -155,14 +155,16 @@ private:
     struct State {
         NVGcolor color;
         Rectangle<float> clip;
+        std::vector<Rectangle<float>> excluded;
         Font font;
         int font_id = 0;
 
         State& operator= (const State& o) {
-            color   = o.color;
-            clip    = o.clip;
-            font    = o.font;
-            font_id = o.font_id;
+            color    = o.color;
+            clip     = o.clip;
+            excluded = o.excluded;
+            font     = o.font;
+            font_id  = o.font_id;
             return *this;
         }
     };
@@ -276,8 +278,9 @@ void Context::stroke() {
     nvgStroke (ctx->ctx);
 }
 
+#define CLIP_WORKAROUND 1
 void Context::clip (const Rectangle<int>& r) {
-#if 1
+#if CLIP_WORKAROUND
     ctx->state.clip = r.as<float>();
     nvgScissor (ctx->ctx,
                 ctx->state.clip.x,
@@ -293,8 +296,59 @@ void Context::clip (const Rectangle<int>& r) {
 }
 
 void Context::exclude_clip (const Rectangle<int>& r) {
-    // noop
-    return;
+#if CLIP_WORKAROUND
+    lui::ignore (r);
+#else
+    auto rf = r.as<float>();
+    
+    // If the exclusion fully contains the current clip, mark clip as empty
+    if (rf.contains (ctx->state.clip)) {
+        ctx->state.clip = Rectangle<float>();
+        nvgScissor (ctx->ctx, 0, 0, 0, 0);
+        return;
+    }
+    
+    // Track excluded region for this state
+    ctx->state.excluded.push_back (rf);
+    
+    // Try to reduce the clip rectangle if exclusion is at an edge
+    auto& c = ctx->state.clip;
+    if (c.empty() || rf.empty())
+        return;
+        
+    // Check if exclusion covers top edge
+    if (rf.x <= c.x && rf.x + rf.width >= c.x + c.width &&
+        rf.y <= c.y && rf.y + rf.height >= c.y) {
+        float new_y = rf.y + rf.height;
+        c.height -= (new_y - c.y);
+        c.y = new_y;
+    }
+    // Check if exclusion covers bottom edge
+    else if (rf.x <= c.x && rf.x + rf.width >= c.x + c.width &&
+             rf.y <= c.y + c.height && rf.y + rf.height >= c.y + c.height) {
+        c.height = rf.y - c.y;
+    }
+    // Check if exclusion covers left edge
+    else if (rf.y <= c.y && rf.y + rf.height >= c.y + c.height &&
+             rf.x <= c.x && rf.x + rf.width >= c.x) {
+        float new_x = rf.x + rf.width;
+        c.width -= (new_x - c.x);
+        c.x = new_x;
+    }
+    // Check if exclusion covers right edge
+    else if (rf.y <= c.y && rf.y + rf.height >= c.y + c.height &&
+             rf.x <= c.x + c.width && rf.x + rf.width >= c.x + c.width) {
+        c.width = rf.x - c.x;
+    }
+    
+    // Update scissor with potentially reduced clip
+    if (c.width > 0 && c.height > 0) {
+        nvgScissor (ctx->ctx, c.x, c.y, c.width, c.height);
+    } else {
+        c = Rectangle<float>();
+        nvgScissor (ctx->ctx, 0, 0, 0, 0);
+    }
+#endif
 }
 
 Rectangle<int> Context::last_clip() const {

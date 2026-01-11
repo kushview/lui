@@ -143,11 +143,14 @@ void Widget::render_all (lui::Widget& widget, Graphics& g) {
         auto cw = impl.widgets[i];
         if (! cw->visible())
             continue;
-
+#define CLIP_WORKAROUND 1
         const auto tb = cw->bounds();
         // FIXME: this itersection check is a workaround for the moment.
+#if CLIP_WORKAROUND
         if (widget.bounds().at (0).intersects (tb)) {
-            // if (cb.intersects (tb)) {
+#else
+        if (cb.intersects (tb)) {
+#endif
             ScopedSave save (g);
 
             if (cw->impl->dont_clip) {
