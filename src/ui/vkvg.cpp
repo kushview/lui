@@ -327,9 +327,7 @@ public:
         set_backend ((uintptr_t) puglVulkanBackend());
         set_view_hint (PUGL_DOUBLE_BUFFER, PUGL_FALSE);
         set_view_hint (PUGL_RESIZABLE, PUGL_FALSE);
-        auto pv = (PuglView*) c_obj();
-        // TODO: make user accesible
-        puglSetViewString (pv, PUGL_WINDOW_TITLE, "LVTK Vulkan Demo");
+        puglSetViewString ((PuglView*) c_obj(), PUGL_WINDOW_TITLE, w.name().c_str());
     }
 
     ~VkvgView() {}

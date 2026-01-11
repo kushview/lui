@@ -8,10 +8,13 @@
 
 #if LUI_DEMO_CAIRO
 #    include <lui/cairo.hpp>
+#    define LUI_DEMO_TITLE "LUI Cairo Demo"
 #elif LUI_DEMO_VULKAN
 #    include <lui/vulkan.hpp>
+#    define LUI_DEMO_TITLE "LUI Vulkan Demo"
 #elif LUI_DEMO_OPENGL
 #    include <lui/opengl.hpp>
+#    define LUI_DEMO_TITLE "LUI OpenGL Demo"
 #endif
 
 #include "demo.hpp"
@@ -23,6 +26,7 @@ template <class Wgt>
 static int run (lui::Main& context) {
     try {
         auto content = std::make_unique<Wgt>();
+        content->set_name (LUI_DEMO_TITLE);
         if (auto view = context.elevate (*content, lui::View::RESIZABLE, 0)) {
             view->set_position ((1920 / 2) - (view->bounds().width / 2),
                                 (1080 / 2) - (view->bounds().height / 2));

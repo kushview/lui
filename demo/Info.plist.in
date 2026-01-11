@@ -4,11 +4,11 @@
 <plist>
   <dict>
     <key>CFBundleDisplayName</key>
-    <string>LVTK</string>
+    <string>@MACOSX_BUNDLE_BUNDLE_NAME@</string>
     <key>CFBundleIdentifier</key>
-    <string>org.lvtk.demo</string>
+    <string>@MACOSX_BUNDLE_GUI_IDENTIFIER@</string>
     <key>CFBundleName</key>
-    <string>LVTK</string>
+    <string>@MACOSX_BUNDLE_BUNDLE_NAME@</string>
     <key>NSAppTransportSecurity</key>
     <dict>
       <key>NSAllowsArbitraryLoads</key>
@@ -19,7 +19,7 @@
       <key>NSAppleEventsUsageDescription</key>
     <string>This is required for some third-party plug-ins to function correctly.</string>
     <key>CFBundleExecutable</key>
-    <string>lui-demo</string>
+    <string>@MACOSX_BUNDLE_EXECUTABLE_NAME@</string>
     <!-- <key>CFBundleIconFile</key>
     <string>Icon.icns</string> -->
     <key>CFBundlePackageType</key>
@@ -27,11 +27,11 @@
     <key>CFBundleSignature</key>
     <string>????</string>
     <key>CFBundleShortVersionString</key>
-    <string>3.0.0</string>
+    <string>@MACOSX_BUNDLE_SHORT_VERSION_STRING@</string>
     <key>CFBundleVersion</key>
-    <string>3.0.0</string>
+    <string>@MACOSX_BUNDLE_BUNDLE_VERSION@</string>
     <key>NSHumanReadableCopyright</key>
-    <string>Copyright (c) 2014-2023 Michael Fisher</string>
+    <string>@MACOSX_BUNDLE_COPYRIGHT@</string>
     <key>NSHighResolutionCapable</key>
     <true/>
     <key>CFBundleDocumentTypes</key>

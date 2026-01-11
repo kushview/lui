@@ -6,6 +6,7 @@
 #include "gl.hpp"
 #include "nanovg.hpp"
 #include <lui/opengl.hpp>
+#include <lui/widget.hpp>
 
 #include <iostream>
 namespace lui {
@@ -33,8 +34,7 @@ public:
         set_view_hint (PUGL_CONTEXT_VERSION_MINOR, 6);
 #endif
         set_view_hint (PUGL_DOUBLE_BUFFER, PUGL_FALSE);
-        // TODO: make user accesible
-        puglSetViewString ((PuglView*) c_obj(), PUGL_WINDOW_TITLE, "LVTK - NanoVG Demo");
+        puglSetViewString ((PuglView*) c_obj(), PUGL_WINDOW_TITLE, widget.name().c_str());
     }
 
     ~OpenGLView() {

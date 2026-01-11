@@ -277,9 +277,7 @@ public:
         set_backend ((uintptr_t) puglCairoBackend());
         set_view_hint (PUGL_DOUBLE_BUFFER, PUGL_FALSE);
         set_view_hint (PUGL_RESIZABLE, PUGL_TRUE);
-        // auto pv = (PuglView*) c_obj();
-        // TODO: make user accesible
-        // puglSetViewString (pv, PUGL_WINDOW_TITLE, "LVTK Cairo Demo");
+        puglSetViewString ((PuglView*) c_obj(), PUGL_WINDOW_TITLE, w.name().c_str());
     }
 
     ~View() {}
