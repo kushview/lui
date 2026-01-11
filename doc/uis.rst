@@ -4,7 +4,7 @@
 UIs
 ###
 
-LVTK provides a core UI template that implements boilerplate code needed
+Lui provides a core UI template that implements boilerplate code needed
 for an LV2 UI.  LV2 features are implemented via 
 :doc:`extension mixin templates <extensions>`. Below is an overview of how this
 works.  See the `C++ API Docs <api/classlui_1_1UI.html>`_ for details on UI
@@ -83,7 +83,7 @@ with :class:`lui::UIDescriptor`.
         }
     );
 
-When the descriptor is added to the global stack. LVTK internally registers
+When the descriptor is added to the global stack. Lui internally registers
 it to automatically be returned in LV2's ``lv2_ui_descriptor()`` entry function.
 
 --------

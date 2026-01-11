@@ -114,7 +114,7 @@ Use when a struct or class has options or settings pertaining to itself,
 the typename is like a "namespace" for the values, or is considered a
 "smart" enum with methods attached.
 
-This is the most commonly used format throughout LVTK. Enums of this
+This is the most commonly used format throughout Lui. Enums of this
 type should implement operators for equality, assignment, and copy
 construction.
 

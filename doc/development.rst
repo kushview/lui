@@ -15,7 +15,7 @@ pkg-config_ packages are provided that link with the UI library and desired back
    pkg-config --cflags --libs lui-gl-0.0
    pkg-config --cflags --libs lui-cairo-0.0
 
-Depending on one of these packages should be all that is necessary to use LVTK,
+Depending on one of these packages should be all that is necessary to use Lui,
 but details on the individual libraries that are installed are available in the README.
 
 If you are instead building directly from source,
@@ -26,7 +26,7 @@ It is only necessary to build the platform and backend implementations that you 
 Meson Subproject
 ****************
 
-LVTK can also be included as a `meson subproject <https://mesonbuild.com/Subprojects.html>`_.
+Lui can also be included as a `cmake sub directory <https://mesonbuild.com/Subprojects.html>`_.
 
 *************
 API Reference

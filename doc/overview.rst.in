@@ -6,7 +6,7 @@
 Overview
 ########
 
-LVTK is a C++ library for Plugin and GUI developers.
+Lui is a C++ library for Plugin and GUI developers.
 If you would rather see the reference docs, refer instead to 
 the `C++ API documentation <api/index.html>`_.
 
@@ -41,7 +41,7 @@ Versioning
 - **Library**: `@LUI_VERSION@`
 - **ABI**: `@lui_abi_version@`
 
-LVTK uses two version types. A typical lib version and an ABI compatibility
+Lui uses two version types. A typical lib version and an ABI compatibility
 version. Installation of headers and shared object naming works the same way
 as Gtkmm.
 
@@ -114,13 +114,13 @@ For clarity, here is a glossary of terms used throughout this manual.
    A host `Application` which loads LV2 `Modules`.
 
 **Wrapper**
-   An LVTK class that wraps an LV2 C-primitive.
+   An Lui class that wraps an LV2 C-primitive.
 
 **Container**
    `LV2 Context:`
-      An LVTK class that wraps an LV2 C-primitive in a STL container.
+      An Lui class that wraps an LV2 C-primitive in a STL container.
 
    `GUI Context:`
-      An LVTK Widget sub-class which lays out children in a predictable way. (like a VBox or HBox)
+      An Lui Widget sub-class which lays out children in a predictable way. (like a VBox or HBox)
 
 .. toctree::

@@ -2,7 +2,7 @@
 Projects
 ########
 
-Listing of projects using LVTK. Want to see your project here?  Make a 
+Listing of projects using Lui. Want to see your project here?  Make a 
 `pull request on Gitlab <https://gitlab.com/lvtk/lvtk/-/blob/main/doc/projects.rst>`__ 
 for review!
 

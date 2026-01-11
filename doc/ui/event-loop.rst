@@ -6,7 +6,7 @@
 Event Loop
 ----------
 
-LVTK does not contain any threads or other event loop "magic".
+Lui does not contain any threads or other event loop "magic".
 For flexibility, the event loop is driven manually by repeatedly calling :func:`Main::loop`,
 which processes events from the window system and dispatches them to views when necessary.
 

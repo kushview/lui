@@ -14,7 +14,7 @@ top-level system window. [#f1]_
 
 This seems backwards? Shouldn't a View own a Widget?. You would think so,
 but structuring it this way makes it easier to deal with the non-global-staticness
-of LVTK and the rest of LV2 architecture.
+of Lui and the rest of LV2 architecture.
 
 It also makes it possible for client code to only have to do two things
 memory management-wise:
@@ -35,7 +35,7 @@ PopUp menus, Main menus, hidden event views, etc...
 Dispatcher
 **********
 
-LVTK communicates with :class:`Widget` by dispatching events in the view received
+Lui communicates with :class:`Widget` by dispatching events in the view received
 from Pugl. :class:`Backends` are :class:`View` factories providing custom
 functionality on a per-backend basis.
 

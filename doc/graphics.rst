@@ -42,7 +42,7 @@ Highlevel drawing context.  Passed to widgets by the View for all rendering.
 Fonts
 -----
 
-Font support in LVTK is current limited to the built-in font.  The Font class
+Font support in Lui is currently limited to the built-in font.  The Font class
 can be used to change size and style though.
 
 --------
