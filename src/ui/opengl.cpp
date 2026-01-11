@@ -2,13 +2,14 @@
 // SPDX-License-Identifier: ISC
 
 #include <cassert>
+#include <iostream>
 
-#include "gl.hpp"
-#include "nanovg.hpp"
 #include <lui/opengl.hpp>
 #include <lui/widget.hpp>
 
-#include <iostream>
+#include "gl.hpp"
+#include "nanovg.hpp"
+
 namespace lui {
 
 using OpenGLContext = nvg::Context;

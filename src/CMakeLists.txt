@@ -21,7 +21,6 @@ endforeach()
 
 # Main library sources
 set(LIBLUI_SOURCES
-    ui/pugl.cpp
     ui/button.cpp
     ui/embed.cpp
     ui/entry.cpp
@@ -29,29 +28,36 @@ set(LIBLUI_SOURCES
     ui/graphics.cpp
     ui/image.cpp
     ui/main.cpp
-    ui/nanovg.cpp
-    ui/nanovglib.cpp
-    ui/opengl.cpp
     ui/fitment.cpp
     ui/slider.cpp
     ui/style.cpp
     ui/view.cpp
     ui/widget.cpp
+    "ui/pugl/src/common.c"
+    "ui/pugl/src/internal.c"
 )
 
-# Platform-specific sources
+# Platform-specific sources and options
 if(APPLE)
-    list(APPEND LIBLUI_SOURCES ui/pugl.mm ui/embed_mac.mm)
+    list(APPEND LIBLUI_SOURCES 
+        ui/embed_mac.mm
+        ui/pugl/src/mac.m)
+    set_source_files_properties(
+        ui/pugl/src/mac.m
+        ui/pugl/src/mac_cairo.m 
+        ui/pugl/src/mac_gl.m PROPERTIES
+            COMPILE_FLAGS "-Wno-deprecated")
 elseif(UNIX AND NOT APPLE)
-    list(APPEND LIBLUI_SOURCES ui/embed_x11.cpp)
+    list(APPEND LIBLUI_SOURCES 
+        ui/embed_x11.cpp)
 elseif(WIN32)
-    list(APPEND LIBLUI_SOURCES ui/embed_win32.cpp)
+    list(APPEND LIBLUI_SOURCES 
+        ui/embed_win32.cpp)
 endif()
 
 # Create the main library
 add_library(lui-${LUI_ABI_VERSION}
     ${LIBLUI_SOURCES}
-    ${RES_GENERATED}
 )
 
 # Set properties
@@ -63,34 +69,28 @@ set_target_properties(lui-${LUI_ABI_VERSION} PROPERTIES
 )
 
 # Add compile definitions
-target_compile_definitions(lui-${LUI_ABI_VERSION} PRIVATE
-    LUI_BUILD
-    PUGL_STATIC
-    NANOVG_GL2
+target_compile_definitions(lui-${LUI_ABI_VERSION}
+    PRIVATE
+        LUI_BUILD
+        PUGL_STATIC
 )
 
 # Include directories
 target_include_directories(lui-${LUI_ABI_VERSION} PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
-    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
     $<INSTALL_INTERFACE:include>
-    ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 # Include pugl from subproject and nanovg sources
 target_include_directories(lui-${LUI_ABI_VERSION} PRIVATE
-    ${CMAKE_SOURCE_DIR}/src/ui/pugl/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/nanovg
-)
+    ${PROJECT_SOURCE_DIR}/src/ui/pugl/include)
 
 # Link dependencies
 target_include_directories(lui-${LUI_ABI_VERSION} PRIVATE)
-
 target_link_directories(lui-${LUI_ABI_VERSION} PRIVATE)
-
-target_link_libraries(lui-${LUI_ABI_VERSION} PRIVATE
-    Threads::Threads
-)
+target_link_libraries(lui-${LUI_ABI_VERSION} 
+    PRIVATE Threads::Threads)
 
 # Apple frameworks
 if(APPLE)
@@ -110,47 +110,72 @@ install(TARGETS lui-${LUI_ABI_VERSION}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
-# Cairo Backend
-if(CAIRO_FOUND)
-    add_library(lui-cairo-${LUI_ABI_VERSION}
-        ui/cairo.cpp
-        ui/pugl/src/mac_cairo.m
-    )
-    
-    set_target_properties(lui-cairo-${LUI_ABI_VERSION} PROPERTIES
+function(lui_setup_backend_library tgt)
+    set_target_properties(${tgt} PROPERTIES
         VERSION ${PROJECT_VERSION}
         SOVERSION ${LUI_ABI_VERSION}
         CXX_VISIBILITY_PRESET hidden
         VISIBILITY_INLINES_HIDDEN ON
     )
-    
-    target_compile_definitions(lui-cairo-${LUI_ABI_VERSION} PRIVATE
+
+    target_compile_definitions(${tgt} PRIVATE 
+        PUGL_STATIC 
         LUI_BUILD
-        PUGL_STATIC
     )
+
+    target_include_directories(${tgt}
+        PRIVATE
+            ${PROJECT_SOURCE_DIR}/src/ui/pugl/include
+            $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>
+        PUBLIC
+            $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
+            $<INSTALL_INTERFACE:include>
+            ${CAIRO_INCLUDE_DIRS}
+    )
+
+    install(TARGETS ${tgt}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    )
+endfunction()
+
+# OpenGL/NanoVG Backend
+add_library(lui-gl-${LUI_ABI_VERSION}
+    ui/nanovg.cpp
+    ui/nanovglib.cpp
+    ui/opengl.cpp
+    ${RES_GENERATED}
+)
+
+if(APPLE)
+    target_sources(lui-gl-${LUI_ABI_VERSION} PRIVATE
+        ui/pugl/src/mac_gl.m)
+endif()
+
+lui_setup_backend_library(lui-gl-${LUI_ABI_VERSION})
+target_include_directories(lui-gl-${LUI_ABI_VERSION} 
+    PRIVATE
+        ${CMAKE_CURRENT_BINARY_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}/nanovg)
+target_compile_definitions(lui-gl-${LUI_ABI_VERSION} PRIVATE NANOVG_GL2)
+
+# Cairo Backend
+if(CAIRO_FOUND)
+    add_library(lui-cairo-${LUI_ABI_VERSION}
+        ui/cairo.cpp
+        ui/pugl/src/mac_cairo.m)
     
-    target_include_directories(lui-cairo-${LUI_ABI_VERSION} PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
-        $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>
-        $<INSTALL_INTERFACE:include>
-        ${CAIRO_INCLUDE_DIRS}
-    )
+    lui_setup_backend_library(lui-cairo-${LUI_ABI_VERSION})
     
-    target_include_directories(lui-cairo-${LUI_ABI_VERSION} PRIVATE
-        ${CMAKE_SOURCE_DIR}/src/ui/pugl/include
-    )
-    
-    target_link_directories(lui-cairo-${LUI_ABI_VERSION} PRIVATE
-        ${CAIRO_LIBRARY_DIRS}
-    )
-    
-    target_link_libraries(lui-cairo-${LUI_ABI_VERSION} PUBLIC
-        lui-${LUI_ABI_VERSION}
-    )
-    
-    target_link_libraries(lui-cairo-${LUI_ABI_VERSION} PRIVATE
-        ${CAIRO_LIBRARIES}
-    )
+    target_include_directories(lui-cairo-${LUI_ABI_VERSION} 
+        PRIVATE ${CAIRO_INCLUDE_DIRS})
+    target_link_directories(lui-cairo-${LUI_ABI_VERSION}
+        PRIVATE ${CAIRO_LIBRARY_DIRS})
+    target_link_libraries(lui-cairo-${LUI_ABI_VERSION}
+        PUBLIC lui-${LUI_ABI_VERSION})
+    target_link_libraries(lui-cairo-${LUI_ABI_VERSION}
+        PRIVATE ${CAIRO_LIBRARIES})
     
     # Platform-specific Cairo libraries
     if(APPLE)
@@ -162,12 +187,6 @@ if(CAIRO_FOUND)
             gdi32
         )
     endif()
-    
-    install(TARGETS lui-cairo-${LUI_ABI_VERSION}
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    )
     
     message(STATUS "Cairo backend enabled - building lui-cairo-${LUI_ABI_VERSION}")
 else()

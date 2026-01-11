@@ -1,10 +1,10 @@
 # Demo resources
-set(DEMO_RES_FILES
+set(demo_res_files
     res/lv2_logo.png
 )
 
-set(DEMO_RES_GENERATED)
-foreach(resource ${DEMO_RES_FILES})
+set(demo_res_generated)
+foreach(resource ${demo_res_files})
     get_filename_component(resource_name ${resource} NAME)
     set(output "${CMAKE_CURRENT_BINARY_DIR}/${resource_name}.h")
     add_custom_command(
@@ -14,7 +14,7 @@ foreach(resource ${DEMO_RES_FILES})
         DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${resource}
         COMMENT "Generating ${resource_name}.h"
     )
-    list(APPEND DEMO_RES_GENERATED ${output})
+    list(APPEND demo_res_generated ${output})
 endforeach()
 
 # Demo library sources
@@ -25,7 +25,7 @@ set(LIBLUI_DEMO_SOURCES
     images.cpp
     sliders.cpp
     shapes.cpp
-    ${DEMO_RES_GENERATED}
+    ${demo_res_generated}
 )
 
 # Create demo library (static)
@@ -34,62 +34,53 @@ add_library(lui-demo STATIC ${LIBLUI_DEMO_SOURCES})
 target_include_directories(lui-demo PRIVATE
     ${PROJECT_SOURCE_DIR}/include
     ${PROJECT_SOURCE_DIR}/src
-    ${CMAKE_CURRENT_BINARY_DIR}
-)
-
+    ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(lui-demo PRIVATE
     lui-${LUI_ABI_VERSION}
-    Threads::Threads
-)
+    Threads::Threads)
 
-# Demo executable
-add_executable(lui-demo-exe
-    main.cpp
-)
+function(lui_add_demo tgt)
+    if(ARGC GREATER 1)
+        set(bundle_name ${ARGV1})
+    else()
+        set(bundle_name ${tgt})
+    endif()
+    
+    add_executable(${tgt} main.cpp)
+    target_include_directories(${tgt} PRIVATE
+        ${CMAKE_SOURCE_DIR}/include
+        ${CMAKE_SOURCE_DIR}/src)
+    target_compile_definitions(${tgt} PRIVATE LUI_NO_SYMBOL_EXPORT)
+    target_link_libraries(${tgt} PRIVATE lui-demo)
 
-set_target_properties(lui-demo-exe PROPERTIES
-    OUTPUT_NAME lui-demo
-)
+    if(APPLE)
+        set_target_properties(${tgt} PROPERTIES
+            OUTPUT_NAME "${bundle_name}"
+            MACOSX_BUNDLE TRUE
+            MACOSX_BUNDLE_BUNDLE_NAME "${bundle_name}"
+            MACOSX_BUNDLE_GUI_IDENTIFIER "net.kushview.lui.demo"
+            MACOSX_BUNDLE_SHORT_VERSION_STRING "${PROJECT_VERSION}"
+            MACOSX_BUNDLE_BUNDLE_VERSION "${PROJECT_VERSION}"
+            MACOSX_BUNDLE_COPYRIGHT "Copyright (c) Kushview, LLC"
+            MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in"
+        )
+    endif()
 
-if(APPLE)
-    set_target_properties(lui-demo-exe PROPERTIES
-        OUTPUT_NAME LUI
-        MACOSX_BUNDLE TRUE
-        MACOSX_BUNDLE_BUNDLE_NAME "LUI"
-        MACOSX_BUNDLE_GUI_IDENTIFIER "net.kushview.lui.demo"
-        MACOSX_BUNDLE_EXECUTABLE_NAME "LUI"
-        MACOSX_BUNDLE_SHORT_VERSION_STRING "${PROJECT_VERSION}"
-        MACOSX_BUNDLE_BUNDLE_VERSION "${PROJECT_VERSION}"
-        MACOSX_BUNDLE_COPYRIGHT "Copyright (c) Kushview, LLC"
-        MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in"
+    install(TARGETS ${tgt}
+        RUNTIME DESTINATION bin
+        BUNDLE DESTINATION Applications
     )
-endif()
+endfunction()
 
-target_include_directories(lui-demo-exe PRIVATE
-    ${CMAKE_SOURCE_DIR}/include
-    ${CMAKE_SOURCE_DIR}/src
-)
+lui_add_demo(lui-demo-gl)
+target_compile_definitions(lui-demo-gl PRIVATE LUI_DEMO_OPENGL=1)
+target_link_directories(lui-demo-gl PRIVATE ${CAIRO_LIBRARY_DIRS})
+target_link_libraries(lui-demo-gl PRIVATE lui-gl-${LUI_ABI_VERSION})
 
-target_compile_definitions(lui-demo-exe PRIVATE
-    LUI_NO_SYMBOL_EXPORT
-    LUI_DEMO_CAIRO=1
-)
-
-target_link_libraries(lui-demo-exe PRIVATE
-    lui-demo
-)
-
+# Cairo
 if(CAIRO_FOUND)
-    target_link_directories(lui-demo-exe PRIVATE
-        ${CAIRO_LIBRARY_DIRS}
-    )
-    target_link_libraries(lui-demo-exe PRIVATE
-        lui-cairo-${LUI_ABI_VERSION}
-    )
+    lui_add_demo(lui-demo-cairo)
+    target_compile_definitions(lui-demo-cairo PRIVATE LUI_DEMO_CAIRO=1)
+    target_link_directories(lui-demo-cairo PRIVATE ${CAIRO_LIBRARY_DIRS})
+    target_link_libraries(lui-demo-cairo PRIVATE lui-cairo-${LUI_ABI_VERSION})
 endif()
-
-# Install
-install(TARGETS lui-demo-exe
-    RUNTIME DESTINATION bin
-    BUNDLE DESTINATION Applications
-)
