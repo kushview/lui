@@ -25,20 +25,30 @@ public:
                      Justify::MID_LEFT);
     }
 
+    bool key_down (const KeyEvent& ev) {
+        if (ev.key() == PUGL_KEY_BACKSPACE) {
+            handle_backspace();
+            owner.repaint();
+            return true;
+        } else if (ev.key() == PUGL_KEY_DELETE) {
+            handle_delete();
+            owner.repaint();
+            return true;
+        }
+        return false;
+    }
+
     bool text_entry (const TextEvent& ev) {
         auto osize = current_text.size();
 
         for (const auto c : ev.body) {
             if (c >= ' ' && c <= '~') {
                 current_text += c;
-                ++cursor;
-            } else if (c == PUGL_KEY_BACKSPACE) {
-                handle_backspace();
-            } else if (c == PUGL_KEY_DELETE) {
-                handle_delete();
             }
         }
 
+        cursor = current_text.size();
+        
         if (osize != current_text.size())
             owner.repaint();
         return true;
@@ -50,9 +60,10 @@ public:
     }
 
     void handle_backspace() {
-        current_text.pop_back();
-        if (cursor > 0)
+        if (cursor > 0 && !current_text.empty()) {
             --cursor;
+            current_text.erase (cursor, 1);
+        }
     }
 
 private:
@@ -70,6 +81,7 @@ Entry::~Entry() { impl.reset(); }
 
 void Entry::pressed (const Event& ev) { grab_focus(); }
 void Entry::paint (Graphics& g) { impl->paint (g); }
+bool Entry::key_down (const KeyEvent& ev) { return impl->key_down (ev); }
 bool Entry::text_entry (const TextEvent& ev) { return impl->text_entry (ev); }
 
 } // namespace lui

@@ -23,9 +23,9 @@ enum ID {
     BUTTONS,
     IMAGES,
     CIRCLE_TEST,
+    ENTRY,
     NUM_DEMOS,
     // disabled: move these above NUM_DEMOS and rebuild to enable.
-    ENTRY,
     EMBED
 };
 

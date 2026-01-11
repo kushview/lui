@@ -26,6 +26,8 @@ private:
     }
 
     /** @private */
+    bool key_down (const KeyEvent& ev) override;
+    /** @private */
     bool text_entry (const TextEvent& ev) override;
     /** @private */
     void paint (Graphics& g) override;
