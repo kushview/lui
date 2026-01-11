@@ -11,7 +11,7 @@ Point
 -----
 
 Represents an XY coordinate.
-`lvtk.Point <api/classlui_1_1Point.html>`__
+`lui.Point <api/classlui_1_1Point.html>`__
 
 ---------
 Rectangle
@@ -49,7 +49,7 @@ can be used to change size and style though.
 Typeface
 --------
 
-:class:`lvtk.Typeface` is the data portion of fonts. Currently is a placeholder in the
+:class:`lui.Typeface` is the data portion of fonts. Currently is a placeholder in the
 API.
 
 **Reference**
@@ -62,7 +62,7 @@ API.
     * - Name
       - C++
       - Lua
-    * - :class:`lvtk.Typeface`
+    * - :class:`lui.Typeface`
       - `Graphics <../api/classlui_1_1Typeface.html>`__
       - N/A
 
@@ -70,8 +70,8 @@ API.
 Font
 ----
 
-:class:`lvtk.Font` is the working part of font handling.  Use this glass to configure
-font style and pass to :class:`lvtk.Graphics` functions.
+:class:`lui.Font` is the working part of font handling.  Use this glass to configure
+font style and pass to :class:`lui.Graphics` functions.
 
 **Reference**
 
@@ -83,6 +83,6 @@ font style and pass to :class:`lvtk.Graphics` functions.
     * - Name
       - C++
       - Lua
-    * - :class:`lvtk.Font`
+    * - :class:`lui.Font`
       - `Graphics <../api/classlui_1_1Font.html>`__
       - N/A

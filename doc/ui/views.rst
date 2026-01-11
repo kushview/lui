@@ -1,6 +1,6 @@
 .. default-domain:: cpp
 .. highlight:: cpp
-.. namespace:: lvtk
+.. namespace:: lui
 
 #####
 Views

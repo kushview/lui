@@ -1,6 +1,6 @@
 .. default-domain:: cpp
 .. highlight:: cpp
-.. namespace:: lvtk
+.. namespace:: lui
 
 ########
 Overview
@@ -12,10 +12,10 @@ the `C++ API documentation <api/index.html>`_.
 
 The C++ Plugin, UI, extension, and utility templates are very lightweight and 
 do not require virtual functions, RTTI, exceptions, or linking to the C++ standard 
-library. They are provided by the package ``lvtk-3`` which must be used in addition 
+library. They are provided by the package ``lui-3`` which must be used in addition 
 to binary libraries if wanted.
 
-The core API (excluding library-specific components) is declared in ``lvtk.hpp``:
+The core API (excluding library-specific components) is declared in ``lui.hpp``:
 
 .. code-block:: cpp
 
@@ -64,7 +64,7 @@ ABI does not affect header-only libraries or lua.  It only affects the widgets, 
 UI backend support libs.
 
 Libraries and headers get installed in subdirs relating to the ABI version. i.e.
-headers go to $includedir/lvtk-$abi and binary libraries to to $libdir/lvtk-$abi
+headers go to $includedir/lui-$abi and binary libraries to to $libdir/lui-$abi
 
 *********
 Libraries
@@ -105,7 +105,7 @@ For clarity, here is a glossary of terms used throughout this manual.
       A loadable module such as an LV2 plugin, UI, Dynamic Manifest, etc...
    
    `Lua Context:`
-      A literal Lua module that you ``require ('lvtk.ModuleName')`` in ``.lua`` code.
+      A literal Lua module that you ``require ('lui.ModuleName')`` in ``.lua`` code.
 
 **Application**
    A standalone program. On windows this would be a runnable ``.exe``

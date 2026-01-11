@@ -3,7 +3,7 @@ Projects
 ########
 
 Listing of projects using Lui. Want to see your project here?  Make a 
-`pull request on Gitlab <https://gitlab.com/lvtk/lvtk/-/blob/main/doc/projects.rst>`__ 
+`pull request on Gitlab <https://gitlab.com/lui/lui/-/blob/main/doc/projects.rst>`__ 
 for review!
 
 .. list-table::

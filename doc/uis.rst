@@ -18,18 +18,18 @@ callbacks.
 Instance
 --------
 
-:class:`lvtk.UI` is a template base class for LV2 UI instances. 
+:class:`lui.UI` is a template base class for LV2 UI instances. 
 Default implementations exist for most core callbacks, so you only have to 
 implement :func:`widget()` and :func:`port_event()`.
 
-The signature of subclass must match the one in ``lvtk/ui.hpp`` header. The
+The signature of subclass must match the one in ``lui/ui.hpp`` header. The
 ``args`` should be used in your constructor to get "details" about instantiation.
 
 Since this is a template, simulated dynamic binding is used for the callbacks.
-When using :class:`lvtk.Extension`  "extensions" no vtable lookups are invoked, 
+When using :class:`lui.Extension`  "extensions" no vtable lookups are invoked, 
 like normal dynamic binding would.
 
-Including the ``lvtk/ui.hpp`` header also adds ``lv2ui_descriptor`` so you don't
+Including the ``lui/ui.hpp`` header also adds ``lv2ui_descriptor`` so you don't
 have to.
 
 ---------
@@ -56,7 +56,7 @@ Callbacks
 
 :func:`write()`
 
-    Write data to plugin ports.  Uses an internal :class:`lvtk.Controller`
+    Write data to plugin ports.  Uses an internal :class:`lui.Controller`
     that implements LV2 standard methods of port writing.
 
 :func:`cleanup()`
@@ -115,4 +115,4 @@ Example without Extensions
     };
 
     // Register a descriptor for this plugin type
-    static Descriptor<CopyAudio> copyaudio ("https://lvtk.org/plugins/CopyAudio");
+    static Descriptor<CopyAudio> copyaudio ("https://lui.org/plugins/CopyAudio");
