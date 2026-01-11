@@ -56,7 +56,11 @@ jobs:
           else
             ARCH_FLAG=""
           fi
-          cmake -B build-node -G Ninja -DLUI_BUILD_TESTS=OFF -DLUI_BUILD_DEMO=OFF -DLUI_NODE=ON $ARCH_FLAG
+          cmake -B build-node -G Ninja \
+            -DLUI_BUILD_TESTS=OFF \
+            -DLUI_BUILD_DEMO=OFF \
+            -DLUI_BUILD_CAIRO=OFF \
+            -DLUI_NODE=ON $ARCH_FLAG
           ninja -C build-node src/liblui-0.0.a
           mkdir -p build-node/lib
           cp build-node/src/liblui-0.0.a build-node/lib/

@@ -52,7 +52,8 @@ jobs:
             -DCMAKE_OSX_ARCHITECTURES=${{ matrix.cmake_arch }} \
             -DLUI_BUILD_TESTS=ON \
             -DLUI_BUILD_DEMO=ON \
-            -DLUI_BUILD_DOCS=OFF
+            -DLUI_BUILD_DOCS=OFF \
+            -DLUI_BUILD_CAIRO=${{ matrix.cmake_arch == 'x86_64' && 'OFF' || 'ON' }}
       
       - name: Configure CMake (Linux)
         if: runner.os == 'Linux'

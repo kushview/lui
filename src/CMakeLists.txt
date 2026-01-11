@@ -110,7 +110,7 @@ install(TARGETS lui-${LUI_ABI_VERSION}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
-function(lui_setup_backend_library tgt)
+function(lui_add_backend tgt)
     set_target_properties(${tgt} PROPERTIES
         VERSION ${PROJECT_VERSION}
         SOVERSION ${LUI_ABI_VERSION}
@@ -153,7 +153,7 @@ if(APPLE)
         ui/pugl/src/mac_gl.m)
 endif()
 
-lui_setup_backend_library(lui-gl-${LUI_ABI_VERSION})
+lui_add_backend(lui-gl-${LUI_ABI_VERSION})
 target_include_directories(lui-gl-${LUI_ABI_VERSION} 
     PRIVATE
         ${CMAKE_CURRENT_BINARY_DIR}
@@ -166,7 +166,7 @@ if(CAIRO_FOUND)
         ui/cairo.cpp
         ui/pugl/src/mac_cairo.m)
     
-    lui_setup_backend_library(lui-cairo-${LUI_ABI_VERSION})
+    lui_add_backend(lui-cairo-${LUI_ABI_VERSION})
     
     target_include_directories(lui-cairo-${LUI_ABI_VERSION} 
         PRIVATE ${CAIRO_INCLUDE_DIRS})
