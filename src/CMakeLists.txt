@@ -109,3 +109,67 @@ install(TARGETS lui-${LUI_ABI_VERSION}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
+
+# Cairo Backend
+if(CAIRO_FOUND)
+    add_library(lui-cairo-${LUI_ABI_VERSION}
+        ui/cairo.cpp
+        ui/pugl/src/mac_cairo.m
+    )
+    
+    set_target_properties(lui-cairo-${LUI_ABI_VERSION} PROPERTIES
+        VERSION ${PROJECT_VERSION}
+        SOVERSION ${LUI_ABI_VERSION}
+        CXX_VISIBILITY_PRESET hidden
+        VISIBILITY_INLINES_HIDDEN ON
+    )
+    
+    target_compile_definitions(lui-cairo-${LUI_ABI_VERSION} PRIVATE
+        LUI_BUILD
+        PUGL_STATIC
+    )
+    
+    target_include_directories(lui-cairo-${LUI_ABI_VERSION} PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>
+        $<INSTALL_INTERFACE:include>
+        ${CAIRO_INCLUDE_DIRS}
+    )
+    
+    target_include_directories(lui-cairo-${LUI_ABI_VERSION} PRIVATE
+        ${CMAKE_SOURCE_DIR}/src/ui/pugl/include
+    )
+    
+    target_link_directories(lui-cairo-${LUI_ABI_VERSION} PRIVATE
+        ${CAIRO_LIBRARY_DIRS}
+    )
+    
+    target_link_libraries(lui-cairo-${LUI_ABI_VERSION} PUBLIC
+        lui-${LUI_ABI_VERSION}
+    )
+    
+    target_link_libraries(lui-cairo-${LUI_ABI_VERSION} PRIVATE
+        ${CAIRO_LIBRARIES}
+    )
+    
+    # Platform-specific Cairo libraries
+    if(APPLE)
+        target_link_libraries(lui-cairo-${LUI_ABI_VERSION} PRIVATE
+            "-framework CoreGraphics"
+        )
+    elseif(WIN32)
+        target_link_libraries(lui-cairo-${LUI_ABI_VERSION} PRIVATE
+            gdi32
+        )
+    endif()
+    
+    install(TARGETS lui-cairo-${LUI_ABI_VERSION}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    )
+    
+    message(STATUS "Cairo backend enabled - building lui-cairo-${LUI_ABI_VERSION}")
+else()
+    message(STATUS "Cairo not found - Cairo backend will not be built")
+endif()

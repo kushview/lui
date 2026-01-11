@@ -45,6 +45,7 @@ include(FindPkgConfig)
 include(GNUInstallDirs)
 
 # Find Cairo (optional for now)
+set(ENV{PKG_CONFIG_PATH} "/opt/lui/lib/pkgconfig:$ENV{PKG_CONFIG_PATH}")
 pkg_check_modules(CAIRO cairo>=1.16.0)
 
 # Python 3 for scripts

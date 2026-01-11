@@ -37,10 +37,6 @@ target_include_directories(lui-demo PRIVATE
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
-target_link_directories(lui-demo PRIVATE
-    ${CAIRO_LIBRARY_DIRS}
-)
-
 target_link_libraries(lui-demo PRIVATE
     lui-${LUI_ABI_VERSION}
     Threads::Threads
@@ -76,12 +72,21 @@ target_include_directories(lui-demo-exe PRIVATE
 
 target_compile_definitions(lui-demo-exe PRIVATE
     LUI_NO_SYMBOL_EXPORT
-    LUI_DEMO_OPENGL=1
+    LUI_DEMO_CAIRO=1
 )
 
 target_link_libraries(lui-demo-exe PRIVATE
     lui-demo
 )
+
+if(CAIRO_FOUND)
+    target_link_directories(lui-demo-exe PRIVATE
+        ${CAIRO_LIBRARY_DIRS}
+    )
+    target_link_libraries(lui-demo-exe PRIVATE
+        lui-cairo-${LUI_ABI_VERSION}
+    )
+endif()
 
 # Install
 install(TARGETS lui-demo-exe

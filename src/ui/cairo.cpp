@@ -18,6 +18,7 @@
 #include <pugl/cairo.h>
 
 #include <lui/cairo.hpp>
+#include <lui/widget.hpp>
 
 namespace lui {
 namespace cairo {

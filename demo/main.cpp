@@ -37,8 +37,9 @@ static int run (lui::Main& context) {
             if (! context.running())
                 break;
         }
-    } catch (...) {
-        std::cerr << "[demo] fatal error in main loop\n";
+    } catch (const std::exception& e) {
+        std::cerr << "[demo] fatal error in main loop" << std::endl
+                  << "[demo] " << e.what() << std::endl;
         context.set_exit_code (-1);
     }
 

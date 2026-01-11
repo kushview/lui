@@ -4,7 +4,6 @@
 #include <lui/path.hpp>
 
 #include "demo.hpp"
-#include "../src/ui/nanovg.hpp"
 
 namespace lui {
 namespace demo {
@@ -27,16 +26,18 @@ protected:
         auto spacing = 150.0f;
         auto start_x = 100.0f;
 
-        // Circle with stroke (using nvgEllipse directly)
-        auto& ctx = dynamic_cast<nvg::Context&>(g.context());
+        // White filled circle
         g.set_color (Color (0xffffffff));
-        ctx.fill_ellipse (start_x + shape_size/2, center_y, shape_size/2, shape_size/2);
+        Path circle_fill;
+        circle_fill.add_ellipse (start_x, center_y - shape_size/2, shape_size, shape_size);
+        g.fill_path (circle_fill);
         
+        // Red circle stroke
         g.set_color (Color (0xffff0000));
         g.context().set_line_width (3.0);
-        Path circle;
-        circle.add_ellipse (start_x, center_y - shape_size/2, shape_size, shape_size);
-        g.stroke_path (circle);
+        Path circle_stroke;
+        circle_stroke.add_ellipse (start_x, center_y - shape_size/2, shape_size, shape_size);
+        g.stroke_path (circle_stroke);
         
         // Green rectangle
         g.set_color (Color (0xff00ff00));
