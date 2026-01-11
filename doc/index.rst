@@ -1,5 +1,5 @@
 ####
-LVTK
+Lui
 ####
 
 .. include:: summary.rst
@@ -7,16 +7,10 @@ LVTK
 .. toctree::
 
     Overview <overview>
-    
-    Plugin <plugins>
-    UI <uis>
     Backends <backends>
-    Extensions <extensions>
     Graphics <graphics>
+    UI <uis>
     Widgets <widgets>
-    Hosting <hosting>
-    DynManifest <dynmanifest>
-    High Level <highlevel>
     Projects Using <projects>
     Developers <development>
     Style Guide <styleguide>

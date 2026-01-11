@@ -1,8 +1,8 @@
-project = "LVTK"
-copyright = "2022, Michael Fisher"
+project = "Lui"
+copyright = "Kushview, LLC"
 author = "Michael Fisher"
-version = "3.0"
-release = "@LUI_VERSION@"
+version = "@PROJECT_VERSION@"
+release = "@PROJECT_VERSION@"
 
 master_doc = 'index'
 

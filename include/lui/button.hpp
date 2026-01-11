@@ -1,4 +1,4 @@
-// Copyright 2022 Michael Fisher <mfisher@lvtk.org>
+// Copyright 2022-2026 Kushview, LLC
 // SPDX-License-Identifier: ISC
 
 #pragma once
@@ -42,7 +42,9 @@ protected:
         @param highlight True if should be highlighted
         @param down True if currently pressed
     */
-    virtual void paint_button (Graphics& g, bool highlight, bool down) {}
+    virtual void paint_button (Graphics& g, bool highlight, bool down) {
+        lui::ignore (g, highlight, down);
+    }
 
     /** @private */
     void paint (Graphics& g) override;
