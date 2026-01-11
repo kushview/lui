@@ -1,0 +1,11 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+exec_prefix=${prefix}
+libdir=${exec_prefix}/@CMAKE_INSTALL_LIBDIR@
+includedir=${prefix}/include
+
+Name: Lui Cairo
+Description: Lui Cairo graphics backend
+Version: @PROJECT_VERSION@
+Requires: lui-@LUI_ABI_VERSION@ = @PROJECT_VERSION@, cairo
+Libs: -L${libdir} -llui-cairo-@LUI_ABI_VERSION@
+Cflags: -I${includedir}

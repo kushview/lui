@@ -3,17 +3,17 @@ Developers
 ##########
 
 *********************
-Building Against LVTK
+Building Against Lui
 *********************
 
-When LVTK is installed,
+When Lui is installed,
 pkg-config_ packages are provided that link with the UI library and desired backend:
 
 .. code-block:: sh
 
-   pkg-config --cflags --libs lvtk-3
-   pkg-config --cflags --libs lvtk-ui-3
-   pkg-config --cflags --libs lvtk-gl-3
+   pkg-config --cflags --libs lui-0.0
+   pkg-config --cflags --libs lui-gl-0.0
+   pkg-config --cflags --libs lui-cairo-0.0
 
 Depending on one of these packages should be all that is necessary to use LVTK,
 but details on the individual libraries that are installed are available in the README.

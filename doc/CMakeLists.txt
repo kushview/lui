@@ -22,6 +22,10 @@ if(DOXYGEN_FOUND)
         VERBATIM
     )
     
+    # Make clean delete the generated HTML documentation
+    set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_CLEAN_FILES 
+        ${CMAKE_BINARY_DIR}/doc/api)
+
     message(STATUS "Doxygen found - 'make doxygen' target available")
 else()
     message(STATUS "Doxygen not found - API documentation will not be built")
@@ -84,6 +88,10 @@ if(SPHINX_EXECUTABLE)
         COMMENT "Generating documentation with Sphinx"
         VERBATIM
     )
+    
+    # Make clean delete the generated HTML documentation
+    set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_CLEAN_FILES 
+        ${CMAKE_BINARY_DIR}/doc/html)
     
     message(STATUS "Sphinx found - 'make sphinx' target available")
 else()

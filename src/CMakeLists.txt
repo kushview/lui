@@ -110,6 +110,16 @@ install(TARGETS lui-${LUI_ABI_VERSION}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
+# Generate and install pkg-config file for main library
+configure_file(
+    ${CMAKE_SOURCE_DIR}/lui.pc.in
+    ${CMAKE_BINARY_DIR}/lui-${LUI_ABI_VERSION}.pc
+    @ONLY
+)
+install(FILES ${CMAKE_BINARY_DIR}/lui-${LUI_ABI_VERSION}.pc
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
+)
+
 function(lui_add_backend tgt)
     set_target_properties(${tgt} PROPERTIES
         VERSION ${PROJECT_VERSION}
@@ -160,6 +170,16 @@ target_include_directories(lui-gl-${LUI_ABI_VERSION}
         ${CMAKE_CURRENT_SOURCE_DIR}/nanovg)
 target_compile_definitions(lui-gl-${LUI_ABI_VERSION} PRIVATE NANOVG_GL2)
 
+# Generate and install pkg-config file for OpenGL backend
+configure_file(
+    ${CMAKE_SOURCE_DIR}/lui-gl.pc.in
+    ${CMAKE_BINARY_DIR}/lui-gl-${LUI_ABI_VERSION}.pc
+    @ONLY
+)
+install(FILES ${CMAKE_BINARY_DIR}/lui-gl-${LUI_ABI_VERSION}.pc
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
+)
+
 # Cairo Backend
 if(CAIRO_FOUND)
     add_library(lui-cairo-${LUI_ABI_VERSION}
@@ -189,6 +209,16 @@ if(CAIRO_FOUND)
     endif()
     
     message(STATUS "Cairo backend enabled - building lui-cairo-${LUI_ABI_VERSION}")
+    
+    # Generate and install pkg-config file for Cairo backend
+    configure_file(
+        ${PROJECT_SOURCE_DIR}/lui-cairo.pc.in
+        ${PROJECT_BINARY_DIR}/lui-cairo-${LUI_ABI_VERSION}.pc
+        @ONLY
+    )
+    install(FILES ${CMAKE_BINARY_DIR}/lui-cairo-${LUI_ABI_VERSION}.pc
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
+    )
 else()
     message(STATUS "Cairo not found - Cairo backend will not be built")
 endif()

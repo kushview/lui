@@ -1,0 +1,11 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+exec_prefix=${prefix}
+libdir=${exec_prefix}/@CMAKE_INSTALL_LIBDIR@
+includedir=${prefix}/include
+
+Name: Lui OpenGL
+Description: Lui OpenGL/NanoVG graphics backend
+Version: @PROJECT_VERSION@
+Requires: lui-@LUI_ABI_VERSION@ = @PROJECT_VERSION@
+Libs: -L${libdir} -llui-gl-@LUI_ABI_VERSION@
+Cflags: -I${includedir}
