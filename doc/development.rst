@@ -23,7 +23,7 @@ all of the implementation files are in the ``src`` directory.
 It is only necessary to build the platform and backend implementations that you need.
 
 ****************
-Meson Subproject
+CMake Subproject
 ****************
 
 Lui can also be included as a `cmake sub directory <https://mesonbuild.com/Subprojects.html>`_.
@@ -35,6 +35,5 @@ API Reference
 Looking for the API docs?
 
 - `C++ API documentation <api/index.html>`_.
-- `Lua API documentation <#>`_.
 
 .. _pkg-config: https://www.freedesktop.org/wiki/Software/pkg-config/
