@@ -19,8 +19,10 @@ enable_testing()
 include(GoogleTest)
 
 set(UNIT_TEST_SOURCES
+    fitment_test.cpp
     observer_test.cpp
     string_test.cpp
+    transform_test.cpp
     weak_ref_test.cpp
     ui_font_test.cpp
 )

@@ -6,6 +6,7 @@
 #include <cmath>
 
 #include <lui/lui.h>
+#include <lui/point.hpp>
 
 namespace lui {
 
@@ -69,6 +70,18 @@ public:
     Transform scaled (double factor) const noexcept {
         return { factor * m00, factor * m01, factor * m02, 
                  factor * m10, factor * m11, factor * m12 };
+    }
+
+    /** Apply this transformation to a point.
+        @param point The point to transform
+        @return The transformed point
+    */
+    template <typename T>
+    Point<T> map (const Point<T>& point) const noexcept {
+        return {
+            static_cast<T> (m00 * point.x + m01 * point.y + m02),
+            static_cast<T> (m10 * point.x + m11 * point.y + m12)
+        };
     }
     // clang-format on
 };
