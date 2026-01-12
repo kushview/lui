@@ -140,9 +140,11 @@ public:
                     _item.y3 = *_i++;
                     break;
                 case PathOp::CLOSE:
-                    _item.x1         = _item.y1 =
-                        _item.x2     = _item.y2 =
-                            _item.x3 = _item.y3 = 0.f;
+                    // clang-format off
+                    _item.x1 = _item.y1 =
+                    _item.x2 = _item.y2 =
+                    _item.x3 = _item.y3 = 0.f;
+                    // clang-format on
                     break;
                 default:
                     break;
