@@ -1,3 +1,7 @@
+#!/bin/sh
+# SPDX-License-Identifier: ISC
+# Copyright Kushview, LLC
+
 export PKG_CONFIG_PATH=""
 export PKG_CONFIG_LIBDIR=""
 

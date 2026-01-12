@@ -6,7 +6,7 @@ Source: https://lvtk.org
 Files: *.clang* *.clang* *meson.build *.gitignore *.gitlab-ci.yml meson/*ini AUTHORS *.wrap 
   .vscode/*.json *README.md ChangeLog doc/* ./meson_options.txt scripts/*.imp 
   deploy/*.* demo/Info.plist* .editorconfig .github/* bindings/node/.npmignore
-  bindings/node/binding.gyp bindings/node/package*.json
+  bindings/node/binding.gyp bindings/node/package*.json *.pc.in
 Copyright: 2025 Michael Fisher <mfisher@lvtk.org>
 License: CC0-1.0 OR ISC
 

@@ -6,6 +6,8 @@ project(lui
     DESCRIPTION "LUI - A Modern C++ UI Library"
 )
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # Require C++20 and C99
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
