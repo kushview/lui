@@ -8,7 +8,7 @@
 #include <Cocoa/Cocoa.h>
 #include <iostream>
 
-#include "ui/detail/embed.hpp"
+#include "detail/embed.hpp"
 
 namespace lui {
 namespace detail {

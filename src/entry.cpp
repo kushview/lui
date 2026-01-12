@@ -5,7 +5,7 @@
 
 #include <lui/entry.hpp>
 
-#include "ui/detail/pugl.hpp"
+#include "detail/pugl.hpp"
 
 namespace lui {
 namespace detail {

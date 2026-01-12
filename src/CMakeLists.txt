@@ -1,8 +1,8 @@
 # Generate font resources using bin2c.py
 set(RES_FONTS
-    ui/res/Roboto-Regular.ttf
-    ui/res/Roboto-Bold.ttf
-    ui/res/Roboto-Light.ttf
+    res/Roboto-Regular.ttf
+    res/Roboto-Bold.ttf
+    res/Roboto-Light.ttf
 )
 
 set(RES_GENERATED)
@@ -21,38 +21,38 @@ endforeach()
 
 # Main library sources
 set(LIBLUI_SOURCES
-    ui/button.cpp
-    ui/embed.cpp
-    ui/entry.cpp
-    ui/font.cpp
-    ui/graphics.cpp
-    ui/image.cpp
-    ui/main.cpp
-    ui/fitment.cpp
-    ui/slider.cpp
-    ui/style.cpp
-    ui/view.cpp
-    ui/widget.cpp
-    "ui/pugl/src/common.c"
-    "ui/pugl/src/internal.c"
+    button.cpp
+    embed.cpp
+    entry.cpp
+    font.cpp
+    graphics.cpp
+    image.cpp
+    main.cpp
+    fitment.cpp
+    slider.cpp
+    style.cpp
+    view.cpp
+    widget.cpp
+    pugl/src/common.c
+    pugl/src/internal.c
 )
 
 # Platform-specific sources and options
 if(APPLE)
     list(APPEND LIBLUI_SOURCES 
-        ui/embed_mac.mm
-        ui/pugl/src/mac.m)
+        embed_mac.mm
+        pugl/src/mac.m)
     set_source_files_properties(
-        ui/pugl/src/mac.m
-        ui/pugl/src/mac_cairo.m 
-        ui/pugl/src/mac_gl.m PROPERTIES
+        pugl/src/mac.m
+        pugl/src/mac_cairo.m 
+        pugl/src/mac_gl.m PROPERTIES
             COMPILE_FLAGS "-Wno-deprecated")
 elseif(UNIX AND NOT APPLE)
     list(APPEND LIBLUI_SOURCES 
-        ui/embed_x11.cpp)
+        embed_x11.cpp)
 elseif(WIN32)
     list(APPEND LIBLUI_SOURCES 
-        ui/embed_win32.cpp)
+        embed_win32.cpp)
 endif()
 
 # Create the main library
@@ -84,7 +84,7 @@ target_include_directories(lui-${LUI_ABI_VERSION} PUBLIC
 
 # Include pugl from subproject and nanovg sources
 target_include_directories(lui-${LUI_ABI_VERSION} PRIVATE
-    ${PROJECT_SOURCE_DIR}/src/ui/pugl/include)
+    ${PROJECT_SOURCE_DIR}/src/pugl/include)
 
 # Link dependencies
 target_include_directories(lui-${LUI_ABI_VERSION} PRIVATE)
@@ -135,7 +135,7 @@ function(lui_add_backend tgt)
 
     target_include_directories(${tgt}
         PRIVATE
-            ${PROJECT_SOURCE_DIR}/src/ui/pugl/include
+            ${PROJECT_SOURCE_DIR}/src/pugl/include
             $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>
         PUBLIC
             $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
@@ -154,15 +154,15 @@ endfunction()
 
 # OpenGL/NanoVG Backend
 add_library(lui-gl-${LUI_ABI_VERSION}
-    ui/nanovg.cpp
-    ui/nanovglib.cpp
-    ui/opengl.cpp
+    nanovg.cpp
+    nanovglib.cpp
+    opengl.cpp
     ${RES_GENERATED}
 )
 
 if(APPLE)
     target_sources(lui-gl-${LUI_ABI_VERSION} PRIVATE
-        ui/pugl/src/mac_gl.m)
+        pugl/src/mac_gl.m)
     target_link_libraries(lui-gl-${LUI_ABI_VERSION} 
         PRIVATE "-framework OpenGL")
 endif()
@@ -187,8 +187,8 @@ install(FILES ${CMAKE_BINARY_DIR}/lui-gl-${LUI_ABI_VERSION}.pc
 # Cairo Backend
 if(CAIRO_FOUND)
     add_library(lui-cairo-${LUI_ABI_VERSION}
-        ui/cairo.cpp
-        ui/pugl/src/mac_cairo.m)
+        cairo.cpp
+        pugl/src/mac_cairo.m)
     
     lui_add_backend(lui-cairo-${LUI_ABI_VERSION})
     

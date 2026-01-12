@@ -9,8 +9,8 @@
 #include <lui/style.hpp>
 #include <lui/widget.hpp>
 
-#include "ui/detail/view.hpp"
-#include "ui/detail/widget.hpp"
+#include "detail/view.hpp"
+#include "detail/widget.hpp"
 
 namespace lui {
 

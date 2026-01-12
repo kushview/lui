@@ -3,7 +3,7 @@
 
 #include <memory>
 
-#include "ui/detail/embed.hpp"
+#include "detail/embed.hpp"
 
 namespace lui {
 namespace detail {

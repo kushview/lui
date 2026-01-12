@@ -6,7 +6,7 @@
 #include <lui/embed.hpp>
 #include <lui/main.hpp>
 
-#include "ui/detail/embed.hpp"
+#include "detail/embed.hpp"
 
 #include <X11/Xlib.h>
 

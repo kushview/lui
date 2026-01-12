@@ -13,7 +13,7 @@
 #include <lui/slider.hpp>
 #include <lui/view.hpp>
 
-#include "ui/detail/view.hpp"
+#include "detail/view.hpp"
 
 namespace lui {
 namespace detail {

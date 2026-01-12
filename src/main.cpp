@@ -10,10 +10,10 @@
 #define PUGL_DISABLE_DEPRECATED
 #include <pugl/pugl.h>
 
-#include "ui/detail/default_style.hpp"
-#include "ui/detail/main.hpp"
-#include "ui/detail/view.hpp"
-#include "ui/detail/widget.hpp"
+#include "detail/default_style.hpp"
+#include "detail/main.hpp"
+#include "detail/view.hpp"
+#include "detail/widget.hpp"
 
 namespace lui {
 namespace detail {

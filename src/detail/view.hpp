@@ -15,8 +15,8 @@
 #define PUGL_DISABLE_DEPRECATED
 #include <pugl/pugl.h>
 
-#include "ui/detail/main.hpp"
-#include "ui/detail/widget.hpp"
+#include "detail/main.hpp"
+#include "detail/widget.hpp"
 
 #ifndef LUI_DISABLE_CLIPPING
 #    define LUI_DISABLE_CLIPPING 1
