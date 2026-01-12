@@ -5,11 +5,25 @@
 export PKG_CONFIG_PATH=""
 export PKG_CONFIG_LIBDIR=""
 
-rm -rf build-cairo
+cairogit="https://gitlab.freedesktop.org/cairo/cairo.git"
+cairorev="200a02286bfe9a39839b9fc8d715b852ccf25d71"
+
+workdir="/tmp/cairo-build"
+cairodir="${workdir}/cairo"
+builddir="${workdir}/build"
+prefix="$HOME/SDKs/cairo"
 
 set -e
 
-meson setup -Dprefix=/opt/lui \
+rm -rf "${workdir}"
+mkdir -p "${workdir}"
+
+trap 'rm -rf "${workdir}"' EXIT
+
+git clone --depth=1 "${cairogit}" "${cairodir}"
+git -C "${cairodir}" checkout "${cairorev}"
+
+meson setup -Dprefix="${prefix}" \
     -Ddefault_library=static \
     -Dtee=disabled \
     -Dxcb=disabled \
@@ -26,10 +40,7 @@ meson setup -Dprefix=/opt/lui \
     -Dpng=disabled \
     -Dquartz=enabled \
     -Dpixman:tests=disabled \
-    "$(pwd)/build-cairo" \
-    "$(pwd)/cairo"
+    "${builddir}" "${cairodir}"
 
-meson compile -C build-cairo
-sudo rm -rf /opt/lui
-sudo ninja install -C build-cairo
-sudo rm -rf build-cairo
+meson compile -C "${builddir}"
+ninja install -C "${builddir}"
