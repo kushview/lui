@@ -56,7 +56,7 @@ public:
 
     /** Copy a path */
     Path (const Path& o) { operator= (o); }
-    Path& operator= (const Path& o) {
+    constexpr Path& operator= (const Path& o) {
         std::copy (o._data.begin(), o._data.end(), _data.begin());
         return *this;
     }
@@ -69,7 +69,7 @@ public:
     }
 
     /** Clear the path */
-    void clear() noexcept { _data.clear(); }
+    constexpr void clear() noexcept { _data.clear(); }
 
     void begin_path() {
         clear();
@@ -175,9 +175,9 @@ public:
     /** End iter */
     auto end() const noexcept { return iterator (_data.cend()); }
     /** Raw data vector */
-    const auto& data() const noexcept { return _data; }
+    constexpr const auto& data() const noexcept { return _data; }
     /** Reserve amount of bytes */
-    void reserve (std::size_t n) { _data.reserve (_data.size() + n); }
+    constexpr void reserve (std::size_t n) { _data.reserve (_data.size() + n); }
 
     void add_ellipse (float x, float y, float width, float height) noexcept {
         auto hw   = width * 0.5f;

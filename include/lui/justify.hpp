@@ -59,15 +59,15 @@ public:
     }
 
     /** Returns the flags of this Align */
-    uint8_t flags() const noexcept { return _flags; }
+    constexpr uint8_t flags() const noexcept { return _flags; }
 
-    bool operator== (const Justify& o) const noexcept { return _flags == o._flags; }
-    bool operator== (uint8_t o) const noexcept { return _flags == o; }
-    bool operator== (int o) const noexcept { return static_cast<int> (_flags) == o; }
+    constexpr bool operator== (const Justify& o) const noexcept { return _flags == o._flags; }
+    constexpr bool operator== (uint8_t o) const noexcept { return _flags == o; }
+    constexpr bool operator== (int o) const noexcept { return static_cast<int> (_flags) == o; }
 
-    bool operator!= (const Justify& o) const noexcept { return _flags != o._flags; }
-    bool operator!= (uint8_t o) const noexcept { return _flags != o; }
-    bool operator!= (int o) const noexcept { return static_cast<int> (_flags) != o; }
+    constexpr bool operator!= (const Justify& o) const noexcept { return _flags != o._flags; }
+    constexpr bool operator!= (uint8_t o) const noexcept { return _flags != o; }
+    constexpr bool operator!= (int o) const noexcept { return static_cast<int> (_flags) != o; }
 
 private:
     uint8_t _flags = 0;
