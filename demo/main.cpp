@@ -9,9 +9,6 @@
 #if LUI_DEMO_CAIRO
 #    include <lui/cairo.hpp>
 #    define LUI_DEMO_TITLE "LUI Cairo Demo"
-#elif LUI_DEMO_VULKAN
-#    include <lui/vulkan.hpp>
-#    define LUI_DEMO_TITLE "LUI Vulkan Demo"
 #elif LUI_DEMO_OPENGL
 #    include <lui/opengl.hpp>
 #    define LUI_DEMO_TITLE "LUI OpenGL Demo"

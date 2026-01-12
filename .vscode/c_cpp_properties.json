@@ -6,15 +6,6 @@
                 "${workspaceFolder}/include/*",
                 "${workspaceFolder}/demo/*",
                 "${workspaceFolder}/src/*",
-                
-                "${workspaceFolder}/subprojects/lv2/include/*",
-                "${workspaceFolder}/subprojects/lilv/include/*",
-                "${workspaceFolder}/subprojects/suil/include/*",
-                "${workspaceFolder}/subprojects/serd/include/*",
-                "${workspaceFolder}/subprojects/sord/include/*",
-                "${workspaceFolder}/subprojects/sratom/include/*",
-                "${workspaceFolder}/subprojects/pugl/include/*",
-
                 "/opt/homebrew/include/*",
                 "/usr/local/include/*"
             ],
@@ -25,8 +16,8 @@
             ],
             "compilerPath": "/usr/bin/clang",
             "cStandard": "c99",
-            "cppStandard": "c++17",
-            "intelliSenseMode": "clang-x64",
+            "cppStandard": "c++20",
+            "intelliSenseMode": "${default}",
             "compileCommands": "${workspaceFolder}/build/compile_commands.json"
         },
         {

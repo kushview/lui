@@ -9,7 +9,7 @@
 namespace lui {
 
 /** A 32bit color value.
-    The value represented by a uint32_t. e.g. 0xRRGGBBAA
+    The value represented by a uint32_t. e.g. 0xAARRGGBB
     @ingroup graphics
     @headerfile lui/color.hpp
  */
@@ -18,12 +18,12 @@ public:
     /** Create an empty color */
     Color() = default;
 
-    /** Create a color from uint32. The format is like a HEX color.
+    /** Create a color from uint32. The format is 0xAARRGGBB.
      
         @param value The integer value to make from.
 
         @code
-        Color (0xff0000ff) is the same as CSS hex #ff0000ff (RED)
+        Color (0xffff0000) creates a fully opaque red color (alpha=FF, red=FF, green=00, blue=00)
         @endcode
      */
     Color (uint32_t value) { pixel.value = value; }

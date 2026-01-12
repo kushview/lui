@@ -29,7 +29,10 @@ To build Cairo as a static library on macOS with minimal dependencies:
      -Ddwrite=disabled \
      -Dlzo=disabled \
      -Dtests=disabled \
-     -Ddefault_library=static \
+     -Ddefault_library=shared \
+     -Dspectre=disabled \
+     -Dpng=disabled \
+     -Dquartz=enabled \
      build
 
 This configuration disables unnecessary features and dependencies, creating a minimal static build suitable for embedding in LUI on macOS.
