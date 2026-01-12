@@ -1,13 +1,13 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: lui
-Upstream-Contact: Michael Fisher <mfisher@lvtk.org>
-Source: https://lvtk.org
+Upstream-Contact: Michael Fisher <mfisher@kushview.net>
+Source: https://github.com/kushview/lui
 
 Files: *.clang* *.clang* *meson.build *.gitignore *.gitlab-ci.yml meson/*ini AUTHORS *.wrap 
   .vscode/*.json *README.md ChangeLog doc/* ./meson_options.txt scripts/*.imp 
   deploy/*.* demo/Info.plist* .editorconfig .github/* bindings/node/.npmignore
-  bindings/node/binding.gyp bindings/node/package*.json *.pc.in
-Copyright: 2025 Michael Fisher <mfisher@lvtk.org>
+  bindings/node/binding.gyp bindings/node/package*.json *.pc.in cmake/*.*
+Copyright: Kushview LLC
 License: CC0-1.0 OR ISC
 
 Files: subprojects/cairo*/*/*.h subprojects/cairo*/**/*.c subprojects/cairo*/**/*.png
@@ -17,7 +17,7 @@ Files: subprojects/cairo*/*/*.h subprojects/cairo*/**/*.c subprojects/cairo*/**/
 Copyright:  Copyright (C) 2008 Chris Wilson <chris@chris-wilson.co.uk>
 License: MPL-1.1
 
-Files: lvtk.lv2/* resources/*
+Files: resources/*
 Copyright: 2022 Michael Fisher <mfisher@lvtk.org>
 License: ISC
 
