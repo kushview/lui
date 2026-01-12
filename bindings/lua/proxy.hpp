@@ -4,7 +4,7 @@
 #pragma once
 
 #include <lui/widget.hpp>
-#include <sol/sol.hpp>
+#include "./sol/sol.hpp"
 
 namespace lui {
 // proxies are needed to simulate class inherritence

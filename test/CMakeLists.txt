@@ -24,7 +24,7 @@ set(UNIT_TEST_SOURCES
     string_test.cpp
     transform_test.cpp
     weak_ref_test.cpp
-    ui_font_test.cpp
+    font_test.cpp
 )
 
 add_executable(lui-unit ${UNIT_TEST_SOURCES})
@@ -47,11 +47,11 @@ target_link_libraries(lui-unit PRIVATE
 gtest_discover_tests(lui-unit)
 
 # Add REUSE license compliance check
-find_program(REUSE_EXECUTABLE NAMES reuse)
-if(REUSE_EXECUTABLE)
+find_program(REUSE_EXE NAMES reuse)
+if(REUSE_EXE)
     add_test(
         NAME reuse-lint
-        COMMAND ${REUSE_EXECUTABLE} lint
+        COMMAND ${REUSE_EXE} lint
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
     )
     message(STATUS "REUSE found - license compliance test added")

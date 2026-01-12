@@ -1,11 +1,11 @@
 --- Define objects with attributes.
 -- Used to facilitate class inheritance from C/C++ to Lua. 
 -- Multiple inheritance not supported.
--- @module lvtk.object
+-- @module lui.object
 -- @usage
 -- local Animal = object()
 
--- Copyright 2022 Michael Fisher <mfisher@lvtk.org>
+-- Copyright 2022 Kushview, LLC
 -- SPDX-License-Identifier: ISC
 
 local M = {}

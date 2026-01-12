@@ -1,12 +1,13 @@
-// Copyright 2024 Michael Fisher <mfisher@lvtk.org>
+// Copyright 2024 Michael Fisher <mfisher@lui.org>
 // SPDX-License-Identifier: ISC
 
-#include "proxy.hpp"
 #include <lui/cairo.hpp>
 #include <lui/lui.hpp>
 #include <lui/string.hpp>
 
-#include "./lvtk/bindings.h"
+#include "./bindings.h"
+#include "./proxy.hpp"
+#include "./sol/sol.hpp"
 
 namespace sol {
 #if 0
@@ -57,9 +58,9 @@ inline static std::string tostring (Self& self, const char* NS, const char* name
 static inline void require_widget_deps (lua_State* L) {
     state_view view (L);
     view.script (R"(
-        require ('lvtk.Point')
-        require ('lvtk.Bounds')
-        require ('lvtk.Graphics')
+        require ('lui.Point')
+        require ('lui.Bounds')
+        require ('lui.Graphics')
     )");
 }
 
@@ -98,7 +99,7 @@ template <typename Wgt, typename... Args>
 inline static table
     bind_widget (lua_State* L, const char* name, Args&&... args) {
     // clang-format off
-    auto M = lua::bind<Wgt> (L, "lvtk", name,
+    auto M = lua::bind<Wgt> (L, "lui", name,
         /// Initialize the widget.
         // Override this to customize your widget.
         // @function Widget.init
@@ -155,7 +156,7 @@ inline static table
     auto M_mt          = M[metatable_key];
     M_mt["__newindex"] = lua_nil;
 
-    // Called when widget is instantiated by lvtk.object
+    // Called when widget is instantiated by lui.class
     M_mt["__newuserdata"] = [L]() {
         state_view view (L);
         return std::make_unique<Wgt> (view.create_table());
@@ -173,7 +174,7 @@ inline static table
 
     require_widget_deps (L);
     view.script (R"(
-        require ('lvtk.Graphics')
+        require ('lui.Graphics')
     )");
     return M;
 }
@@ -188,31 +189,12 @@ int luaopen_lui_Context (lua_State* L) {
     // This'll need re-done in plain lua if it ever
     // becomes a performance hit in realtime/dsp
     // contexts.
-    auto M = lua::bind<lui::Context> (L, "lvtk", "Context",
-        "symbols", &Context::symbols
-    );
+    auto M = lua::bind<lui::Context> (L, "lui", "Context");
 
     lua::script (L, R"(
-        require ('lvtk.Graphics')
+        require ('lui.Graphics')
     )");
     
-    stack::push (L, M);
-    return 1;
-}
-
-//=============================================================================
-#include <lui/symbols.hpp>
-LUI_LUALIB
-int luaopen_lui_Symbols (lua_State* L) {
-    auto M = lua::bind<lui::Symbols> (L, "lvtk", "Symbols",
-        "map", [](Symbols& self, const char* uri) -> lua_Integer {
-            return static_cast<lua_Integer> (self.map (uri));
-        },
-        "unmap", [](Symbols& self, lua_Integer urid) -> std::string {
-            return self.unmap (static_cast<LV2_URID> (urid));
-        }
-    );
-
     stack::push (L, M);
     return 1;
 }
@@ -223,7 +205,7 @@ LUI_LUALIB
 int luaopen_lui_Point (lua_State* L) {
     using Point = Point<float>;
     using T = float;
-    auto M = lua::bind<Point> (L, "lvtk", "Point",
+    auto M = lua::bind<Point> (L, "lui", "Point",
         "x",        &Point::x,
         "y",        &Point::y,
         "new", factories (
@@ -231,7 +213,7 @@ int luaopen_lui_Point (lua_State* L) {
             [](T x, T y) { return Point{ x, y }; }
         ),
         meta_method::to_string, [](const Point& self) {
-            auto s = lua::tostring (self, "lvtk", "Point");
+            auto s = lua::tostring (self, "lui", "Point");
             s += std::string(": ") + self.str();
             return s;
         }
@@ -246,7 +228,7 @@ LUI_LUALIB
 int luaopen_lui_Bounds (lua_State* L) {
     using R = Bounds;
     using T = int;
-    auto M = lua::bind<Bounds> (L, "lvtk", "Bounds",
+    auto M = lua::bind<Bounds> (L, "lui", "Bounds",
         "x",        &Bounds::x,
         "y",        &Bounds::y,
         "width",    &Bounds::width,
@@ -262,14 +244,14 @@ int luaopen_lui_Bounds (lua_State* L) {
         ),
 
         meta_method::to_string, [](const Bounds& self) {
-            auto s = lua::tostring (self, "lvtk", "Bounds");
+            auto s = lua::tostring (self, "lui", "Bounds");
             s += std::string(": ") + self.str();
             return s;
         }
     );
 
     state_view(L).script (R"(
-        require ('lvtk.Point')
+        require ('lui.Point')
     )");
     stack::push (L, M);
     return 1;
@@ -277,7 +259,7 @@ int luaopen_lui_Bounds (lua_State* L) {
 
 LUI_LUALIB
 int luaopen_lui_Graphics (lua_State* L) {
-    static constexpr const char* ns = "lvtk";
+    static constexpr const char* ns = "lui";
     static constexpr const char* name = "Graphics";
     auto M = lua::bind<lui::Graphics> (L, ns, name,
         "last_clip", &Graphics::last_clip,
@@ -298,8 +280,8 @@ int luaopen_lui_Graphics (lua_State* L) {
 }
 
 LUI_LUALIB
-int luaopen_lui_Surface (lua_State* L) {
-    static constexpr const char* ns = "lvtk";
+int luaopen_lui_DrawingContext (lua_State* L) {
+    static constexpr const char* ns = "lui";
     static constexpr const char* name = "DrawingContext";
     auto M = lua::bind<lui::DrawingContext> (L, ns, name,
         "dummy", []() {}
@@ -313,7 +295,7 @@ int luaopen_lui_Surface (lua_State* L) {
 #include <lui/input.hpp>
 LUI_LUALIB
 int luaopen_lui_Event (lua_State* L) {
-    auto T = lua::bind<lui::Event> (L, "lvtk", "Event",
+    auto T = lua::bind<lui::Event> (L, "lui", "Event",
         "source", readonly_property (&Event::source),
         "pos", readonly_property (&Event::pos),
         "x", readonly_property (&Event::x),
@@ -328,7 +310,7 @@ int luaopen_lui_Event (lua_State* L) {
 #include <lui/main.hpp>
 LUI_LUALIB
 int luaopen_lui_Main (lua_State* L) {
-    auto T = lua::bind<lui::Main> (L, "lvtk", "Main",
+    auto T = lua::bind<lui::Main> (L, "lui", "Main",
         "loop",     &Main::loop,
         "running",  &Main::running,
         "elevate", [](lui::Main& self, object tbl) {
@@ -354,7 +336,6 @@ int luaopen_lui_Main (lua_State* L) {
         "quit", &Main::quit,
         
         "exit_code", &Main::exit_code,
-        "symbols",  &Main::symbols,
         "new", factories ([]() {
             auto obj = std::make_unique<lui::Main>(
                 lui::Mode::PROGRAM,
@@ -366,10 +347,10 @@ int luaopen_lui_Main (lua_State* L) {
     );
 
     lua::script (L, R"(
-        require ('lvtk.Graphics')
-        require ('lvtk.Widget')
-        require ('lvtk.View')
-        require ('lvtk.Event')
+        require ('lui.Graphics')
+        require ('lui.Widget')
+        require ('lui.View')
+        require ('lui.Event')
     )");
 
     stack::push (L, T);
@@ -380,7 +361,7 @@ int luaopen_lui_Main (lua_State* L) {
 #include <lui/view.hpp>
 LUI_LUALIB
 int luaopen_lui_View (lua_State* L) {
-    auto T = lua::bind<lui::View> (L, "lvtk", "View",
+    auto T = lua::bind<lui::View> (L, "lui", "View",
         "visible",  property (&View::visible, &View::set_visible),
         "bounds",       &View::bounds,
         "scale_factor", &View::scale_factor,
@@ -404,66 +385,6 @@ int luaopen_lui_Widget (lua_State* L) {
     return 1;
 }
 
-#include <lui/host/world.hpp>
-LUI_LUALIB
-int luaopen_lui_World (lua_State* L) {
-    auto T = lua::bind<lui::World> (L, "lvtk", "World",
-        "load_all",         &lui::World::load_all,
-        "find",             &lui::World::find,
-        "new", factories ([]() {
-            return std::make_unique<lui::World>();
-        })
-    );
-
-    lua::script (L, R"(
-        require ('lvtk.Instance')
-    )");
-
-    stack::push (L, T);
-    return 1;
-}
-
-#include <lui/host/instance.hpp>
-
-// using sol probably isn't good enough for realtime. This might
-// need re-written in vanilla lua.
-LUI_LUALIB
-int luaopen_lui_Instance (lua_State* L) {
-    auto T = lua::bind<lui::Instance> (L, "lvtk", "Instance",
-        "name",             [](Instance&) {},
-        "activate",         [](Instance&) {},
-        "connect_port",     [](Instance&) {},
-        "run",              [](Instance&) {},
-        "deactivate",       [](Instance&) {}
-    );
-
-    stack::push (L, T);
-    return 1;
-}
-
-#if 0
-LUI_LUALIB
-int luaopen_lui_InstanceUI (lua_State* L) {
-    auto T = lua::bind<lui::InstanceUI> (L, "lvtk", "InstanceUI",
-        "loaded", &lui::InstanceUI::loaded,
-        "unload", &lui::InstanceUI::unload,
-        "world",  &lui::InstanceUI::world,
-        "plugin", &lui::InstanceUI::plugin,
-        "widget", [](lui::InstanceUI& self) -> lua_Integer {
-            return (lua_Integer) self.widget();
-        },
-        "native", &lui::InstanceUI::is_native,
-        "is_a", &lui::InstanceUI::is_a,
-        "idle", &lui::InstanceUI::idle,
-        "show", &lui::InstanceUI::show,
-        "hide", &lui::InstanceUI::hide
-    );
-
-    stack::push (L, T);
-    return 1;
-}
-#endif
-
 // main module
 LUI_LUALIB
 int luaopen_lvtk (lua_State* L) {
@@ -471,22 +392,22 @@ int luaopen_lvtk (lua_State* L) {
     state_view view (L);
     stack::push (L, view.script (R"(
     local M = {
-        bytes       = require ('lvtk.bytes'),
-        import      = require ('lvtk.import'),
-        object      = require ('lvtk.object'),
-        midi        = require ('lvtk.midi'),
-        round       = require ('lvtk.round'),
+        bytes       = require ('lui.bytes'),
+        import      = require ('lui.import'),
+        object      = require ('lui.class'),
+        midi        = require ('lui.midi'),
+        round       = require ('lui.round'),
         
-        Point       = require ('lvtk.Point'),
-        Bounds      = require ('lvtk.Bounds'),
-        Surface     = require ('lvtk.Surface'),
-        Graphics    = require ('lvtk.Graphics'),
-        Event       = require ('lvtk.Event'),
-        Main        = require ('lvtk.Main'),
-        View        = require ('lvtk.View'),
-        Widget      = require ('lvtk.Widget'),
-        World       = require ('lvtk.World'),
-        Symbols     = require ('lvtk.Symbols')
+        Point       = require ('lui.Point'),
+        Bounds      = require ('lui.Bounds'),
+        Surface     = require ('lui.Surface'),
+        Graphics    = require ('lui.Graphics'),
+        Event       = require ('lui.Event'),
+        Main        = require ('lui.Main'),
+        View        = require ('lui.View'),
+        Widget      = require ('lui.Widget'),
+        World       = require ('lui.World'),
+        Symbols     = require ('lui.Symbols')
     }
     return M
     )"));

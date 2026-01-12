@@ -1,4 +1,4 @@
-// Copyright 2022 Michael Fisher <mfisher@lvtk.org>
+// Copyright 2022 Kushview, LLC
 // SPDX-License-Identifier: ISC
 
 #ifndef LUI_BINDINGS_H

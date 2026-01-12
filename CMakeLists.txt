@@ -59,6 +59,31 @@ find_package(Python3 REQUIRED COMPONENTS Interpreter)
 # Add subdirectories
 add_subdirectory(src)
 
+find_program(LUA_EXE lua)
+if(LUA_EXE)
+    # Run `lua -v` extract version number
+    execute_process(
+        COMMAND ${LUA_EXE} -v
+        OUTPUT_VARIABLE LUA_VERSION_OUTPUT
+        ERROR_VARIABLE LUA_VERSION_OUTPUT
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_STRIP_TRAILING_WHITESPACE
+    )
+    string(REGEX MATCH "Lua ([0-9]+\\.[0-9]+)" LUA_VERSION_MATCH "${LUA_VERSION_OUTPUT}")
+    if(LUA_VERSION_MATCH)
+        set(LUA_VERSION ${CMAKE_MATCH_1})
+        message(STATUS "Lua interpreter found: ${LUA_EXE} (version ${LUA_VERSION})")
+    else()
+        message(STATUS "Lua interpreter found, but does not report version: ${LUA_EXE}")
+        unset(LUA_EXE)
+        unset(LUA_VERSION)
+    endif()
+endif()
+
+if(CAIRO_FOUND AND LUA_EXE)
+    add_subdirectory(bindings/lua)
+endif()
+
 # Demo
 option(LUI_BUILD_DEMO "Build the demo application" ON)
 if(LUI_BUILD_DEMO)
