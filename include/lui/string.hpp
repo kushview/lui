@@ -68,7 +68,7 @@ public:
     bool empty() const noexcept { return _str.empty(); }
 
     /** Validate UTF-8 encoding. Returns true if valid. */
-    bool isValidUTF8() const noexcept {
+    bool valid_utf8() const noexcept {
         for (size_t i = 0; i < _str.length(); ++i) {
             unsigned char c              = static_cast<unsigned char> (_str[i]);
             size_t expected_continuation = 0;
@@ -202,7 +202,7 @@ public:
         @param prefix The prefix to match
         @return True if this string starts with the given prefix
     */
-    bool startsWith (const String& prefix) const noexcept {
+    bool starts_with (const String& prefix) const noexcept {
         return _str.rfind (prefix._str, 0) == 0;
     }
 
@@ -210,7 +210,7 @@ public:
         @param prefix The prefix to match
         @return True if this string starts with the given prefix
     */
-    bool startsWith (const char* prefix) const noexcept {
+    bool starts_with (const char* prefix) const noexcept {
         return _str.rfind (prefix, 0) == 0;
     }
 
@@ -218,7 +218,7 @@ public:
         @param suffix The suffix to match
         @return True if this string ends with the given suffix
     */
-    bool endsWith (const String& suffix) const noexcept {
+    bool ends_with (const String& suffix) const noexcept {
         if (suffix._str.length() > _str.length()) {
             return false;
         }
@@ -229,7 +229,7 @@ public:
         @param suffix The suffix to match
         @return True if this string ends with the given suffix
     */
-    bool endsWith (const char* suffix) const noexcept {
+    bool ends_with (const char* suffix) const noexcept {
         size_t suffix_len = std::strlen (suffix);
         if (suffix_len > _str.length()) {
             return false;
@@ -298,7 +298,7 @@ public:
         outside ASCII range are unchanged.
         @return A new String with uppercase ASCII characters
     */
-    String toUpperCase() const {
+    String to_upper() const {
         String result (*this);
         std::transform (result._str.begin(), result._str.end(), result._str.begin(), [] (unsigned char c) { return std::toupper (c); });
         return result;
@@ -309,7 +309,7 @@ public:
         outside ASCII range are unchanged.
         @return A new String with lowercase ASCII characters
     */
-    String toLowerCase() const {
+    String to_lower() const {
         String result (*this);
         std::transform (result._str.begin(), result._str.end(), result._str.begin(), [] (unsigned char c) { return std::tolower (c); });
         return result;

@@ -96,16 +96,16 @@ TEST(String, utf8_basics) {
     String ascii = "hello";
     EXPECT_EQ (ascii.charCount(), 5);
     EXPECT_EQ (ascii.length(), 5);
-    EXPECT_TRUE (ascii.isValidUTF8());
+    EXPECT_TRUE (ascii.valid_utf8());
 
     // UTF-8: é (C3 A9), ñ (C3 B1), ü (C3 BC)
     String utf8 = "café";  // é is 2 bytes in UTF-8
     EXPECT_EQ (utf8.charCount(), 4);  // 4 characters
     EXPECT_EQ (utf8.length(), 5);  // 5 bytes
-    EXPECT_TRUE (utf8.isValidUTF8());
+    EXPECT_TRUE (utf8.valid_utf8());
 
     String emoji = "Hello🎉";
-    EXPECT_TRUE (emoji.isValidUTF8());
+    EXPECT_TRUE (emoji.valid_utf8());
     EXPECT_GT (emoji.length(), emoji.charCount());
 }
 
@@ -138,15 +138,15 @@ TEST(String, startswith_endswith) {
     using lui::String;
     
     String s = "hello world";
-    EXPECT_TRUE (s.startsWith ("hello"));
-    EXPECT_TRUE (s.startsWith ("hello world"));
-    EXPECT_FALSE (s.startsWith ("world"));
-    EXPECT_FALSE (s.startsWith ("Hello"));
+    EXPECT_TRUE (s.starts_with ("hello"));
+    EXPECT_TRUE (s.starts_with ("hello world"));
+    EXPECT_FALSE (s.starts_with ("world"));
+    EXPECT_FALSE (s.starts_with ("Hello"));
 
-    EXPECT_TRUE (s.endsWith ("world"));
-    EXPECT_TRUE (s.endsWith ("hello world"));
-    EXPECT_FALSE (s.endsWith ("hello"));
-    EXPECT_FALSE (s.endsWith ("World"));
+    EXPECT_TRUE (s.ends_with ("world"));
+    EXPECT_TRUE (s.ends_with ("hello world"));
+    EXPECT_FALSE (s.ends_with ("hello"));
+    EXPECT_FALSE (s.ends_with ("World"));
 }
 
 TEST(String, trim) {
@@ -192,14 +192,14 @@ TEST(String, case_conversion) {
     using lui::String;
     
     String lower = "Hello World";
-    String lower_result = lower.toLowerCase();
+    String lower_result = lower.to_lower();
     EXPECT_EQ (lower_result, "hello world");
 
     String upper = "Hello World";
-    String upper_result = upper.toUpperCase();
+    String upper_result = upper.to_upper();
     EXPECT_EQ (upper_result, "HELLO WORLD");
 
     String mixed = "MiXeD CaSe";
-    EXPECT_EQ (mixed.toLowerCase(), "mixed case");
-    EXPECT_EQ (mixed.toUpperCase(), "MIXED CASE");
+    EXPECT_EQ (mixed.to_lower(), "mixed case");
+    EXPECT_EQ (mixed.to_upper(), "MIXED CASE");
 }
