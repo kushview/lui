@@ -94,12 +94,12 @@ target_link_libraries(lui-${LUI_ABI_VERSION}
 
 # Apple frameworks
 if(APPLE)
-    target_link_libraries(lui-${LUI_ABI_VERSION} PRIVATE
-        "-framework Foundation"
-        "-framework CoreVideo"
-        "-framework CoreGraphics"
-        "-framework Cocoa"
-        "-framework OpenGL"
+    target_link_libraries(lui-${LUI_ABI_VERSION} 
+        PUBLIC
+            "-framework Foundation"
+            "-framework CoreVideo"
+            "-framework CoreGraphics"
+            "-framework Cocoa"
     )
 endif()
 
@@ -143,6 +143,8 @@ function(lui_add_backend tgt)
             ${CAIRO_INCLUDE_DIRS}
     )
 
+    target_link_libraries(${tgt} PUBLIC lui-${LUI_ABI_VERSION})
+
     install(TARGETS ${tgt}
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -161,6 +163,8 @@ add_library(lui-gl-${LUI_ABI_VERSION}
 if(APPLE)
     target_sources(lui-gl-${LUI_ABI_VERSION} PRIVATE
         ui/pugl/src/mac_gl.m)
+    target_link_libraries(lui-gl-${LUI_ABI_VERSION} 
+        PRIVATE "-framework OpenGL")
 endif()
 
 lui_add_backend(lui-gl-${LUI_ABI_VERSION})
