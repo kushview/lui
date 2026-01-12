@@ -21,6 +21,8 @@ set(UNIT_TEST_SOURCES
     color_test.cpp
     fitment_test.cpp
     observer_test.cpp
+    range_test.cpp
+    rectangle_test.cpp
     string_test.cpp
     transform_test.cpp
     weak_ref_test.cpp
