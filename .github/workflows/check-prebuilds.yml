@@ -3,9 +3,7 @@ name: Check Node Prebuilds
 on:
   push:
     branches:
-      - main
       - n-api
-  pull_request:
   workflow_dispatch:
 
 jobs:
@@ -59,7 +57,7 @@ jobs:
           cmake -B build-node -G Ninja \
             -DLUI_BUILD_TESTS=OFF \
             -DLUI_BUILD_DEMO=OFF \
-            -DLUI_BUILD_CAIRO=OFF \
+            -DLUI_ENABLE_CAIRO=OFF \
             -DLUI_NODE=ON $ARCH_FLAG
           ninja -C build-node src/liblui-0.0.a
           mkdir -p build-node/lib

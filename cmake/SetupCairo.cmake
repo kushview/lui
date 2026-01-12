@@ -1,0 +1,10 @@
+# Find Cairo (optional for now)
+# option(LUI_DOWNLOAD_CAIRO "Download and use an internal static build of Cairo." OFF)
+option(LUI_ENABLE_CAIRO "Build the Cairo backend if available" ON)
+
+if(LUI_ENABLE_CAIRO)
+    set(ENV{PKG_CONFIG_PATH} "/opt/lui/lib/pkgconfig:$ENV{PKG_CONFIG_PATH}")
+    pkg_check_modules(CAIRO cairo>=1.16.0)
+else()
+    set(CAIRO_FOUND FALSE)
+endif()

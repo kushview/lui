@@ -16,7 +16,7 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 
 # Add Objective-C/C++ support on macOS
 if(APPLE)
-    enable_language(OBJCXX)
+    enable_language(OBJCXX OBJC)
 endif()
 
 # Option for Node.js bindings compatibility
@@ -43,17 +43,11 @@ set(LUI_VERSION_MICRO ${PROJECT_VERSION_PATCH})
 find_package(Threads REQUIRED)
 
 # Use pkgconfig to find dependencies
+include(FetchContent)
 include(FindPkgConfig)
 include(GNUInstallDirs)
 
-# Find Cairo (optional for now)
-option(LUI_BUILD_CAIRO "Build the Cairo backend if available" ON)
-if(LUI_BUILD_CAIRO)
-    set(ENV{PKG_CONFIG_PATH} "/opt/lui/lib/pkgconfig:$ENV{PKG_CONFIG_PATH}")
-    pkg_check_modules(CAIRO cairo>=1.16.0)
-else()
-    set(CAIRO_FOUND FALSE)
-endif()
+include(cmake/SetupCairo.cmake)
 
 # Python 3 for scripts
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
