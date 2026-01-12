@@ -32,6 +32,7 @@ void Graphics::set_color (Color color) { _context.set_fill (color); }
 
 void Graphics::fill_path (const Path& path) {
     _context.clear_path();
+
     for (const auto& i : path) {
         switch (i.type) {
             case PathOp::MOVE:

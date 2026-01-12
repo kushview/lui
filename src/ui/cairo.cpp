@@ -118,6 +118,8 @@ public:
     /** Translate the origin */
     void translate (double x, double y) override {
         cairo_translate (cr, x, y);
+        state.clip.x -= x;
+        state.clip.y -= y;
     }
 
     /** Apply transformation matrix */
@@ -131,6 +133,7 @@ public:
     }
 
     void reset_clip() noexcept {
+        state.clip = {};
         cairo_reset_clip (cr);
     }
 
@@ -142,7 +145,28 @@ public:
     }
 
     void exclude_clip (const Rectangle<int>& r) override {
-        // TODO
+#if 1 // FIXME: exlusions still aren't quite right.
+        lui::ignore (r);
+#else
+        // Create a clipping region that excludes the specified rectangle
+        // Uses even-odd fill rule to create a hole in the clip region
+        cairo_new_path (cr);
+        
+        // Add outer rectangle (current clip bounds)
+        auto current = state.clip;
+        cairo_rectangle (cr, current.x, current.y, current.width, current.height);
+        
+        // Add inner rectangle (excluded region)
+        cairo_rectangle (cr, r.x, r.y, r.width, r.height);
+        
+        // Apply even-odd rule to create exclusion, then restore default
+        cairo_set_fill_rule (cr, CAIRO_FILL_RULE_EVEN_ODD);
+        cairo_clip (cr);
+        cairo_set_fill_rule (cr, CAIRO_FILL_RULE_WINDING);
+        
+        // Note: state.clip remains as the outer rectangle since we can't
+        // represent a complex clip region as a single rectangle
+#endif
     }
 
     Rectangle<int> last_clip() const override {

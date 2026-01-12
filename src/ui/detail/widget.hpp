@@ -128,7 +128,7 @@ private:
     std::vector<lui::Widget*> widgets;
     Rectangle<int> bounds;
     bool visible { false };
-    bool opaque { true };
+    bool opaque { false };
     bool dont_clip { false };
 
     static bool clip_widgets_blocking (const lui::Widget& w, Graphics& g, const Rectangle<int> cr, Point<int> delta);

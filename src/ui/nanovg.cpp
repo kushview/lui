@@ -211,6 +211,8 @@ void Context::translate (double x, double y) {
     nvgTranslate (ctx->ctx,
                   static_cast<float> (x),
                   static_cast<float> (y));
+    ctx->state.clip.x -= x;
+    ctx->state.clip.y -= y;
 }
 
 // [a c e]
@@ -278,9 +280,8 @@ void Context::stroke() {
     nvgStroke (ctx->ctx);
 }
 
-#define CLIP_WORKAROUND 1
 void Context::clip (const Rectangle<int>& r) {
-#if CLIP_WORKAROUND
+#if 0
     ctx->state.clip = r.as<float>();
     nvgScissor (ctx->ctx,
                 ctx->state.clip.x,
@@ -296,7 +297,7 @@ void Context::clip (const Rectangle<int>& r) {
 }
 
 void Context::exclude_clip (const Rectangle<int>& r) {
-#if CLIP_WORKAROUND
+#if 1
     lui::ignore (r);
 #else
     auto rf = r.as<float>();
