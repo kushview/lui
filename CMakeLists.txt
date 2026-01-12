@@ -49,6 +49,16 @@ include(GNUInstallDirs)
 
 include(cmake/SetupCairo.cmake)
 
+# Find libepoxy for GL backend (Linux/cross-platform)
+if(UNIX AND NOT APPLE)
+    find_package(PkgConfig)
+    if(PKG_CONFIG_FOUND)
+        pkg_check_modules(LIBEPOXY epoxy)
+    endif()
+    # Find X11 and related libraries for Pugl
+    find_package(X11 REQUIRED)
+endif()
+
 # Python 3 for scripts
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
 

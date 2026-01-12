@@ -444,7 +444,7 @@ void Context::draw_image (Image i, Transform matrix) {
         handle = nvgCreateImageRGBA (ctx->ctx,
                                      i.width(),
                                      i.height(),
-                                     NVG_IMAGE_PREMULTIPLIED | NVG_IMAGE_NODELETE,
+                                     (int) NVG_IMAGE_PREMULTIPLIED | (int) NVG_IMAGE_NODELETE,
                                      i.data());
 
         if (handle <= 0) {

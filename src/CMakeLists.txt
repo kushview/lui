@@ -49,7 +49,8 @@ if(APPLE)
             COMPILE_FLAGS "-Wno-deprecated")
 elseif(UNIX AND NOT APPLE)
     list(APPEND LIBLUI_SOURCES 
-        embed_x11.cpp)
+        embed_x11.cpp
+        pugl/src/x11.c)
 elseif(WIN32)
     list(APPEND LIBLUI_SOURCES 
         embed_win32.cpp)
@@ -91,6 +92,20 @@ target_include_directories(lui-${LUI_ABI_VERSION} PRIVATE)
 target_link_directories(lui-${LUI_ABI_VERSION} PRIVATE)
 target_link_libraries(lui-${LUI_ABI_VERSION} 
     PRIVATE Threads::Threads)
+
+# X11 support for Linux
+if(UNIX AND NOT APPLE)
+    target_link_libraries(lui-${LUI_ABI_VERSION} 
+        PRIVATE 
+            X11::X11 
+            X11::Xcursor
+            X11::Xext
+            X11::Xrandr)
+    # Xsync is optional, may not be available on all systems
+    if(TARGET X11::Xsync)
+        target_link_libraries(lui-${LUI_ABI_VERSION} PRIVATE X11::Xsync)
+    endif()
+endif()
 
 # Apple frameworks
 if(APPLE)
@@ -165,6 +180,20 @@ if(APPLE)
         pugl/src/mac_gl.m)
     target_link_libraries(lui-gl-${LUI_ABI_VERSION} 
         PRIVATE "-framework OpenGL")
+    target_compile_definitions(lui-gl-${LUI_ABI_VERSION} PRIVATE NANOVG_GL2)
+elseif(UNIX AND NOT APPLE)
+    # Linux: use libepoxy for OpenGL function loading
+    target_sources(lui-gl-${LUI_ABI_VERSION} PRIVATE
+        pugl/src/x11_gl.c)
+    if(LIBEPOXY_FOUND)
+        target_link_libraries(lui-gl-${LUI_ABI_VERSION} 
+            PRIVATE ${LIBEPOXY_LIBRARIES} GL X11)
+        target_include_directories(lui-gl-${LUI_ABI_VERSION} 
+            PRIVATE ${LIBEPOXY_INCLUDE_DIRS})
+        target_compile_definitions(lui-gl-${LUI_ABI_VERSION} PRIVATE NANOVG_GL3)
+    else()
+        message(FATAL_ERROR "libepoxy not found - required for OpenGL backend on Linux")
+    endif()
 endif()
 
 lui_add_backend(lui-gl-${LUI_ABI_VERSION})
@@ -172,7 +201,6 @@ target_include_directories(lui-gl-${LUI_ABI_VERSION}
     PRIVATE
         ${CMAKE_CURRENT_BINARY_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}/nanovg)
-target_compile_definitions(lui-gl-${LUI_ABI_VERSION} PRIVATE NANOVG_GL2)
 
 # Generate and install pkg-config file for OpenGL backend
 configure_file(

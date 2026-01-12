@@ -7,7 +7,11 @@
 #include <cctype>
 #include <cstdint>
 #include <cstring>
+
+#if __has_include(<format>)
 #include <format>
+#endif
+
 #include <string>
 
 namespace lui {
@@ -132,22 +136,42 @@ public:
 
     /** Append an int */
     String& append (int i) {
+#if __has_include(<format>)
         return append_formatted ("{}", i);
+#else
+        _str.append (std::to_string (i));
+        return *this;
+#endif
     }
 
     /** Append an int64 */
     String& append (int64_t i) {
+#if __has_include(<format>)
         return append_formatted ("{}", i);
+#else
+        _str.append (std::to_string (i));
+        return *this;
+#endif
     }
 
     /** Append a float */
     String& append (float i) {
+#if __has_include(<format>)
         return append_formatted ("{}", i);
+#else
+        _str.append (std::to_string (i));
+        return *this;
+#endif
     }
 
     /** Append a double */
     String& append (double i) {
+#if __has_include(<format>)
         return append_formatted ("{}", i);
+#else
+        _str.append (std::to_string (i));
+        return *this;
+#endif
     }
 
     /** Append formatted output using C++20 std::format.
@@ -157,11 +181,13 @@ public:
         
         Example: str.append_formatted("Value: {}", 42);
     */
+#if __has_include(<format>)
     template <typename... Args>
     String& append_formatted (std::format_string<Args...> fmt, Args&&... args) {
         _str.append (std::format (fmt, std::forward<Args> (args)...));
         return *this;
     }
+#endif
 
     /** Create a new formatted String using C++20 std::format.
         @param fmt Format string (e.g., "{} items: {:.2f}")
@@ -170,10 +196,12 @@ public:
         
         Example: auto msg = String::formatted("{} + {} = {}", 1, 2, 3);
     */
+#if __has_include(<format>)
     template <typename... Args>
     static String formatted (std::format_string<Args...> fmt, Args&&... args) {
         return String (std::format (fmt, std::forward<Args> (args)...));
     }
+#endif
 
     /** Return substring by byte position and length. 
         Warning: Does not validate UTF-8 boundaries. Use with caution.
