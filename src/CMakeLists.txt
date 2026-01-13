@@ -56,7 +56,10 @@ elseif(UNIX AND NOT APPLE)
         pugl/src/x11.c)
 elseif(WIN32)
     list(APPEND LIBLUI_SOURCES 
-        embed_win32.cpp)
+        direct2d.cpp
+        embed_win32.cpp
+        win_direct2d.c
+        pugl/src/win.c)
 endif()
 
 # Create the main library
@@ -119,6 +122,17 @@ if(APPLE)
             "-framework CoreVideo"
             "-framework CoreGraphics"
             "-framework Cocoa"
+    )
+endif()
+
+# Windows Direct2D libraries
+if(WIN32)
+    target_link_libraries(lui-${LUI_ABI_VERSION}
+        PRIVATE
+            d2d1
+            dwrite
+            gdi32
+            user32
     )
 endif()
 
