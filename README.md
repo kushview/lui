@@ -1,4 +1,4 @@
-[![REUSE status](https://api.reuse.software/badge/github.com/kushview/lui)](https://api.reuse.software/info/github.com/kushview/lui)
+[![REUSE status](https://api.reuse.software/badge/github.com/kushview/lui)](https://api.reuse.software/info/github.com/kushview/lui) [![Build](https://github.com/kushview/lui/actions/workflows/build.yml/badge.svg)](https://github.com/kushview/lui/actions/workflows/build.yml) [![Docs](https://github.com/kushview/lui/actions/workflows/pages.yml/badge.svg)](https://github.com/kushview/lui/actions/workflows/pages.yml)
 
 # Lui
 
