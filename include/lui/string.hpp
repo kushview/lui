@@ -9,7 +9,7 @@
 #include <cstring>
 
 #if __has_include(<format>)
-#include <format>
+#    include <format>
 #endif
 
 #include <string>

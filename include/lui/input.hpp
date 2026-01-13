@@ -64,7 +64,7 @@ public:
         */
         POPUP = RIGHT_BUTTON | CTRL,
 #else
-        POPUP   = RIGHT_BUTTON,
+        POPUP = RIGHT_BUTTON,
 #endif
 
         /** All buttons left, right, and middle */

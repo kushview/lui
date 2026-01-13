@@ -197,9 +197,9 @@ public:
             fm.height  = fm.ascent + fm.descent;
 #if 0
             fm.leading = CTFontGetLeading (ctFont);
-#endif       
+#endif
             // Use bounding box for max stride approximation
-            CGRect bbox = CTFontGetBoundingBox (ctFont);
+            CGRect bbox     = CTFontGetBoundingBox (ctFont);
             fm.x_stride_max = bbox.size.width;
             fm.y_stride_max = bbox.size.height;
             CFRelease (ctFont);

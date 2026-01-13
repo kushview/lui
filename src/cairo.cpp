@@ -152,19 +152,19 @@ public:
         // Create a clipping region that excludes the specified rectangle
         // Uses even-odd fill rule to create a hole in the clip region
         cairo_new_path (cr);
-        
+
         // Add outer rectangle (current clip bounds)
         auto current = state.clip;
         cairo_rectangle (cr, current.x, current.y, current.width, current.height);
-        
+
         // Add inner rectangle (excluded region)
         cairo_rectangle (cr, r.x, r.y, r.width, r.height);
-        
+
         // Apply even-odd rule to create exclusion, then restore default
         cairo_set_fill_rule (cr, CAIRO_FILL_RULE_EVEN_ODD);
         cairo_clip (cr);
         cairo_set_fill_rule (cr, CAIRO_FILL_RULE_WINDING);
-        
+
         // Note: state.clip remains as the outer rectangle since we can't
         // represent a complex clip region as a single rectangle
 #endif

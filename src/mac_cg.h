@@ -15,6 +15,6 @@ PUGL_BEGIN_DECLS
    native CoreGraphics on macOS.
 */
 const PuglBackend*
-puglCGBackend(void);
+    puglCGBackend (void);
 
 PUGL_END_DECLS

@@ -229,7 +229,7 @@ void Context::set_line_width (double width) {
 }
 
 void Context::clear_path() {
-    ctx->last_pos = {};
+    ctx->last_pos     = {};
     ctx->has_geometry = false;
     nvgBeginPath (ctx->ctx);
     nvgPathWinding (ctx->ctx, NVG_SOLID);
@@ -238,10 +238,10 @@ void Context::clear_path() {
 void Context::move_to (double x1, double y1) {
     // Skip spurious move_to(0,0) if we haven't added any geometry yet
     // This prevents creating empty sub-paths in NanoVG
-    if (!ctx->has_geometry && x1 == 0.0 && y1 == 0.0) {
+    if (! ctx->has_geometry && x1 == 0.0 && y1 == 0.0) {
         return;
     }
-    
+
     ctx->last_pos.x = x1;
     ctx->last_pos.y = y1;
     nvgMoveTo (ctx->ctx, x1, y1);
@@ -249,22 +249,22 @@ void Context::move_to (double x1, double y1) {
 
 void Context::line_to (double x1, double y1) {
     ctx->has_geometry = true;
-    ctx->last_pos.x = x1;
-    ctx->last_pos.y = y1;
+    ctx->last_pos.x   = x1;
+    ctx->last_pos.y   = y1;
     nvgLineTo (ctx->ctx, x1, y1);
 }
 
 void Context::quad_to (double x1, double y1, double x2, double y2) {
     ctx->has_geometry = true;
-    ctx->last_pos.x = x2;
-    ctx->last_pos.y = y2;
+    ctx->last_pos.x   = x2;
+    ctx->last_pos.y   = y2;
     nvgQuadTo (ctx->ctx, x1, y1, x2, y2);
 }
 
 void Context::cubic_to (double x1, double y1, double x2, double y2, double x3, double y3) {
     ctx->has_geometry = true;
-    ctx->last_pos.x = x3;
-    ctx->last_pos.y = y3;
+    ctx->last_pos.x   = x3;
+    ctx->last_pos.y   = y3;
     nvgBezierTo (ctx->ctx, x1, y1, x2, y2, x3, y3);
 }
 
@@ -301,47 +301,43 @@ void Context::exclude_clip (const Rectangle<int>& r) {
     lui::ignore (r);
 #else
     auto rf = r.as<float>();
-    
+
     // If the exclusion fully contains the current clip, mark clip as empty
     if (rf.contains (ctx->state.clip)) {
         ctx->state.clip = Rectangle<float>();
         nvgScissor (ctx->ctx, 0, 0, 0, 0);
         return;
     }
-    
+
     // Track excluded region for this state
     ctx->state.excluded.push_back (rf);
-    
+
     // Try to reduce the clip rectangle if exclusion is at an edge
     auto& c = ctx->state.clip;
     if (c.empty() || rf.empty())
         return;
-        
+
     // Check if exclusion covers top edge
-    if (rf.x <= c.x && rf.x + rf.width >= c.x + c.width &&
-        rf.y <= c.y && rf.y + rf.height >= c.y) {
+    if (rf.x <= c.x && rf.x + rf.width >= c.x + c.width && rf.y <= c.y && rf.y + rf.height >= c.y) {
         float new_y = rf.y + rf.height;
         c.height -= (new_y - c.y);
         c.y = new_y;
     }
     // Check if exclusion covers bottom edge
-    else if (rf.x <= c.x && rf.x + rf.width >= c.x + c.width &&
-             rf.y <= c.y + c.height && rf.y + rf.height >= c.y + c.height) {
+    else if (rf.x <= c.x && rf.x + rf.width >= c.x + c.width && rf.y <= c.y + c.height && rf.y + rf.height >= c.y + c.height) {
         c.height = rf.y - c.y;
     }
     // Check if exclusion covers left edge
-    else if (rf.y <= c.y && rf.y + rf.height >= c.y + c.height &&
-             rf.x <= c.x && rf.x + rf.width >= c.x) {
+    else if (rf.y <= c.y && rf.y + rf.height >= c.y + c.height && rf.x <= c.x && rf.x + rf.width >= c.x) {
         float new_x = rf.x + rf.width;
         c.width -= (new_x - c.x);
         c.x = new_x;
     }
     // Check if exclusion covers right edge
-    else if (rf.y <= c.y && rf.y + rf.height >= c.y + c.height &&
-             rf.x <= c.x + c.width && rf.x + rf.width >= c.x + c.width) {
+    else if (rf.y <= c.y && rf.y + rf.height >= c.y + c.height && rf.x <= c.x + c.width && rf.x + rf.width >= c.x + c.width) {
         c.width = rf.x - c.x;
     }
-    
+
     // Update scissor with potentially reduced clip
     if (c.width > 0 && c.height > 0) {
         nvgScissor (ctx->ctx, c.x, c.y, c.width, c.height);
@@ -469,4 +465,4 @@ void Context::draw_image (Image i, Transform matrix) {
 }
 
 } // namespace nvg
-} // namespace lvtk
+} // namespace lui

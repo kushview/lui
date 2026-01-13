@@ -26,7 +26,7 @@ private:
     }
 
     void resized() override {
-        const auto w = bounds().at(0).width;
+        const auto w = bounds().at (0).width;
         entry.set_bounds (10, 10, w - 20, 30);
     }
 

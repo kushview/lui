@@ -16,9 +16,9 @@ extern "C" {
 
 #ifdef _WIN32
 #    if ! defined(LUI_STATIC) && defined(LUI_BUILD)
-#        define LUI_API __declspec(dllexport)
+#        define LUI_API __declspec (dllexport)
 #    elif ! defined(LUI_STATIC)
-#        define LUI_API __declspec(dllimport)
+#        define LUI_API __declspec (dllimport)
 #    endif
 #else
 #    if ! defined(LUI_STATIC)
