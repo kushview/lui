@@ -58,7 +58,7 @@ static PuglStatus
     PuglWinDirect2DSurface* const surface = (PuglWinDirect2DSurface*) impl->surface;
 
     if (surface->renderTarget) {
-        surface->renderTarget->lpVtbl->Release ((ID2D1RenderTarget*) surface->renderTarget);
+        ((IUnknown*) surface->renderTarget)->lpVtbl->Release ((IUnknown*) surface->renderTarget);
         surface->renderTarget = NULL;
     }
 
@@ -128,11 +128,11 @@ static void
         puglWinDirect2DDestroyDrawContext (view);
 
         if (surface->writeFactory) {
-            surface->writeFactory->lpVtbl->Release (surface->writeFactory);
+            ((IUnknown*) surface->writeFactory)->lpVtbl->Release ((IUnknown*) surface->writeFactory);
         }
 
         if (surface->d2dFactory) {
-            surface->d2dFactory->lpVtbl->Release (surface->d2dFactory);
+            ((IUnknown*) surface->d2dFactory)->lpVtbl->Release ((IUnknown*) surface->d2dFactory);
         }
 
         free (surface);
