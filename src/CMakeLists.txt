@@ -95,6 +95,7 @@ target_link_libraries(lui-${LUI_ABI_VERSION}
 
 # X11 support for Linux
 if(UNIX AND NOT APPLE)
+    target_compile_options(lui-${LUI_ABI_VERSION} PRIVATE -fPIC)
     target_link_libraries(lui-${LUI_ABI_VERSION} 
         PRIVATE 
             X11::X11 
@@ -160,6 +161,10 @@ function(lui_add_backend tgt)
 
     target_link_libraries(${tgt} PUBLIC lui-${LUI_ABI_VERSION})
 
+    if(UNIX AND NOT APPLE)
+        target_compile_options(${tgt} PRIVATE -fPIC)
+    endif()
+
     install(TARGETS ${tgt}
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -215,8 +220,7 @@ install(FILES ${CMAKE_BINARY_DIR}/lui-gl-${LUI_ABI_VERSION}.pc
 # Cairo Backend
 if(CAIRO_FOUND)
     add_library(lui-cairo-${LUI_ABI_VERSION}
-        cairo.cpp
-        pugl/src/mac_cairo.m)
+        cairo.cpp)
     
     lui_add_backend(lui-cairo-${LUI_ABI_VERSION})
     
@@ -231,13 +235,15 @@ if(CAIRO_FOUND)
     
     # Platform-specific Cairo libraries
     if(APPLE)
+        target_sources(lui-cairo-${LUI_ABI_VERSION}  PRIVATE pugl/src/mac_cairo.m)
         target_link_libraries(lui-cairo-${LUI_ABI_VERSION} PRIVATE
             "-framework CoreGraphics"
         )
+    elseif(UNIX AND NOT APPLE)
+        target_sources(lui-cairo-${LUI_ABI_VERSION}  PRIVATE pugl/src/x11_cairo.c)
     elseif(WIN32)
-        target_link_libraries(lui-cairo-${LUI_ABI_VERSION} PRIVATE
-            gdi32
-        )
+        target_sources(lui-cairo-${LUI_ABI_VERSION}  PRIVATE pugl/src/win_cairo.c)
+        target_link_libraries(lui-cairo-${LUI_ABI_VERSION} PRIVATE gdi32)
     endif()
     
     message(STATUS "Cairo backend enabled - building lui-cairo-${LUI_ABI_VERSION}")
