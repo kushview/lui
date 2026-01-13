@@ -1,4 +1,6 @@
 #!/bin/bash
+# SPDX-FileCopyrightText: 2026 Kushview, LLC
+# SPDX-License-Identifier: ISC
 # Format C++ source files using clang-format version 21
 
 set -e

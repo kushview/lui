@@ -5,6 +5,11 @@ SPDX-License-Identifier: ISC
 
 # Copilot Instructions for LUI Project
 
+## Copyright Notice
+
+- All new files should use: `Copyright 2026 Kushview, LLC`
+- Do not use individual contributor names (e.g., Michael Fisher, lvtk.org) in copyright headers.
+
 ## General Guidelines
 
 - This is a GUI toolkit library. Changes to public APIs affect all users.
