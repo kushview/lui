@@ -1,6 +1,7 @@
 // Copyright 2024 Michael Fisher <mfisher@lvtk.org>
 // SPDX-License-Identifier: ISC
 
+#include <cassert>
 #include <iostream>
 
 #if _MSC_VER

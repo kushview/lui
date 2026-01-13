@@ -6,6 +6,8 @@
 #define NVG_NO_STB
 #define GL_SILENCE_DEPRECATION
 
+#include "gl.hpp"
+
 // Include the nanovg C sources directly
 #include "../nanovg/nanovg.c"
 #include "../nanovg/nanovg_gl.c"

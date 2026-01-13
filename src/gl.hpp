@@ -15,6 +15,8 @@
 #        undef NOMINMAX
 #    endif
 #    define NOMINMAX
+#elif __linux__
+#    include <epoxy/gl.h>
 #endif
 
 #define PUGL_DISABLE_DEPRECATED

@@ -20,8 +20,8 @@ jobs:
           - os: macos-latest
             arch: arm64
             cmake_arch: arm64
-          # - os: ubuntu-latest
-          #   arch: x64
+          - os: ubuntu-latest
+            arch: x64
           # - os: windows-latest
           #   arch: x64
     
@@ -41,9 +41,10 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libx11-dev libgl1-mesa-dev ninja-build cmake \
+          sudo apt-get install -y libx11-dev libxcursor-dev libxext-dev libxrandr-dev \
+            libgl1-mesa-dev libepoxy-dev libcairo2-dev ninja-build cmake \
             doxygen graphviz python3-sphinx python3-sphinx-rtd-theme
-      
+
       - name: Configure CMake (macOS)
         if: runner.os == 'macOS'
         run: |
