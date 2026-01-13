@@ -1,3 +1,8 @@
+<!--
+SPDX-FileCopyrightText: 2026 Kushview, LLC
+SPDX-License-Identifier: ISC
+-->
+
 # Copilot Instructions for LUI Project
 
 ## General Guidelines
