@@ -12,6 +12,9 @@
 #elif LUI_DEMO_OPENGL
 #    include <lui/opengl.hpp>
 #    define LUI_DEMO_TITLE "LUI OpenGL Demo"
+#elif LUI_DEMO_CG
+#    include <lui/core_graphics.hpp>
+#    define LUI_DEMO_TITLE "LUI Core Graphics Demo"
 #endif
 
 #include "demo.hpp"
@@ -83,8 +86,8 @@ int WinMain (HINSTANCE hInstance,
 int main (int argc, char** argv) {
 #    if LUI_DEMO_CAIRO
     lui::Main context (lui::Mode::PROGRAM, std::make_unique<lui::Cairo>());
-#    elif LUI_DEMO_VULKAN
-    lui::Main context (lui::Mode::PROGRAM, std::make_unique<lui::Vulkan>());
+#    elif LUI_DEMO_CG
+    lui::Main context (lui::Mode::PROGRAM, std::make_unique<lui::CoreGraphics>());
 #    else
     lui::Main context (lui::Mode::PROGRAM, std::make_unique<lui::OpenGL>());
 #    endif

@@ -40,9 +40,12 @@ set(LIBLUI_SOURCES
 # Platform-specific sources and options
 if(APPLE)
     list(APPEND LIBLUI_SOURCES 
+        core_graphics.cpp
         embed_mac.mm
+        mac_cg.m
         pugl/src/mac.m)
     set_source_files_properties(
+        mac_cg.m
         pugl/src/mac.m
         pugl/src/mac_cairo.m 
         pugl/src/mac_gl.m PROPERTIES
