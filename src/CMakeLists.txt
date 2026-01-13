@@ -80,6 +80,8 @@ target_compile_definitions(lui-${LUI_ABI_VERSION}
     PRIVATE
         LUI_BUILD
         PUGL_STATIC
+    PUBLIC
+        $<$<PLATFORM_ID:Windows>:LUI_STATIC>
 )
 
 # Include directories
