@@ -42,7 +42,8 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libx11-dev libgl1-mesa-dev ninja-build cmake \
-            doxygen graphviz python3-sphinx python3-sphinx-rtd-theme
+            doxygen graphviz python3-sphinx python3-sphinx-rtd-theme \
+            libepoxy-dev
       
       - name: Configure CMake (macOS)
         if: runner.os == 'macOS'
