@@ -72,10 +72,12 @@ function(lui_add_demo tgt)
     )
 endfunction()
 
-lui_add_demo(lui-demo-gl)
-target_compile_definitions(lui-demo-gl PRIVATE LUI_DEMO_OPENGL=1)
-target_link_directories(lui-demo-gl PRIVATE ${CAIRO_LIBRARY_DIRS})
-target_link_libraries(lui-demo-gl PRIVATE lui-gl-${LUI_ABI_VERSION})
+if(NOT WIN32)
+    lui_add_demo(lui-demo-gl)
+    target_compile_definitions(lui-demo-gl PRIVATE LUI_DEMO_OPENGL=1)
+    target_link_directories(lui-demo-gl PRIVATE ${CAIRO_LIBRARY_DIRS})
+    target_link_libraries(lui-demo-gl PRIVATE lui-gl-${LUI_ABI_VERSION})
+endif()
 
 # Cairo
 if(CAIRO_FOUND)

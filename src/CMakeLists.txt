@@ -189,50 +189,52 @@ function(lui_add_backend tgt)
     )
 endfunction()
 
-# OpenGL/NanoVG Backend
-add_library(lui-gl-${LUI_ABI_VERSION}
-    nanovg.cpp
-    nanovglib.cpp
-    opengl.cpp
-    ${RES_GENERATED}
-)
+if(NOT WIN32)
+    # OpenGL/NanoVG Backend
+    add_library(lui-gl-${LUI_ABI_VERSION}
+        nanovg.cpp
+        nanovglib.cpp
+        opengl.cpp
+        ${RES_GENERATED}
+    )
 
-if(APPLE)
-    target_sources(lui-gl-${LUI_ABI_VERSION} PRIVATE
-        pugl/src/mac_gl.m)
-    target_link_libraries(lui-gl-${LUI_ABI_VERSION} 
-        PRIVATE "-framework OpenGL")
-    target_compile_definitions(lui-gl-${LUI_ABI_VERSION} PRIVATE NANOVG_GL2)
-elseif(UNIX AND NOT APPLE)
-    # Linux: use libepoxy for OpenGL function loading
-    target_sources(lui-gl-${LUI_ABI_VERSION} PRIVATE
-        pugl/src/x11_gl.c)
-    if(LIBEPOXY_FOUND)
+    if(APPLE)
+        target_sources(lui-gl-${LUI_ABI_VERSION} PRIVATE
+            pugl/src/mac_gl.m)
         target_link_libraries(lui-gl-${LUI_ABI_VERSION} 
-            PRIVATE ${LIBEPOXY_LIBRARIES} GL X11)
-        target_include_directories(lui-gl-${LUI_ABI_VERSION} 
-            PRIVATE ${LIBEPOXY_INCLUDE_DIRS})
-        target_compile_definitions(lui-gl-${LUI_ABI_VERSION} PRIVATE NANOVG_GL3)
-    else()
-        message(FATAL_ERROR "libepoxy not found - required for OpenGL backend on Linux")
+            PRIVATE "-framework OpenGL")
+        target_compile_definitions(lui-gl-${LUI_ABI_VERSION} PRIVATE NANOVG_GL2)
+    elseif(UNIX AND NOT APPLE)
+        # Linux: use libepoxy for OpenGL function loading
+        target_sources(lui-gl-${LUI_ABI_VERSION} PRIVATE
+            pugl/src/x11_gl.c)
+        if(LIBEPOXY_FOUND)
+            target_link_libraries(lui-gl-${LUI_ABI_VERSION} 
+                PRIVATE ${LIBEPOXY_LIBRARIES} GL X11)
+            target_include_directories(lui-gl-${LUI_ABI_VERSION} 
+                PRIVATE ${LIBEPOXY_INCLUDE_DIRS})
+            target_compile_definitions(lui-gl-${LUI_ABI_VERSION} PRIVATE NANOVG_GL3)
+        else()
+            message(FATAL_ERROR "libepoxy not found - required for OpenGL backend on Linux")
+        endif()
     endif()
+
+    lui_add_backend(lui-gl-${LUI_ABI_VERSION})
+    target_include_directories(lui-gl-${LUI_ABI_VERSION} 
+        PRIVATE
+            ${CMAKE_CURRENT_BINARY_DIR}
+            ${CMAKE_CURRENT_SOURCE_DIR}/nanovg)
+
+    # Generate and install pkg-config file for OpenGL backend
+    configure_file(
+        ${CMAKE_SOURCE_DIR}/lui-gl.pc.in
+        ${CMAKE_BINARY_DIR}/lui-gl-${LUI_ABI_VERSION}.pc
+        @ONLY
+    )
+    install(FILES ${CMAKE_BINARY_DIR}/lui-gl-${LUI_ABI_VERSION}.pc
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
+    )
 endif()
-
-lui_add_backend(lui-gl-${LUI_ABI_VERSION})
-target_include_directories(lui-gl-${LUI_ABI_VERSION} 
-    PRIVATE
-        ${CMAKE_CURRENT_BINARY_DIR}
-        ${CMAKE_CURRENT_SOURCE_DIR}/nanovg)
-
-# Generate and install pkg-config file for OpenGL backend
-configure_file(
-    ${CMAKE_SOURCE_DIR}/lui-gl.pc.in
-    ${CMAKE_BINARY_DIR}/lui-gl-${LUI_ABI_VERSION}.pc
-    @ONLY
-)
-install(FILES ${CMAKE_BINARY_DIR}/lui-gl-${LUI_ABI_VERSION}.pc
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
-)
 
 # Cairo Backend
 if(CAIRO_FOUND)
