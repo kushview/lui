@@ -314,7 +314,7 @@ public:
                             fm.ascent       = metrics.ascent * scale;
                             fm.descent      = metrics.descent * scale;
                             fm.height       = fm.ascent + fm.descent;
-                            fm.x_stride_max = metrics.maxWidth * scale;
+                            fm.x_stride_max = fontSize; // Approximate max width as font size
                             fm.y_stride_max = (metrics.ascent + metrics.descent) * scale;
 
                             font->Release();

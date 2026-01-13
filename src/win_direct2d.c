@@ -128,7 +128,7 @@ static void
         puglWinDirect2DDestroyDrawContext (view);
 
         if (surface->writeFactory) {
-            IDWriteFactory_Release (surface->writeFactory);
+            IUnknown_Release ((IUnknown*) surface->writeFactory);
         }
 
         if (surface->d2dFactory) {
