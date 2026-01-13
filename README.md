@@ -1,8 +1,8 @@
-[![REUSE status](https://api.reuse.software/badge/github.com/lvtk/lui)](https://api.reuse.software/info/github.com/lvtk/lui)
+[![REUSE status](https://api.reuse.software/badge/github.com/kushview/lui)](https://api.reuse.software/info/github.com/kushview/lui)
 
 # Lui
 
-Minimal C++ Gui library with Lua bindings and console. Write your LV2 plugins and gui's in C++.  The Widgets library can be used in any project, it is not directly tied to LV2 UI.
+Minimal C++ Gui library with Lua bindings and console. Write your plugins and gui's in C++.
 
 **Heavy Development:** API's will break from time to time until the core system is ready. Plugin/UI templates are largely unchanged, but could radically change in terms of API.  
 
@@ -68,7 +68,7 @@ cd build
 Double-clickable Mac apps can be found somewhere in the build directory. The following command will list them all out.
 ```bash
 # From the source top dir.
-find build -name "LUI*.app"
+find build -name "*.app"
 ```
 
 ### Screenshots
@@ -108,4 +108,4 @@ Graphics/UI/Hosting classes utilize these libraries internally:
 
 ## Issue Tracking
 
-Please report bugs and feature requests on [GitHub](https://github.com/lvtk/lvtk/issues) or [GitLab](https://gitlab.com/lvtk/lvtk/-/issues). 
+Please report bugs and feature requests on [GitHub](https://github.com/kushview/lui/issues). 

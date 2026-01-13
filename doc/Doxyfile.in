@@ -34,6 +34,6 @@ PREDEFINED             = LUI_API \
 RECURSIVE              = YES
 STRIP_FROM_PATH        = @LUI_SRCDIR@
 INPUT                  = @LUI_SRCDIR@/include
-# EXAMPLE_PATH           = @LUI_SRCDIR@/doc/examples
+# EXAMPLE_PATH         = @LUI_SRCDIR@/doc/examples
 
 OUTPUT_DIRECTORY       = @DOX_OUTPUT@

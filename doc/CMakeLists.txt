@@ -6,7 +6,7 @@ find_package(Doxygen)
 if(DOXYGEN_FOUND)
     # Configure Doxyfile
     set(LUI_SRCDIR ${CMAKE_SOURCE_DIR})
-    set(DOX_OUTPUT ${CMAKE_BINARY_DIR}/doc)
+    set(DOX_OUTPUT ${CMAKE_BINARY_DIR}/doc/html)
     
     configure_file(
         ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in
