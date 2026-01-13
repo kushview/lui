@@ -299,6 +299,57 @@ public:
         return true;
     }
 
+    void draw_image (Image i, Transform matrix) override {
+        CGImageAlphaInfo alphaInfo;
+        CGBitmapInfo bitmapInfo;
+        size_t bitsPerComponent = 8;
+        size_t bitsPerPixel;
+
+        switch (i.format()) {
+            case PixelFormat::ARGB32:
+                alphaInfo     = kCGImageAlphaFirst;
+                bitmapInfo    = kCGBitmapByteOrder32Host | alphaInfo;
+                bitsPerPixel  = 32;
+                break;
+            case PixelFormat::RGB24:
+                alphaInfo     = kCGImageAlphaNoneSkipFirst;
+                bitmapInfo    = kCGBitmapByteOrder32Host | alphaInfo;
+                bitsPerPixel  = 32;
+                break;
+            case PixelFormat::INVALID:
+            default:
+                return;
+        }
+
+        CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+        CGDataProviderRef provider = CGDataProviderCreateWithData (
+            nullptr, i.data(), i.stride() * i.height(), nullptr);
+
+        CGImageRef image = CGImageCreate (
+            i.width(), i.height(),
+            bitsPerComponent, bitsPerPixel, i.stride(),
+            colorSpace, bitmapInfo,
+            provider, nullptr, false, kCGRenderingIntentDefault);
+
+        if (image) {
+            CGContextSaveGState (cg);
+            
+            transform (matrix);
+            
+            // Images need to be flipped since we've already flipped the context
+            CGContextTranslateCTM (cg, 0, i.height());
+            CGContextScaleCTM (cg, 1.0, -1.0);
+            
+            CGContextDrawImage (cg, CGRectMake (0, 0, i.width(), i.height()), image);
+            
+            CGContextRestoreGState (cg);
+            CGImageRelease (image);
+        }
+
+        CGDataProviderRelease (provider);
+        CGColorSpaceRelease (colorSpace);
+    }
+
 private:
     void apply_pending_state() {
         if (_fill_dirty) {
@@ -343,11 +394,6 @@ public:
 
         CGContextSaveGState (cg);
 
-#if 0
-        // FIXME: needed on macOS until lvtk.Widget clipping problems
-        // can be resolved.
-        frame = bounds().at (0);
-#endif
         if (_context->begin_frame (cg, frame)) {
             render (*_context);
             _context->end_frame();
