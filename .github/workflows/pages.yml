@@ -30,13 +30,9 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y \
-            cmake \
-            ninja-build \
-            doxygen \
-            graphviz \
-            python3-sphinx \
-            python3-sphinx-rtd-theme
+          sudo apt-get install -y libx11-dev libxcursor-dev libxext-dev libxrandr-dev \
+            libgl1-mesa-dev libepoxy-dev libcairo2-dev ninja-build cmake \
+            doxygen graphviz python3-sphinx python3-sphinx-rtd-theme
       
       - name: Configure CMake
         run: |
