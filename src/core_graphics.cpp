@@ -1,6 +1,22 @@
 // Copyright 2024 Michael Fisher <mfisher@lvtk.org>
 // SPDX-License-Identifier: ISC
 
+/**
+    Coordinate System Strategy:
+
+    The Pugl backend (mac_cg.m) applies a global Y-flip transformation to the
+    CoreGraphics context, converting from CG's native bottom-left origin to
+    match NSView's top-left flipped coordinate system. This means all standard
+    drawing operations (paths, fills, strokes, rectangles) work naturally with
+    top-left coordinates.
+
+    However, Core Text and CGImage have internal coordinate systems that expect
+    bottom-left origins. To render them correctly, we locally "un-flip" the
+    coordinate system using CGContextSaveGState/RestoreGState for just those
+    operations (show_text and draw_image). This is cleaner than flipping
+    coordinates for every drawing operation throughout the codebase.
+*/
+
 #include <cassert>
 #include <iostream>
 
@@ -11,6 +27,7 @@
 #define LUI_CG_DEFAULT_FONT "Helvetica"
 
 #include <lui/core_graphics.hpp>
+#include <lui/graphics.hpp>
 #include <lui/widget.hpp>
 
 namespace lui {
@@ -109,9 +126,7 @@ public:
     /** Apply transformation matrix */
     void transform (const Transform& mat) override {
         CGAffineTransform m = CGAffineTransformMake (
-            mat.m00, mat.m10,
-            mat.m01, mat.m11,
-            mat.m02, mat.m12);
+            mat.m00, mat.m10, mat.m01, mat.m11, mat.m02, mat.m12);
         CGContextConcatCTM (cg, m);
     }
 
@@ -137,20 +152,19 @@ public:
     }
 
     Font font() const noexcept override { return state.font; }
-    
+
     void set_font (const Font& f) override {
         state.font = f;
-        
+
         // Create CTFont for the given font
         CFStringRef fontName = CFStringCreateWithCString (
             kCFAllocatorDefault, LUI_CG_DEFAULT_FONT, kCFStringEncodingUTF8);
-        
+
         CTFontRef ctFont = CTFontCreateWithName (fontName, f.height(), nullptr);
         CFRelease (fontName);
-        
+
         if (ctFont) {
-            CGContextSetFont (cg, CGFontCreateWithFontName (
-                CTFontCopyFullName (ctFont)));
+            CGContextSetFont (cg, CGFontCreateWithFontName (CTFontCopyFullName (ctFont)));
             CGContextSetFontSize (cg, f.height());
             CFRelease (ctFont);
         }
@@ -172,129 +186,128 @@ public:
         // Create CTFont from current font
         CFStringRef fontName = CFStringCreateWithCString (
             kCFAllocatorDefault, LUI_CG_DEFAULT_FONT, kCFStringEncodingUTF8);
-        
+
         CTFontRef ctFont = CTFontCreateWithName (fontName, state.font.height(), nullptr);
         CFRelease (fontName);
-        
+
         FontMetrics fm;
         if (ctFont) {
-            fm.ascent     = CTFontGetAscent (ctFont);
-            fm.descent    = CTFontGetDescent (ctFont);
-            fm.height     = fm.ascent + fm.descent;
-        #if 0
-            fm.leading    = CTFontGetLeading (ctFont);
-            fm.max_x      = CTFontGetBoundingBox (ctFont).size.width;
-            fm.max_y      = CTFontGetBoundingBox (ctFont).size.height;
-            #endif
+            fm.ascent  = CTFontGetAscent (ctFont);
+            fm.descent = CTFontGetDescent (ctFont);
+            fm.height  = fm.ascent + fm.descent;
+#if 0
+            fm.leading = CTFontGetLeading (ctFont);
+#endif       
+            // Use bounding box for max stride approximation
+            CGRect bbox = CTFontGetBoundingBox (ctFont);
+            fm.x_stride_max = bbox.size.width;
+            fm.y_stride_max = bbox.size.height;
             CFRelease (ctFont);
         }
-        
+
         return fm;
     }
 
     TextMetrics text_metrics (std::string_view text) const noexcept override {
         TextMetrics tm;
-        
+
         CFStringRef str = CFStringCreateWithBytes (
             kCFAllocatorDefault,
             reinterpret_cast<const UInt8*> (text.data()),
             text.size(),
             kCFStringEncodingUTF8,
             false);
-        
-        if (!str)
+
+        if (! str)
             return tm;
-        
+
         CFStringRef fontName = CFStringCreateWithCString (
             kCFAllocatorDefault, LUI_CG_DEFAULT_FONT, kCFStringEncodingUTF8);
-        
+
         CTFontRef ctFont = CTFontCreateWithName (fontName, state.font.height(), nullptr);
         CFRelease (fontName);
-        
+
         if (ctFont) {
             CFMutableAttributedStringRef attrStr = CFAttributedStringCreateMutable (
                 kCFAllocatorDefault, 0);
             CFAttributedStringReplaceString (attrStr, CFRangeMake (0, 0), str);
             CFAttributedStringSetAttribute (
-                attrStr, CFRangeMake (0, CFStringGetLength (str)),
-                kCTFontAttributeName, ctFont);
-            
+                attrStr, CFRangeMake (0, CFStringGetLength (str)), kCTFontAttributeName, ctFont);
+
             CTLineRef line = CTLineCreateWithAttributedString (attrStr);
             CGRect bounds  = CTLineGetBoundsWithOptions (line, 0);
-            
+
             tm.width    = bounds.size.width;
             tm.height   = bounds.size.height;
             tm.x_offset = bounds.origin.x;
             tm.y_offset = bounds.origin.y;
             tm.x_stride = CTLineGetTypographicBounds (line, nullptr, nullptr, nullptr);
-            
+            tm.y_stride = 0.0; // Horizontal text has no vertical advance
+
             CFRelease (line);
             CFRelease (attrStr);
             CFRelease (ctFont);
         }
-        
+
         CFRelease (str);
         return tm;
     }
 
     bool show_text (const std::string_view text) override {
         apply_pending_state();
-        
+
         CFStringRef str = CFStringCreateWithBytes (
             kCFAllocatorDefault,
             reinterpret_cast<const UInt8*> (text.data()),
             text.size(),
             kCFStringEncodingUTF8,
             false);
-        
-        if (!str)
+
+        if (! str)
             return false;
-        
+
         CFStringRef fontName = CFStringCreateWithCString (
             kCFAllocatorDefault, LUI_CG_DEFAULT_FONT, kCFStringEncodingUTF8);
-        
+
         CTFontRef ctFont = CTFontCreateWithName (fontName, state.font.height(), nullptr);
         CFRelease (fontName);
-        
+
         if (ctFont) {
             CFMutableAttributedStringRef attrStr = CFAttributedStringCreateMutable (
                 kCFAllocatorDefault, 0);
             CFAttributedStringReplaceString (attrStr, CFRangeMake (0, 0), str);
             CFAttributedStringSetAttribute (
-                attrStr, CFRangeMake (0, CFStringGetLength (str)),
-                kCTFontAttributeName, ctFont);
-            
+                attrStr, CFRangeMake (0, CFStringGetLength (str)), kCTFontAttributeName, ctFont);
+
             // Set text color
             CGColorRef color = CGColorCreateGenericRGB (
-                state.color.fred(), state.color.fgreen(),
-                state.color.fblue(), state.color.alpha());
+                state.color.fred(), state.color.fgreen(), state.color.fblue(), state.color.alpha());
             CFAttributedStringSetAttribute (
-                attrStr, CFRangeMake (0, CFStringGetLength (str)),
-                kCTForegroundColorAttributeName, color);
+                attrStr, CFRangeMake (0, CFStringGetLength (str)), kCTForegroundColorAttributeName, color);
             CGColorRelease (color);
-            
+
             CTLineRef line = CTLineCreateWithAttributedString (attrStr);
-            
+
             // Get current point from path (where move_to positioned us)
             CGPoint currentPoint = CGContextGetPathCurrentPoint (cg);
-            
+
             CGContextSaveGState (cg);
             // Translate to position, flip Y for text
             CGContextTranslateCTM (cg, currentPoint.x, currentPoint.y);
             CGContextScaleCTM (cg, 1.0, -1.0);
-            
+
             // Explicitly set text position to origin after transforms
             CGContextSetTextPosition (cg, 0, 0);
-            
+
             CTLineDraw (line, cg);
-            
+
             CGContextRestoreGState (cg);
-            
+
             CFRelease (line);
             CFRelease (attrStr);
             CFRelease (ctFont);
         }
-        
+
         CFRelease (str);
         return true;
     }
@@ -307,14 +320,14 @@ public:
 
         switch (i.format()) {
             case PixelFormat::ARGB32:
-                alphaInfo     = kCGImageAlphaFirst;
-                bitmapInfo    = kCGBitmapByteOrder32Host | alphaInfo;
-                bitsPerPixel  = 32;
+                alphaInfo    = kCGImageAlphaFirst;
+                bitmapInfo   = kCGBitmapByteOrder32Host | alphaInfo;
+                bitsPerPixel = 32;
                 break;
             case PixelFormat::RGB24:
-                alphaInfo     = kCGImageAlphaNoneSkipFirst;
-                bitmapInfo    = kCGBitmapByteOrder32Host | alphaInfo;
-                bitsPerPixel  = 32;
+                alphaInfo    = kCGImageAlphaNoneSkipFirst;
+                bitmapInfo   = kCGBitmapByteOrder32Host | alphaInfo;
+                bitsPerPixel = 32;
                 break;
             case PixelFormat::INVALID:
             default:
@@ -326,22 +339,19 @@ public:
             nullptr, i.data(), i.stride() * i.height(), nullptr);
 
         CGImageRef image = CGImageCreate (
-            i.width(), i.height(),
-            bitsPerComponent, bitsPerPixel, i.stride(),
-            colorSpace, bitmapInfo,
-            provider, nullptr, false, kCGRenderingIntentDefault);
+            i.width(), i.height(), bitsPerComponent, bitsPerPixel, i.stride(), colorSpace, bitmapInfo, provider, nullptr, false, kCGRenderingIntentDefault);
 
         if (image) {
             CGContextSaveGState (cg);
-            
+
             transform (matrix);
-            
+
             // Images need to be flipped since we've already flipped the context
             CGContextTranslateCTM (cg, 0, i.height());
             CGContextScaleCTM (cg, 1.0, -1.0);
-            
+
             CGContextDrawImage (cg, CGRectMake (0, 0, i.width(), i.height()), image);
-            
+
             CGContextRestoreGState (cg);
             CGImageRelease (image);
         }
@@ -421,7 +431,7 @@ private:
     double _last_scale { 1.0 };
 };
 
-} // namespace coregraphics
+} // namespace cg
 
 std::unique_ptr<lui::View> CoreGraphics::create_view (Main& c, Widget& w) {
     return std::make_unique<cg::View> (c, w);
