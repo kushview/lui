@@ -84,3 +84,8 @@ if(CAIRO_FOUND)
     target_link_directories(lui-demo-cairo PRIVATE ${CAIRO_LIBRARY_DIRS})
     target_link_libraries(lui-demo-cairo PRIVATE lui-cairo-${LUI_ABI_VERSION})
 endif()
+
+if (APPLE)
+    lui_add_demo(lui-demo-cg)
+    target_compile_definitions(lui-demo-cg PRIVATE LUI_DEMO_CG=1)
+endif()
