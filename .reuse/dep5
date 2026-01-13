@@ -18,7 +18,7 @@ Copyright:  Copyright (C) 2008 Chris Wilson <chris@chris-wilson.co.uk>
 License: MPL-1.1
 
 Files: resources/*
-Copyright: 2022 Michael Fisher <mfisher@lvtk.org>
+Copyright: 2022 Kushview, LLC
 License: ISC
 
 Files: bindings/lua/5.*/lua*.h bindings/lua/**/lua*.hpp bindings/lua/**/laux*.h
@@ -54,7 +54,7 @@ Copyright: 2012-2023 David Robillard <d@drobilla.net>
 License: 0BSD
 
 Files: src/pugl.cpp src/pugl.mm src/nanovglib.cpp
-Copyright: 2022 Michael Fisher <mfisher@lvtk.org>
+Copyright: 2022 Kushview, LLC
 License: ISC
 
 Files: scripts/bin2c.py

@@ -1,5 +1,5 @@
 // Copyright 2012-2022 David Robillard <d@drobilla.net>
-// Copyright 2026 Michael Fisher <mfisher@lvtk.org>
+// Copyright 2026 Kushview, LLC
 // SPDX-License-Identifier: ISC
 
 #include "pugl/src/stub.h"

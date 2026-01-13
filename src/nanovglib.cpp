@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2022 Michael Fisher <mfisher@lvtk.org>m
+// SPDX-FileCopyrightText: 2022 Kushview, LLC
 // SPDX-License-Identifier: ISC
 
 // NanoVG C amalgamation - include nanovg C sources directly
