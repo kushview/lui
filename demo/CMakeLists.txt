@@ -46,7 +46,12 @@ function(lui_add_demo tgt)
         set(bundle_name ${tgt})
     endif()
     
-    add_executable(${tgt} main.cpp)
+    if(WIN32)
+        add_executable(${tgt} WIN32 main.cpp)
+    else()
+        add_executable(${tgt} main.cpp)
+    endif()
+    
     target_include_directories(${tgt} PRIVATE
         ${CMAKE_SOURCE_DIR}/include
         ${CMAKE_SOURCE_DIR}/src)
