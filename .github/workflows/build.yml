@@ -24,6 +24,10 @@ jobs:
             arch: x64
           - os: windows-latest
             arch: x64
+            toolchain: mingw
+          - os: windows-latest
+            arch: x64
+            toolchain: msvc
     
     runs-on: ${{ matrix.os }}
     
@@ -65,8 +69,8 @@ jobs:
             -DLUI_BUILD_DEMO=ON \
             -DLUI_BUILD_DOCS=ON
       
-      - name: Configure CMake (Windows)
-        if: runner.os == 'Windows'
+      - name: Configure CMake (Windows MinGW)
+        if: runner.os == 'Windows' && matrix.toolchain == 'mingw'
         run: |
           cmake -B build -G Ninja `
             -DCMAKE_BUILD_TYPE=Release `
@@ -74,8 +78,17 @@ jobs:
             -DLUI_BUILD_DEMO=ON `
             -DLUI_BUILD_DOCS=OFF
       
+      - name: Configure CMake (Windows MSVC)
+        if: runner.os == 'Windows' && matrix.toolchain == 'msvc'
+        run: |
+          cmake -B build -G "Visual Studio 17 2022" -A x64 `
+            -DCMAKE_BUILD_TYPE=Release `
+            -DLUI_BUILD_TESTS=ON `
+            -DLUI_BUILD_DEMO=ON `
+            -DLUI_BUILD_DOCS=OFF
+      
       - name: Build
-        run: ninja -C build
+        run: cmake --build build --config Release
       
       - name: Run Tests
-        run: ctest --test-dir build --output-on-failure
+        run: ctest --test-dir build --build-config Release --output-on-failure
