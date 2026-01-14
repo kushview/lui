@@ -1,4 +1,4 @@
-// Copyright 2022 Michael Fisher <mfisher@lvtk.org>
+// Copyright 2022 Kushview, LLC
 // SPDX-License-Identifier: ISC
 
 #include <memory>
@@ -13,7 +13,7 @@ public:
     HWNDEmbed (lui::Embed& o) : detail::Embed (o) {}
     ~HWNDEmbed() = default;
 
-    void* native_view() const noexcept { nullptr; }
+    void* native_view() const noexcept { return nullptr; }
 
     void view_changed() {
         if (attachment == nullptr)

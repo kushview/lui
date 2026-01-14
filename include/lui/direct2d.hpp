@@ -1,4 +1,4 @@
-// Copyright 2024 Kushview, LLC
+// Copyright 2026 Kushview, LLC
 // SPDX-License-Identifier: ISC
 
 #pragma once
@@ -11,15 +11,15 @@ namespace lui {
 class Main;
 class Widget;
 
-/** The Vulkan graphics backend.
-    Using this backend requires linking with lvtk-cairo-3.0
+/** The Direct2D graphics backend.
+    Using this backend requires Windows and links to Direct2D and DirectWrite.
 
     @ingroup widgets
     @ingroup graphics
-    @headerfile lui/cairo.hpp 
+    @headerfile lui/direct2d.hpp 
 */
-struct LUI_API Cairo : public Backend {
-    Cairo() : Backend ("Cairo") {}
+struct LUI_API Direct2D : public Backend {
+    Direct2D() : Backend ("Direct2D") {}
     std::unique_ptr<View> create_view (Main& c, Widget& w) override;
 };
 

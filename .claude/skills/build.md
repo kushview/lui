@@ -1,5 +1,5 @@
 <!--
-SPDX-FileCopyrightText: 2026 Michael Fisher <mfisher@lvtk.org>
+SPDX-FileCopyrightText: 2026 Kushview, LLC
 SPDX-License-Identifier: ISC
 -->
 

@@ -1,4 +1,4 @@
-// Copyright 2019-2024 Michael Fisher <mfisher@lvtk.org>
+// Copyright 2019-2024 Kushview, LLC
 // SPDX-License-Identifier: ISC
 
 #include <iostream>
@@ -15,6 +15,9 @@
 #elif LUI_DEMO_CG
 #    include <lui/core_graphics.hpp>
 #    define LUI_DEMO_TITLE "LUI Core Graphics Demo"
+#elif LUI_DEMO_D2D
+#    include <lui/direct2d.hpp>
+#    define LUI_DEMO_TITLE "LUI Direct2D Demo"
 #endif
 
 #include "demo.hpp"
@@ -73,6 +76,8 @@ int WinMain (HINSTANCE hInstance,
     lui::Main context (lui::Mode::PROGRAM, std::make_unique<lui::Cairo>());
 #    elif LUI_DEMO_VULKAN
     lui::Main context (lui::Mode::PROGRAM, std::make_unique<lui::Vulkan>());
+#    elif LUI_DEMO_D2D
+    lui::Main context (lui::Mode::PROGRAM, std::make_unique<lui::Direct2D>());
 #    else
     lui::Main context (lui::Mode::PROGRAM, std::make_unique<lui::OpenGL>());
 #    endif

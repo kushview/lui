@@ -1,2 +1,2 @@
-// Copyright 2019 Michael Fisher <mfisher@lvtk.org>
+// Copyright 2019 Kushview, LLC
 // SPDX-License-Identifier: ISC

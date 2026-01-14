@@ -46,11 +46,21 @@ function(lui_add_demo tgt)
         set(bundle_name ${tgt})
     endif()
     
-    add_executable(${tgt} main.cpp)
+    if(WIN32)
+        add_executable(${tgt} WIN32 main.cpp)
+    else()
+        add_executable(${tgt} main.cpp)
+    endif()
+    
     target_include_directories(${tgt} PRIVATE
         ${CMAKE_SOURCE_DIR}/include
         ${CMAKE_SOURCE_DIR}/src)
     target_compile_definitions(${tgt} PRIVATE LUI_NO_SYMBOL_EXPORT)
+    
+    if(WIN32)
+        target_compile_definitions(${tgt} PRIVATE LUI_STATIC)
+    endif()
+    
     target_link_libraries(${tgt} PRIVATE lui-demo)
 
     if(APPLE)
@@ -72,10 +82,12 @@ function(lui_add_demo tgt)
     )
 endfunction()
 
-lui_add_demo(lui-demo-gl)
-target_compile_definitions(lui-demo-gl PRIVATE LUI_DEMO_OPENGL=1)
-target_link_directories(lui-demo-gl PRIVATE ${CAIRO_LIBRARY_DIRS})
-target_link_libraries(lui-demo-gl PRIVATE lui-gl-${LUI_ABI_VERSION})
+if(NOT WIN32)
+    lui_add_demo(lui-demo-gl)
+    target_compile_definitions(lui-demo-gl PRIVATE LUI_DEMO_OPENGL=1)
+    target_link_directories(lui-demo-gl PRIVATE ${CAIRO_LIBRARY_DIRS})
+    target_link_libraries(lui-demo-gl PRIVATE lui-gl-${LUI_ABI_VERSION})
+endif()
 
 # Cairo
 if(CAIRO_FOUND)
@@ -88,4 +100,9 @@ endif()
 if (APPLE)
     lui_add_demo(lui-demo-cg)
     target_compile_definitions(lui-demo-cg PRIVATE LUI_DEMO_CG=1)
+endif()
+
+if(WIN32)
+    lui_add_demo(lui-demo-d2d)
+    target_compile_definitions(lui-demo-d2d PRIVATE LUI_DEMO_D2D=1)
 endif()

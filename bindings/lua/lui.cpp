@@ -1,4 +1,4 @@
-// Copyright 2024 Michael Fisher <mfisher@lui.org>
+// Copyright 2024 Kushview, LLC
 // SPDX-License-Identifier: ISC
 
 #include <lui/cairo.hpp>

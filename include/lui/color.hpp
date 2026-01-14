@@ -1,4 +1,4 @@
-// Copyright 2022 Michael Fisher <mfisher@lvtk.org>
+// Copyright 2022 Kushview, LLC
 // SPDX-License-Identifier: ISC
 
 #pragma once
@@ -171,7 +171,7 @@ private:
     template <typename FT>
     static inline uint8_t convert (FT v) {
         return static_cast<uint8_t> (
-            (FT) 255 * std::max (FT(), std::min (FT (1), v)));
+            (FT) 255 * (std::max) (FT(), (std::min) (FT (1), v)));
     }
 };
 

@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2022 Michael Fisher <mfisher@lvtk.org>
+# Copyright 2022 Kushview, LLC
 # SPDX-License-Identifier: ISC
 
 export LUA_PATH="bindings/?.lua"

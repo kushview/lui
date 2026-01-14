@@ -1,4 +1,4 @@
-// Copyright 2022-2024 Michael Fisher <mfisher@lvtk.org>
+// Copyright 2022-2024 Kushview, LLC
 // SPDX-License-Identifier: ISC
 
 #pragma once

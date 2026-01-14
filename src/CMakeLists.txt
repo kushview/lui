@@ -56,7 +56,10 @@ elseif(UNIX AND NOT APPLE)
         pugl/src/x11.c)
 elseif(WIN32)
     list(APPEND LIBLUI_SOURCES 
-        embed_win32.cpp)
+        direct2d.cpp
+        embed_win32.cpp
+        win_direct2d.cpp
+        pugl/src/win.c)
 endif()
 
 # Create the main library
@@ -77,6 +80,8 @@ target_compile_definitions(lui-${LUI_ABI_VERSION}
     PRIVATE
         LUI_BUILD
         PUGL_STATIC
+    PUBLIC
+        $<$<PLATFORM_ID:Windows>:LUI_STATIC>
 )
 
 # Include directories
@@ -119,6 +124,19 @@ if(APPLE)
             "-framework CoreVideo"
             "-framework CoreGraphics"
             "-framework Cocoa"
+    )
+endif()
+
+# Windows Direct2D libraries
+if(WIN32)
+    target_link_libraries(lui-${LUI_ABI_VERSION}
+        PRIVATE
+            uuid
+            d2d1
+            dwrite
+            dwmapi
+            gdi32
+            user32
     )
 endif()
 
@@ -175,50 +193,52 @@ function(lui_add_backend tgt)
     )
 endfunction()
 
-# OpenGL/NanoVG Backend
-add_library(lui-gl-${LUI_ABI_VERSION}
-    nanovg.cpp
-    nanovglib.cpp
-    opengl.cpp
-    ${RES_GENERATED}
-)
+if(NOT WIN32)
+    # OpenGL/NanoVG Backend
+    add_library(lui-gl-${LUI_ABI_VERSION}
+        nanovg.cpp
+        nanovglib.cpp
+        opengl.cpp
+        ${RES_GENERATED}
+    )
 
-if(APPLE)
-    target_sources(lui-gl-${LUI_ABI_VERSION} PRIVATE
-        pugl/src/mac_gl.m)
-    target_link_libraries(lui-gl-${LUI_ABI_VERSION} 
-        PRIVATE "-framework OpenGL")
-    target_compile_definitions(lui-gl-${LUI_ABI_VERSION} PRIVATE NANOVG_GL2)
-elseif(UNIX AND NOT APPLE)
-    # Linux: use libepoxy for OpenGL function loading
-    target_sources(lui-gl-${LUI_ABI_VERSION} PRIVATE
-        pugl/src/x11_gl.c)
-    if(LIBEPOXY_FOUND)
+    if(APPLE)
+        target_sources(lui-gl-${LUI_ABI_VERSION} PRIVATE
+            pugl/src/mac_gl.m)
         target_link_libraries(lui-gl-${LUI_ABI_VERSION} 
-            PRIVATE ${LIBEPOXY_LIBRARIES} GL X11)
-        target_include_directories(lui-gl-${LUI_ABI_VERSION} 
-            PRIVATE ${LIBEPOXY_INCLUDE_DIRS})
-        target_compile_definitions(lui-gl-${LUI_ABI_VERSION} PRIVATE NANOVG_GL3)
-    else()
-        message(FATAL_ERROR "libepoxy not found - required for OpenGL backend on Linux")
+            PRIVATE "-framework OpenGL")
+        target_compile_definitions(lui-gl-${LUI_ABI_VERSION} PRIVATE NANOVG_GL2)
+    elseif(UNIX AND NOT APPLE)
+        # Linux: use libepoxy for OpenGL function loading
+        target_sources(lui-gl-${LUI_ABI_VERSION} PRIVATE
+            pugl/src/x11_gl.c)
+        if(LIBEPOXY_FOUND)
+            target_link_libraries(lui-gl-${LUI_ABI_VERSION} 
+                PRIVATE ${LIBEPOXY_LIBRARIES} GL X11)
+            target_include_directories(lui-gl-${LUI_ABI_VERSION} 
+                PRIVATE ${LIBEPOXY_INCLUDE_DIRS})
+            target_compile_definitions(lui-gl-${LUI_ABI_VERSION} PRIVATE NANOVG_GL3)
+        else()
+            message(FATAL_ERROR "libepoxy not found - required for OpenGL backend on Linux")
+        endif()
     endif()
+
+    lui_add_backend(lui-gl-${LUI_ABI_VERSION})
+    target_include_directories(lui-gl-${LUI_ABI_VERSION} 
+        PRIVATE
+            ${CMAKE_CURRENT_BINARY_DIR}
+            ${CMAKE_CURRENT_SOURCE_DIR}/nanovg)
+
+    # Generate and install pkg-config file for OpenGL backend
+    configure_file(
+        ${CMAKE_SOURCE_DIR}/lui-gl.pc.in
+        ${CMAKE_BINARY_DIR}/lui-gl-${LUI_ABI_VERSION}.pc
+        @ONLY
+    )
+    install(FILES ${CMAKE_BINARY_DIR}/lui-gl-${LUI_ABI_VERSION}.pc
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
+    )
 endif()
-
-lui_add_backend(lui-gl-${LUI_ABI_VERSION})
-target_include_directories(lui-gl-${LUI_ABI_VERSION} 
-    PRIVATE
-        ${CMAKE_CURRENT_BINARY_DIR}
-        ${CMAKE_CURRENT_SOURCE_DIR}/nanovg)
-
-# Generate and install pkg-config file for OpenGL backend
-configure_file(
-    ${CMAKE_SOURCE_DIR}/lui-gl.pc.in
-    ${CMAKE_BINARY_DIR}/lui-gl-${LUI_ABI_VERSION}.pc
-    @ONLY
-)
-install(FILES ${CMAKE_BINARY_DIR}/lui-gl-${LUI_ABI_VERSION}.pc
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
-)
 
 # Cairo Backend
 if(CAIRO_FOUND)
