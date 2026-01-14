@@ -240,8 +240,8 @@ inline static Pth&& rounded_rect (Pth&& path, const float x, const float y,
                                   float corner_size_x, float corner_size_y,
                                   const bool top_left, const bool top_right,
                                   const bool bottom_left, const bool bottom_right) {
-    corner_size_x = std::min (corner_size_x, w * 0.5f);
-    corner_size_y = std::min (corner_size_y, h * 0.5f);
+    corner_size_x = (std::min) (corner_size_x, w * 0.5f);
+    corner_size_y = (std::min) (corner_size_y, h * 0.5f);
     auto cs45x    = corner_size_x * 0.45f;
     auto cs45y    = corner_size_y * 0.45f;
     auto x2       = x + w;

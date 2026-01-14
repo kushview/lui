@@ -294,10 +294,10 @@ struct Rectangle {
     */
     Rectangle intersection (Rectangle o) const noexcept {
         Rectangle r;
-        r.x      = std::max (x, o.x);
-        r.y      = std::max (y, o.y);
-        r.width  = std::min (x + width, o.x + o.width) - r.x;
-        r.height = std::min (y + height, o.y + o.height) - r.y;
+        r.x      = (std::max) (x, o.x);
+        r.y      = (std::max) (y, o.y);
+        r.width  = (std::min) (x + width, o.x + o.width) - r.x;
+        r.height = (std::min) (y + height, o.y + o.height) - r.y;
         return r.height >= Val() && r.width >= Val() ? r : Rectangle();
     }
 };
