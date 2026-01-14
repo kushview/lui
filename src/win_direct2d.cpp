@@ -4,18 +4,15 @@
 
 #include "pugl/src/stub.h"
 #include "pugl/src/types.h"
-#include "pugl/src/win.h"
 
-#define COBJMACROS
-#define INITGUID
+extern "C" {
+#include "pugl/src/win.h"
+}
+
 #include <d2d1.h>
 #include <dwrite.h>
 
 #include <stdlib.h>
-
-// Define GUIDs if not already defined
-DEFINE_GUID (IID_ID2D1Factory, 0x06152247, 0x6f50, 0x465a, 0x92, 0x45, 0x11, 0x8b, 0xfd, 0x3b, 0x60, 0x07);
-DEFINE_GUID (IID_IDWriteFactory, 0xb859ee5a, 0xd838, 0x4b5b, 0xa2, 0xe8, 0x1a, 0xdc, 0x7d, 0x93, 0xdb, 0x48);
 
 typedef struct {
     ID2D1Factory* d2dFactory;
@@ -49,8 +46,7 @@ static PuglStatus
         D2D1_PRESENT_OPTIONS_NONE
     };
 
-    HRESULT hr = ID2D1Factory_CreateHwndRenderTarget (
-        surface->d2dFactory,
+    HRESULT hr = surface->d2dFactory->CreateHwndRenderTarget (
         &props,
         &hwndProps,
         &surface->renderTarget);
@@ -64,7 +60,7 @@ static PuglStatus
     PuglWinDirect2DSurface* const surface = (PuglWinDirect2DSurface*) impl->surface;
 
     if (surface->renderTarget) {
-        ((IUnknown*) surface->renderTarget)->lpVtbl->Release ((IUnknown*) surface->renderTarget);
+        surface->renderTarget->Release();
         surface->renderTarget = NULL;
     }
 
@@ -84,9 +80,7 @@ static PuglStatus
         // Create D2D factory
         HRESULT hr = D2D1CreateFactory (
             D2D1_FACTORY_TYPE_SINGLE_THREADED,
-            &IID_ID2D1Factory,
-            NULL,
-            (void**) &surface->d2dFactory);
+            &surface->d2dFactory);
 
         if (FAILED (hr)) {
             free (surface);
@@ -95,14 +89,13 @@ static PuglStatus
         }
 
         // Create DWrite factory
-        static const GUID id_write = { 0xb859ee5a, 0xd838, 0x4b5b, { 0xa2, 0xe8, 0x1a, 0xdc, 0x7d, 0x93, 0xdb, 0x48 } };
-        hr                         = DWriteCreateFactory (
+        hr = DWriteCreateFactory (
             DWRITE_FACTORY_TYPE_SHARED,
-            &id_write,
-            (IUnknown**) &surface->writeFactory);
+            __uuidof(IDWriteFactory),
+            reinterpret_cast<IUnknown**> (&surface->writeFactory));
 
         if (FAILED (hr)) {
-            ID2D1Factory_Release (surface->d2dFactory);
+            surface->d2dFactory->Release ();
             free (surface);
             view->impl->surface = NULL;
             return PUGL_CREATE_CONTEXT_FAILED;
@@ -135,11 +128,11 @@ static void
         puglWinDirect2DDestroyDrawContext (view);
 
         if (surface->writeFactory) {
-            ((IUnknown*) surface->writeFactory)->lpVtbl->Release ((IUnknown*) surface->writeFactory);
+            surface->writeFactory->Release();
         }
 
         if (surface->d2dFactory) {
-            ((IUnknown*) surface->d2dFactory)->lpVtbl->Release ((IUnknown*) surface->d2dFactory);
+            surface->d2dFactory->Release();
         }
 
         free (surface);
@@ -167,7 +160,7 @@ static PuglStatus
             PuglWinDirect2DSurface* const surface =
                 (PuglWinDirect2DSurface*) view->impl->surface;
             if (surface->renderTarget) {
-                ID2D1RenderTarget_BeginDraw ((ID2D1RenderTarget*) surface->renderTarget);
+                surface->renderTarget->BeginDraw ();
             }
         }
     }
@@ -182,10 +175,7 @@ static PuglStatus
 
     if (expose && surface->renderTarget) {
         // End drawing
-        HRESULT hr = ID2D1RenderTarget_EndDraw (
-            (ID2D1RenderTarget*) surface->renderTarget,
-            NULL,
-            NULL);
+        HRESULT hr = surface->renderTarget->EndDraw ();
 
         if (hr == D2DERR_RECREATE_TARGET) {
             // Need to recreate render target
@@ -203,6 +193,8 @@ static void*
     return ((PuglWinDirect2DSurface*) view->impl->surface)->renderTarget;
 }
 
+extern "C" {
+
 const PuglBackend*
     puglDirect2DBackend (void) {
     static const PuglBackend backend = {
@@ -216,3 +208,5 @@ const PuglBackend*
 
     return &backend;
 }
+
+} // extern "C"

@@ -58,7 +58,7 @@ elseif(WIN32)
     list(APPEND LIBLUI_SOURCES 
         direct2d.cpp
         embed_win32.cpp
-        win_direct2d.c
+        win_direct2d.cpp
         pugl/src/win.c)
 endif()
 
