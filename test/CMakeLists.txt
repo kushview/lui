@@ -22,6 +22,7 @@ set(UNIT_TEST_SOURCES
     fitment_test.cpp
     observer_test.cpp
     path_test.cpp
+    point_test.cpp
     range_test.cpp
     rectangle_test.cpp
     string_test.cpp
