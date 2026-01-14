@@ -6,10 +6,16 @@
 #include "pugl/src/types.h"
 #include "pugl/src/win.h"
 
+#define COBJMACROS
+#define INITGUID
 #include <d2d1.h>
 #include <dwrite.h>
 
 #include <stdlib.h>
+
+// Define GUIDs if not already defined
+DEFINE_GUID (IID_ID2D1Factory, 0x06152247, 0x6f50, 0x465a, 0x92, 0x45, 0x11, 0x8b, 0xfd, 0x3b, 0x60, 0x07);
+DEFINE_GUID (IID_IDWriteFactory, 0xb859ee5a, 0xd838, 0x4b5b, 0xa2, 0xe8, 0x1a, 0xdc, 0x7d, 0x93, 0xdb, 0x48);
 
 typedef struct {
     ID2D1Factory* d2dFactory;
@@ -89,9 +95,10 @@ static PuglStatus
         }
 
         // Create DWrite factory
-        hr = DWriteCreateFactory (
+        static const GUID id_write = { 0xb859ee5a, 0xd838, 0x4b5b, { 0xa2, 0xe8, 0x1a, 0xdc, 0x7d, 0x93, 0xdb, 0x48 } };
+        hr                         = DWriteCreateFactory (
             DWRITE_FACTORY_TYPE_SHARED,
-            &IID_IDWriteFactory,
+            &id_write,
             (IUnknown**) &surface->writeFactory);
 
         if (FAILED (hr)) {

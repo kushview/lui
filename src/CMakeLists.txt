@@ -131,8 +131,10 @@ endif()
 if(WIN32)
     target_link_libraries(lui-${LUI_ABI_VERSION}
         PRIVATE
+            uuid
             d2d1
             dwrite
+            dwmapi
             gdi32
             user32
     )

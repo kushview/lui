@@ -51,6 +51,11 @@ function(lui_add_demo tgt)
         ${CMAKE_SOURCE_DIR}/include
         ${CMAKE_SOURCE_DIR}/src)
     target_compile_definitions(${tgt} PRIVATE LUI_NO_SYMBOL_EXPORT)
+    
+    if(WIN32)
+        target_compile_definitions(${tgt} PRIVATE LUI_STATIC)
+    endif()
+    
     target_link_libraries(${tgt} PRIVATE lui-demo)
 
     if(APPLE)
@@ -90,4 +95,9 @@ endif()
 if (APPLE)
     lui_add_demo(lui-demo-cg)
     target_compile_definitions(lui-demo-cg PRIVATE LUI_DEMO_CG=1)
+endif()
+
+if(WIN32)
+    lui_add_demo(lui-demo-d2d)
+    target_compile_definitions(lui-demo-d2d PRIVATE LUI_DEMO_D2D=1)
 endif()

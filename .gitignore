@@ -2,6 +2,8 @@
 build/
 build-cmake/
 build-node/
+/build-*/
+
 .cproject
 .lock-waf*
 lock-waf*
