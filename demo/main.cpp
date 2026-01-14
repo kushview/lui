@@ -61,6 +61,20 @@ int WinMain (HINSTANCE hInstance,
              int nShowCmd) {
     (hInstance, hPrevInstance, lpCmdLine, nShowCmd);
 
+    // Attach to parent console if launched from terminal, otherwise allocate new one
+    if (!AttachConsole(ATTACH_PARENT_PROCESS)) {
+        AllocConsole();
+    }
+    FILE* fpStdout = nullptr;
+    FILE* fpStderr = nullptr;
+    freopen_s(&fpStdout, "CONOUT$", "w", stdout);
+    freopen_s(&fpStderr, "CONOUT$", "w", stderr);
+    std::cout.clear();
+    std::cerr.clear();
+    std::clog.clear();
+
+    std::cout << "[demo] Console attached, std::cout working\n" << std::flush;
+
     struct ClogBuf : public std::stringbuf {
         ~ClogBuf() { sync(); }
         int sync() {
