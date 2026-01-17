@@ -419,7 +419,7 @@ public:
     View (Main& m, Widget& w)
         : lui::View (m, w) {
         set_backend ((uintptr_t) puglGdiBackend());
-        set_view_hint (PUGL_DOUBLE_BUFFER, PUGL_FALSE);
+        set_view_hint (PUGL_DOUBLE_BUFFER, PUGL_TRUE);
         set_view_hint (PUGL_RESIZABLE, PUGL_TRUE);
         puglSetViewString ((PuglView*) c_obj(), PUGL_WINDOW_TITLE, w.name().c_str());
     }
@@ -430,14 +430,20 @@ public:
         auto hdc = (HDC) puglGetContext (_view);
         assert (hdc != nullptr);
 
-        if (true || ! _scale_set || _last_scale != scale_factor()) {
-            _scale_set         = true;
-            const auto scale_x = scale_factor();
-            const auto scale_y = scale_x;
-            _last_scale        = scale_x;
+        // Set advanced graphics mode for transformations
+        SetGraphicsMode (hdc, GM_ADVANCED);
 
-            // Set advanced graphics mode for transformations
-            SetGraphicsMode (hdc, GM_ADVANCED);
+        const auto scale = 1.0 / scale_factor();
+        if (scale != 1.0) {
+            // Apply DPI scaling transform
+            XFORM xform;
+            xform.eM11 = static_cast<FLOAT> (scale);
+            xform.eM12 = 0.0f;
+            xform.eM21 = 0.0f;
+            xform.eM22 = static_cast<FLOAT> (scale);
+            xform.eDx  = 0.0f;
+            xform.eDy  = 0.0f;
+            SetWorldTransform (hdc, &xform);
         }
 
         if (_context->begin_frame (hdc, frame)) {
@@ -461,8 +467,6 @@ private:
     using Parent = lui::View;
     PuglView* _view { nullptr };
     std::unique_ptr<Context> _context;
-    bool _scale_set { false };
-    double _last_scale { 1.0 };
 };
 
 } // namespace gdi
