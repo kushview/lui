@@ -25,6 +25,10 @@ static PuglStatus
 
     surface->oldBitmap = (HBITMAP) SelectObject (surface->drawDc, surface->drawBitmap);
 
+    // Clear the offscreen bitmap to prevent uninitialized memory artifacts
+    RECT rect = { 0, 0, (LONG) view->lastConfigure.width, (LONG) view->lastConfigure.height };
+    FillRect (surface->drawDc, &rect, (HBRUSH) GetStockObject (WHITE_BRUSH));
+
     return PUGL_SUCCESS;
 }
 

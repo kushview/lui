@@ -51,6 +51,10 @@ public:
         stack.clear();
         release_resources();
 
+        // Enable better rendering modes
+        SetStretchBltMode (dc, HALFTONE);
+        SetBrushOrgEx (dc, 0, 0, NULL);
+
         this->clip (bounds);
         return true;
     }
@@ -195,9 +199,12 @@ public:
     }
 
     void exclude_clip (const Rectangle<int>& r) override {
+// noop
+#if 0
         HRGN rgn = CreateRectRgn (r.x, r.y, r.x + r.width, r.y + r.height);
         ExtSelectClipRgn (dc, rgn, RGN_DIFF);
         DeleteObject (rgn);
+#endif
     }
 
     Rectangle<int> last_clip() const override {
@@ -355,7 +362,7 @@ private:
                 DEFAULT_CHARSET,
                 OUT_DEFAULT_PRECIS,
                 CLIP_DEFAULT_PRECIS,
-                DEFAULT_QUALITY,
+                ANTIALIASED_QUALITY,
                 DEFAULT_PITCH | FF_DONTCARE,
                 "Arial");
 
