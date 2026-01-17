@@ -18,6 +18,9 @@
 #elif LUI_DEMO_D2D
 #    include <lui/direct2d.hpp>
 #    define LUI_DEMO_TITLE "LUI Direct2D Demo"
+#elif LUI_DEMO_GDI
+#    include <lui/gdi.hpp>
+#    define LUI_DEMO_TITLE "LUI GDI Demo"
 #endif
 
 #include "demo.hpp"
@@ -78,6 +81,8 @@ int WinMain (HINSTANCE hInstance,
     lui::Main context (lui::Mode::PROGRAM, std::make_unique<lui::Vulkan>());
 #    elif LUI_DEMO_D2D
     lui::Main context (lui::Mode::PROGRAM, std::make_unique<lui::Direct2D>());
+#    elif LUI_DEMO_GDI
+    lui::Main context (lui::Mode::PROGRAM, std::make_unique<lui::GDI>());
 #    else
     lui::Main context (lui::Mode::PROGRAM, std::make_unique<lui::OpenGL>());
 #    endif

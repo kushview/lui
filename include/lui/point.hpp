@@ -16,8 +16,8 @@ namespace lui {
 */
 template <typename Val>
 struct Point {
-    static_assert(std::is_integral_v<Val> || std::is_floating_point_v<Val>,
-                  "Point value type must be integral or floating point");
+    static_assert (std::is_integral_v<Val> || std::is_floating_point_v<Val>,
+                   "Point value type must be integral or floating point");
 
     /** X coordinate */
     Val x {};
@@ -26,13 +26,12 @@ struct Point {
 
     Point() = default;
 
-    template<typename TX, typename TY,
-             typename = std::enable_if_t<
-                 (std::is_integral_v<TX> || std::is_floating_point_v<TX>) &&
-                 (std::is_integral_v<TY> || std::is_floating_point_v<TY>)>>
-    Point(TX x_val, TY y_val) noexcept
-        : x(static_cast<Val>(x_val)),
-          y(static_cast<Val>(y_val)) {}
+    template <typename TX, typename TY,
+              typename = std::enable_if_t<
+                  (std::is_integral_v<TX> || std::is_floating_point_v<TX>) && (std::is_integral_v<TY> || std::is_floating_point_v<TY>)>>
+    Point (TX x_val, TY y_val) noexcept
+        : x (static_cast<Val> (x_val)),
+          y (static_cast<Val> (y_val)) {}
 
     /** Convert this point to another value type.
         i.e. int to float

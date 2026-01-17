@@ -31,4 +31,5 @@ lvtk.includes
 
 doxy.log
 
-.meson-subproject-wrap-hash.txt
+.meson-subproject-wrap-hash.txt.cache/
+.cache/

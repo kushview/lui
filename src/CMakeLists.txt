@@ -56,9 +56,11 @@ elseif(UNIX AND NOT APPLE)
         pugl/src/x11.c)
 elseif(WIN32)
     list(APPEND LIBLUI_SOURCES 
-        direct2d.cpp
         embed_win32.cpp
+        direct2d.cpp
         win_direct2d.cpp
+        gdi.cpp
+        win_gdi.c
         pugl/src/win.c)
 endif()
 

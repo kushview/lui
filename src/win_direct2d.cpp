@@ -91,11 +91,11 @@ static PuglStatus
         // Create DWrite factory
         hr = DWriteCreateFactory (
             DWRITE_FACTORY_TYPE_SHARED,
-            __uuidof(IDWriteFactory),
+            __uuidof (IDWriteFactory),
             reinterpret_cast<IUnknown**> (&surface->writeFactory));
 
         if (FAILED (hr)) {
-            surface->d2dFactory->Release ();
+            surface->d2dFactory->Release();
             free (surface);
             view->impl->surface = NULL;
             return PUGL_CREATE_CONTEXT_FAILED;
@@ -160,7 +160,7 @@ static PuglStatus
             PuglWinDirect2DSurface* const surface =
                 (PuglWinDirect2DSurface*) view->impl->surface;
             if (surface->renderTarget) {
-                surface->renderTarget->BeginDraw ();
+                surface->renderTarget->BeginDraw();
             }
         }
     }
@@ -175,7 +175,7 @@ static PuglStatus
 
     if (expose && surface->renderTarget) {
         // End drawing
-        HRESULT hr = surface->renderTarget->EndDraw ();
+        HRESULT hr = surface->renderTarget->EndDraw();
 
         if (hr == D2DERR_RECREATE_TARGET) {
             // Need to recreate render target
