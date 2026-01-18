@@ -5,8 +5,7 @@
 #include "buttons.hpp"
 #include "embedding.hpp"
 
-namespace lui {
-namespace demo {
+namespace lui::demo {
 
 extern std::unique_ptr<Widget> create_entry_demo();
 extern std::unique_ptr<Widget> create_sliders_demo();
@@ -100,5 +99,4 @@ void Content::run_demo (int index) {
     repaint();
 }
 
-} // namespace demo
-} // namespace lui
+} // namespace lui::demo
