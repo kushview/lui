@@ -27,6 +27,7 @@ set(UNIT_TEST_SOURCES
     point_test.cpp
     range_test.cpp
     rectangle_test.cpp
+    signal_test.cpp
     string_test.cpp
     transform_test.cpp
     weak_ref_test.cpp
