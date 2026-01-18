@@ -11,17 +11,6 @@
 namespace lui {
 namespace detail {
 
-class Ranged {
-public:
-    Ranged (lui::Ranged& o) : owner (o) {}
-
-private:
-    friend class lui::Ranged;
-    lui::Ranged& owner;
-    Range<double> range;
-    double value = 0.0;
-};
-
 class Slider {
 public:
     using Type = lui::Slider::Type;
@@ -94,45 +83,7 @@ private:
 
 } // namespace detail
 
-Ranged::Ranged() : impl (std::make_unique<detail::Ranged> (*this)) {}
-Ranged::~Ranged() { impl.reset(); }
-
-const Range<double>& Ranged::range() const noexcept { return impl->range; }
-double Ranged::value() const noexcept { return impl->value; }
-
-void Ranged::set_value (double value, Notify notify) {
-    if (impl->value == value)
-        return;
-
-    impl->value = value;
-
-    resized();
-    repaint();
-
-    if (notify == Notify::NONE)
-        return;
-
-    if (on_value_changed) {
-        if (notify == Notify::SYNC)
-            on_value_changed();
-        else { /* trigger async callback somehow */
-        }
-    }
-}
-
-void Ranged::set_range (double min, double max) {
-    if (min >= max)
-        return;
-    if (min != impl->range.min || max != impl->range.max) {
-        impl->range.min = min;
-        impl->range.max = max;
-    }
-}
-
-Slider::Slider() {
-    impl = std::make_unique<detail::Slider> (*this);
-}
-
+Slider::Slider() : impl (std::make_unique<detail::Slider> (*this)) {}
 Slider::~Slider() { impl.reset(); }
 
 bool Slider::vertical() const noexcept {
