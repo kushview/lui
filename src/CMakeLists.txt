@@ -140,6 +140,7 @@ if(WIN32)
             dwrite
             dwmapi
             gdi32
+            gdiplus
             user32
     )
 endif()
