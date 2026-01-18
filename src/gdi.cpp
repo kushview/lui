@@ -4,28 +4,33 @@
 /**
     Coordinate System Strategy:
 
-    GDI uses a top-left origin coordinate system by default, which matches
+    GDI+ uses a top-left origin coordinate system by default, which matches
     the natural LUI coordinate system. Paths, fills, strokes, and rectangles
     work directly with top-left coordinates.
 
-    Text rendering in GDI also uses top-left origin naturally, so no
+    Text rendering in GDI+ also uses top-left origin naturally, so no
     coordinate flipping is needed for text operations.
 */
 
 #include <cassert>
 #include <cmath>
 #include <iostream>
+#include <memory>
 #include <string>
 #include <vector>
-
+// clang-format off
 #include <windows.h>
-#include <wingdi.h>
+#include <oleauto.h>
+#include <gdiplus.h>
+// clang-format on
 
 #include <lui/gdi.hpp>
 #include <lui/graphics.hpp>
 #include <lui/widget.hpp>
 
 #include "pugl/src/stub.h"
+
+#include "Roboto-Regular.h"
 
 extern "C" {
 const PuglBackend* puglGdiBackend();
@@ -39,21 +44,49 @@ public:
     explicit Context (HDC hdc = nullptr)
         : dc (hdc) {
         stack.reserve (64);
+
+        // Initialize GDI+
+        Gdiplus::GdiplusStartupInput gdiplusStartupInput;
+        Gdiplus::GdiplusStartup (&gdiplusToken, &gdiplusStartupInput, nullptr);
+
+        // Load embedded Roboto font from memory using GDI+ PrivateFontCollection
+        fontCollection         = std::make_unique<Gdiplus::PrivateFontCollection>();
+        Gdiplus::Status status = fontCollection->AddMemoryFont (
+            (void*) Roboto_Regular_ttf,
+            sizeof (Roboto_Regular_ttf));
+
+        if (status != Gdiplus::Ok) {
+            std::cerr << "Failed to load Roboto font, status: " << status << std::endl;
+        }
     }
 
     ~Context() {
         release_resources();
+
+        // Font collection will be cleaned up automatically
+        fontCollection.reset();
+
+        // Shutdown GDI+
+        Gdiplus::GdiplusShutdown (gdiplusToken);
     }
 
     bool begin_frame (HDC _dc, lui::Bounds bounds) {
-        dc    = _dc;
-        state = {};
+        dc         = _dc;
+        state      = {};
+        state.font = Font (14.0f);
         stack.clear();
         release_resources();
 
-        // Enable better rendering modes
-        SetStretchBltMode (dc, HALFTONE);
-        SetBrushOrgEx (dc, 0, 0, NULL);
+        // Create GDI+ Graphics object
+        graphics = std::make_unique<Gdiplus::Graphics> (dc);
+        graphics->SetSmoothingMode (Gdiplus::SmoothingModeHighQuality);
+        graphics->SetTextRenderingHint (Gdiplus::TextRenderingHintAntiAliasGridFit);
+        graphics->SetCompositingQuality (Gdiplus::CompositingQualityHighQuality);
+        graphics->SetInterpolationMode (Gdiplus::InterpolationModeHighQualityBicubic);
+
+        // Create path and reset position
+        path        = std::make_unique<Gdiplus::GraphicsPath>();
+        current_pos = Gdiplus::PointF (0, 0);
 
         this->clip (bounds);
         return true;
@@ -72,11 +105,16 @@ public:
 
     void save() override {
         stack.push_back (state);
-        SaveDC (dc);
+        if (graphics) {
+            graphics_states.push_back (graphics->Save());
+        }
     }
 
     void restore() override {
-        RestoreDC (dc, -1);
+        if (graphics && ! graphics_states.empty()) {
+            graphics->Restore (graphics_states.back());
+            graphics_states.pop_back();
+        }
         if (stack.empty())
             return;
         std::swap (state, stack.back());
@@ -84,33 +122,28 @@ public:
     }
 
     void set_line_width (double width) override {
-        state.line_width = static_cast<int> (width);
+        state.line_width = static_cast<float> (width);
     }
 
     void clear_path() override {
-        path_points.clear();
-        path_types.clear();
-        current_pos = { 0, 0 };
+        path        = std::make_unique<Gdiplus::GraphicsPath>();
+        current_pos = Gdiplus::PointF (0, 0);
     }
 
     void move_to (double x1, double y1) override {
-        path_points.push_back (POINT { static_cast<LONG> (x1), static_cast<LONG> (y1) });
-        path_types.push_back (PT_MOVETO);
-        current_pos = { static_cast<LONG> (x1), static_cast<LONG> (y1) };
+        path->StartFigure();
+        current_pos = Gdiplus::PointF (static_cast<float> (x1), static_cast<float> (y1));
     }
 
     void line_to (double x1, double y1) override {
-        path_points.push_back (POINT { static_cast<LONG> (x1), static_cast<LONG> (y1) });
-        path_types.push_back (PT_LINETO);
-        current_pos = { static_cast<LONG> (x1), static_cast<LONG> (y1) };
+        path->AddLine (current_pos, Gdiplus::PointF (static_cast<float> (x1), static_cast<float> (y1)));
+        current_pos = Gdiplus::PointF (static_cast<float> (x1), static_cast<float> (y1));
     }
 
     void quad_to (double x1, double y1, double x2, double y2) override {
         // Convert quadratic bezier to cubic
-        // Control points: Q1 = current, Q2 = (x1,y1), Q3 = (x2,y2)
-        // Cubic: P0 = Q1, P1 = Q1 + 2/3(Q2-Q1), P2 = Q3 + 2/3(Q2-Q3), P3 = Q3
-        double cx1 = current_pos.x + 2.0 / 3.0 * (x1 - current_pos.x);
-        double cy1 = current_pos.y + 2.0 / 3.0 * (y1 - current_pos.y);
+        double cx1 = current_pos.X + 2.0 / 3.0 * (x1 - current_pos.X);
+        double cy1 = current_pos.Y + 2.0 / 3.0 * (y1 - current_pos.Y);
         double cx2 = x2 + 2.0 / 3.0 * (x1 - x2);
         double cy2 = y2 + 2.0 / 3.0 * (y1 - y2);
 
@@ -118,92 +151,70 @@ public:
     }
 
     void cubic_to (double x1, double y1, double x2, double y2, double x3, double y3) override {
-        // GDI uses PolyBezierTo which requires control points and end point
-        path_points.push_back (POINT { static_cast<LONG> (x1), static_cast<LONG> (y1) });
-        path_types.push_back (PT_BEZIERTO);
-        path_points.push_back (POINT { static_cast<LONG> (x2), static_cast<LONG> (y2) });
-        path_types.push_back (PT_BEZIERTO);
-        path_points.push_back (POINT { static_cast<LONG> (x3), static_cast<LONG> (y3) });
-        path_types.push_back (PT_BEZIERTO);
-        current_pos = { static_cast<LONG> (x3), static_cast<LONG> (y3) };
+        path->AddBezier (
+            current_pos,
+            Gdiplus::PointF (static_cast<float> (x1), static_cast<float> (y1)),
+            Gdiplus::PointF (static_cast<float> (x2), static_cast<float> (y2)),
+            Gdiplus::PointF (static_cast<float> (x3), static_cast<float> (y3)));
+        current_pos = Gdiplus::PointF (static_cast<float> (x3), static_cast<float> (y3));
     }
 
     void close_path() override {
-        if (! path_types.empty()) {
-            path_types.back() |= PT_CLOSEFIGURE;
-        }
+        path->CloseFigure();
     }
 
     void fill() override {
-        apply_pending_state();
-        if (path_points.empty())
+        if (! graphics || ! path)
             return;
 
-        BeginPath (dc);
-        PolyDraw (dc, path_points.data(), path_types.data(), static_cast<int> (path_points.size()));
-        EndPath (dc);
-
-        if (current_brush) {
-            SelectObject (dc, current_brush);
-            FillPath (dc);
-        }
+        auto c = state.color;
+        Gdiplus::SolidBrush brush (Gdiplus::Color (c.alpha(), c.red(), c.green(), c.blue()));
+        graphics->FillPath (&brush, path.get());
     }
 
     void stroke() override {
-        apply_pending_state();
-        if (path_points.empty())
+        if (! graphics || ! path)
             return;
 
-        BeginPath (dc);
-        PolyDraw (dc, path_points.data(), path_types.data(), static_cast<int> (path_points.size()));
-        EndPath (dc);
-
-        if (current_pen) {
-            SelectObject (dc, current_pen);
-            StrokePath (dc);
-        }
+        auto c = state.color;
+        Gdiplus::Pen pen (Gdiplus::Color (c.alpha(), c.red(), c.green(), c.blue()), state.line_width);
+        pen.SetLineCap (Gdiplus::LineCapRound, Gdiplus::LineCapRound, Gdiplus::DashCapRound);
+        graphics->DrawPath (&pen, path.get());
     }
 
     void translate (double x, double y) override {
-        XFORM xform;
-        xform.eM11 = 1.0f;
-        xform.eM12 = 0.0f;
-        xform.eM21 = 0.0f;
-        xform.eM22 = 1.0f;
-        xform.eDx  = static_cast<FLOAT> (x);
-        xform.eDy  = static_cast<FLOAT> (y);
-
-        ModifyWorldTransform (dc, &xform, MWT_LEFTMULTIPLY);
-
+        if (graphics) {
+            graphics->TranslateTransform (static_cast<float> (x), static_cast<float> (y));
+        }
         state.clip.x -= x;
         state.clip.y -= y;
     }
 
     void transform (const Transform& mat) override {
-        XFORM xform;
-        xform.eM11 = static_cast<FLOAT> (mat.m00);
-        xform.eM12 = static_cast<FLOAT> (mat.m10);
-        xform.eM21 = static_cast<FLOAT> (mat.m01);
-        xform.eM22 = static_cast<FLOAT> (mat.m11);
-        xform.eDx  = static_cast<FLOAT> (mat.m02);
-        xform.eDy  = static_cast<FLOAT> (mat.m12);
-
-        ModifyWorldTransform (dc, &xform, MWT_LEFTMULTIPLY);
+        if (graphics) {
+            Gdiplus::Matrix matrix (
+                static_cast<float> (mat.m00),
+                static_cast<float> (mat.m10),
+                static_cast<float> (mat.m01),
+                static_cast<float> (mat.m11),
+                static_cast<float> (mat.m02),
+                static_cast<float> (mat.m12));
+            graphics->MultiplyTransform (&matrix);
+        }
     }
 
     void clip (const Rectangle<int>& r) override {
         state.clip = r.as<double>();
-        HRGN rgn   = CreateRectRgn (r.x, r.y, r.x + r.width, r.y + r.height);
-        SelectClipRgn (dc, rgn);
-        DeleteObject (rgn);
+        if (graphics) {
+            graphics->SetClip (Gdiplus::Rect (r.x, r.y, r.width, r.height));
+        }
     }
 
-    void exclude_clip (const Rectangle<int>& r) override {
-// noop
-#if 0
-        HRGN rgn = CreateRectRgn (r.x, r.y, r.x + r.width, r.y + r.height);
-        ExtSelectClipRgn (dc, rgn, RGN_DIFF);
-        DeleteObject (rgn);
+    void exclude_clip (const Rectangle<int>&) override {
+#if 0 // TODO:
+        if (graphics) {
+            graphics->ExcludeClip (Gdiplus::Rect (r.x, r.y, r.width, r.height));
+        }
 #endif
     }
 
@@ -217,201 +228,174 @@ public:
 
     void set_font (const Font& font) override {
         state.font = font;
-        font_dirty = true;
     }
 
     void set_fill (const Fill& fill) override {
         if (fill.is_color()) {
             state.color = fill.color();
-            brush_dirty = true;
         }
     }
 
     void fill_rect (const Rectangle<double>& r) override {
-        apply_pending_state();
-        RECT rect;
-        rect.left   = static_cast<LONG> (r.x);
-        rect.top    = static_cast<LONG> (r.y);
-        rect.right  = static_cast<LONG> (r.x + r.width);
-        rect.bottom = static_cast<LONG> (r.y + r.height);
+        if (! graphics)
+            return;
 
-        if (current_brush) {
-            FillRect (dc, &rect, current_brush);
-        }
+        auto c = state.color;
+        Gdiplus::SolidBrush brush (Gdiplus::Color (c.alpha(), c.red(), c.green(), c.blue()));
+        graphics->FillRectangle (
+            &brush,
+            static_cast<float> (r.x),
+            static_cast<float> (r.y),
+            static_cast<float> (r.width),
+            static_cast<float> (r.height));
     }
 
     FontMetrics font_metrics() const noexcept override {
-        TEXTMETRIC tm;
-        GetTextMetrics (dc, &tm);
+        if (! graphics || ! fontCollection)
+            return {};
+
+        // Get font family from private collection
+        Gdiplus::FontFamily fontFamily;
+        int found = 0;
+        fontCollection->GetFamilies (1, &fontFamily, &found);
+        if (found == 0)
+            return {};
+
+        Gdiplus::Font gdiFont (&fontFamily, state.font.height(), Gdiplus::FontStyleRegular, Gdiplus::UnitPixel);
+
+        const float emSize   = gdiFont.GetSize();
+        const float cellAsc  = fontFamily.GetCellAscent (Gdiplus::FontStyleRegular);
+        const float cellDesc = fontFamily.GetCellDescent (Gdiplus::FontStyleRegular);
+        const float emHeight = fontFamily.GetEmHeight (Gdiplus::FontStyleRegular);
+
+        const float ascent  = emSize * cellAsc / emHeight;
+        const float descent = emSize * cellDesc / emHeight;
+        const float height  = ascent + descent;
+
         return {
-            static_cast<double> (tm.tmAscent),
-            static_cast<double> (tm.tmDescent),
-            static_cast<double> (tm.tmHeight),
-            static_cast<double> (tm.tmAveCharWidth),
-            static_cast<double> (tm.tmHeight)
+            static_cast<double> (ascent),
+            static_cast<double> (descent),
+            static_cast<double> (height),
+            static_cast<double> (emSize / 2.0), // approximate
+            static_cast<double> (height)
         };
     }
 
     TextMetrics text_metrics (std::string_view text) const noexcept override {
-        SIZE size;
-        GetTextExtentPoint32A (dc, text.data(), static_cast<int> (text.length()), &size);
+        if (! graphics || ! fontCollection)
+            return {};
+
+        // Get font family from private collection
+        Gdiplus::FontFamily fontFamily;
+        int found = 0;
+        fontCollection->GetFamilies (1, &fontFamily, &found);
+        if (found == 0)
+            return {};
+
+        std::wstring wtext (text.begin(), text.end());
+        Gdiplus::Font gdiFont (&fontFamily, state.font.height(), Gdiplus::FontStyleRegular, Gdiplus::UnitPixel);
+        Gdiplus::RectF layoutRect;
+        Gdiplus::RectF boundingBox;
+        graphics->MeasureString (wtext.c_str(), -1, &gdiFont, layoutRect, &boundingBox);
+
         return {
-            static_cast<double> (size.cx),
-            static_cast<double> (size.cy),
+            static_cast<double> (boundingBox.Width),
+            static_cast<double> (boundingBox.Height),
             0.0,
             0.0,
-            static_cast<double> (size.cx),
-            static_cast<double> (size.cy)
+            static_cast<double> (boundingBox.Width),
+            static_cast<double> (boundingBox.Height)
         };
     }
 
     bool show_text (std::string_view text) override {
-        apply_pending_state();
+        if (! graphics || ! fontCollection)
+            return false;
 
-        SetBkMode (dc, TRANSPARENT);
+        std::wstring wtext (text.begin(), text.end());
+
+        // Get the font family from our private collection
+        int numFamilies = fontCollection->GetFamilyCount();
+        if (numFamilies == 0)
+            return false;
+
+        Gdiplus::FontFamily fontFamily;
+        int found = 0;
+        fontCollection->GetFamilies (1, &fontFamily, &found);
+
+        if (found == 0)
+            return false;
+
+        Gdiplus::Font gdiFont (&fontFamily, state.font.height(), Gdiplus::FontStyleRegular, Gdiplus::UnitPixel);
+
+        // Get font metrics to calculate baseline adjustment
+        const float emSize   = gdiFont.GetSize();
+        const float cellAsc  = fontFamily.GetCellAscent (Gdiplus::FontStyleRegular);
+        const float emHeight = fontFamily.GetEmHeight (Gdiplus::FontStyleRegular);
+        const float ascent   = emSize * cellAsc / emHeight;
+
         auto c = state.color;
-        SetTextColor (dc, RGB (c.red(), c.green(), c.blue()));
+        Gdiplus::SolidBrush brush (Gdiplus::Color (c.alpha(), c.red(), c.green(), c.blue()));
 
-        TextOutA (dc, current_pos.x, current_pos.y, text.data(), static_cast<int> (text.length()));
+        // GDI+ DrawString uses top-left positioning, but current_pos represents the baseline
+        // Adjust Y coordinate by subtracting ascent to position text correctly
+        Gdiplus::PointF origin (current_pos.X, current_pos.Y - ascent);
+
+        graphics->DrawString (wtext.c_str(), -1, &gdiFont, origin, &brush);
         return true;
     }
 
     void draw_image (Image i, Transform matrix) override {
-        // Create a memory DC for the source image
-        HDC memDC = CreateCompatibleDC (dc);
-        if (! memDC)
+        if (! graphics)
             return;
 
-        // Create a DIB section for the image
-        BITMAPINFO bmi              = {};
-        bmi.bmiHeader.biSize        = sizeof (BITMAPINFOHEADER);
-        bmi.bmiHeader.biWidth       = i.width();
-        bmi.bmiHeader.biHeight      = -i.height(); // Negative for top-down DIB
-        bmi.bmiHeader.biPlanes      = 1;
-        bmi.bmiHeader.biBitCount    = 32;
-        bmi.bmiHeader.biCompression = BI_RGB;
-
-        void* bits      = nullptr;
-        HBITMAP hBitmap = CreateDIBSection (memDC, &bmi, DIB_RGB_COLORS, &bits, nullptr, 0);
-        if (! hBitmap) {
-            DeleteDC (memDC);
-            return;
-        }
-
-        // Copy image data
-        memcpy (bits, i.data(), i.stride() * i.height());
-
-        HBITMAP oldBitmap = (HBITMAP) SelectObject (memDC, hBitmap);
+        // Create a GDI+ bitmap from the image data
+        Gdiplus::Bitmap bitmap (i.width(), i.height(), i.stride(), PixelFormat32bppARGB, (BYTE*) i.data());
 
         // Save current transform
-        XFORM oldXform;
-        GetWorldTransform (dc, &oldXform);
+        Gdiplus::GraphicsState state = graphics->Save();
 
         // Apply the transformation matrix
-        transform (matrix);
+        Gdiplus::Matrix mat (
+            static_cast<float> (matrix.m00),
+            static_cast<float> (matrix.m10),
+            static_cast<float> (matrix.m01),
+            static_cast<float> (matrix.m11),
+            static_cast<float> (matrix.m02),
+            static_cast<float> (matrix.m12));
+        graphics->MultiplyTransform (&mat);
 
-        // Blit the image
-        BitBlt (dc, 0, 0, i.width(), i.height(), memDC, 0, 0, SRCCOPY);
+        // Draw the image
+        graphics->DrawImage (&bitmap, 0, 0, i.width(), i.height());
 
         // Restore transform
-        SetWorldTransform (dc, &oldXform);
-
-        SelectObject (memDC, oldBitmap);
-        DeleteObject (hBitmap);
-        DeleteDC (memDC);
+        graphics->Restore (state);
     }
 
 private:
-    void apply_pending_state() {
-        if (brush_dirty) {
-            if (current_brush) {
-                DeleteObject (current_brush);
-                current_brush = nullptr;
-            }
-            auto c        = state.color;
-            current_brush = CreateSolidBrush (RGB (c.red(), c.green(), c.blue()));
-            brush_dirty   = false;
-        }
-
-        if (pen_dirty || state.line_width != last_line_width) {
-            if (current_pen) {
-                DeleteObject (current_pen);
-                current_pen = nullptr;
-            }
-            auto c          = state.color;
-            current_pen     = CreatePen (PS_SOLID, state.line_width, RGB (c.red(), c.green(), c.blue()));
-            pen_dirty       = false;
-            last_line_width = state.line_width;
-        }
-
-        if (font_dirty) {
-            if (current_font) {
-                DeleteObject (current_font);
-                current_font = nullptr;
-            }
-
-            current_font = CreateFontA (
-                static_cast<int> (state.font.height()),
-                0,
-                0,
-                0,
-                FW_NORMAL,
-                FALSE,
-                FALSE,
-                FALSE,
-                DEFAULT_CHARSET,
-                OUT_DEFAULT_PRECIS,
-                CLIP_DEFAULT_PRECIS,
-                ANTIALIASED_QUALITY,
-                DEFAULT_PITCH | FF_DONTCARE,
-                "Arial");
-
-            if (current_font) {
-                SelectObject (dc, current_font);
-            }
-            font_dirty = false;
-        }
-    }
-
     void release_resources() {
-        if (current_brush) {
-            DeleteObject (current_brush);
-            current_brush = nullptr;
-        }
-        if (current_pen) {
-            DeleteObject (current_pen);
-            current_pen = nullptr;
-        }
-        if (current_font) {
-            DeleteObject (current_font);
-            current_font = nullptr;
-        }
-        path_points.clear();
-        path_types.clear();
+        graphics.reset();
+        path.reset();
+        graphics_states.clear();
     }
 
     struct State {
         Font font;
         Color color;
         Rectangle<double> clip;
-        int line_width { 1 };
+        float line_width { 1.0f };
     };
 
     HDC dc { nullptr };
-    HBRUSH current_brush { nullptr };
-    HPEN current_pen { nullptr };
-    HFONT current_font { nullptr };
-    POINT current_pos { 0, 0 };
-
-    std::vector<POINT> path_points;
-    std::vector<BYTE> path_types;
+    ULONG_PTR gdiplusToken { 0 };
+    std::unique_ptr<Gdiplus::Graphics> graphics;
+    std::unique_ptr<Gdiplus::GraphicsPath> path;
+    std::unique_ptr<Gdiplus::PrivateFontCollection> fontCollection;
+    Gdiplus::PointF current_pos { 0, 0 };
 
     State state;
     std::vector<State> stack;
-    bool brush_dirty { false };
-    bool pen_dirty { false };
-    bool font_dirty { false };
-    int last_line_width { 1 };
+    std::vector<Gdiplus::GraphicsState> graphics_states;
 };
 
 class View : public lui::View {

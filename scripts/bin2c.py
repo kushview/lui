@@ -40,7 +40,11 @@ def bin2c(filename, varname='data', linesize=80, indent=4):
         linesize = 40
     byte_len = 6  # '0x00, '
     data_len = len(data)
-    out = 'static const unsigned char %s[%d] = {\n' % (varname, data_len)
+    header_guard = '%s_H' % (varname.upper())
+    out  = "#ifndef " + header_guard + "\n"
+    out += "#define " + header_guard + "\n\n"
+    out += '#include <stddef.h>\n'
+    out += 'static const unsigned char %s[%d] = {\n' % (varname, data_len)
     line = ''
     for byte in data:
         line += '0x%02x, ' % (byte if PY3 else ord(byte))
@@ -53,7 +57,8 @@ def bin2c(filename, varname='data', linesize=80, indent=4):
     # strip the last comma
     out = out.rstrip(', \n') + '\n'
     out += '};\n'
-    out += 'static const size_t %s_size = %d;\n' % (varname, data_len)
+    out += 'static const size_t %s_size = %d;\n\n' % (varname, data_len)
+    out += '#endif\n'
     return out
 
 def main():
