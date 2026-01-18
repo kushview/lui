@@ -51,6 +51,9 @@ public:
         stack.clear();
         release_resources();
 
+        // Enable advanced graphics mode for transformations
+        SetGraphicsMode (dc, GM_ADVANCED);
+
         // Enable better rendering modes
         SetStretchBltMode (dc, HALFTONE);
         SetBrushOrgEx (dc, 0, 0, NULL);
@@ -193,7 +196,15 @@ public:
 
     void clip (const Rectangle<int>& r) override {
         state.clip = r.as<double>();
-        HRGN rgn   = CreateRectRgn (r.x, r.y, r.x + r.width, r.y + r.height);
+
+        // Convert logical coordinates to device coordinates
+        POINT pts[2] = {
+            { static_cast<LONG> (r.x), static_cast<LONG> (r.y) },
+            { static_cast<LONG> (r.x + r.width), static_cast<LONG> (r.y + r.height) }
+        };
+        LPtoDP (dc, pts, 2);
+
+        HRGN rgn = CreateRectRgn (pts[0].x, pts[0].y, pts[1].x, pts[1].y);
         SelectClipRgn (dc, rgn);
         DeleteObject (rgn);
     }
@@ -224,6 +235,7 @@ public:
         if (fill.is_color()) {
             state.color = fill.color();
             brush_dirty = true;
+            pen_dirty   = true;
         }
     }
 
