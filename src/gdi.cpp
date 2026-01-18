@@ -12,22 +12,25 @@
     coordinate flipping is needed for text operations.
 */
 
-#include "Roboto-Regular.h"
 #include <cassert>
 #include <cmath>
-#include <gdiplus.h>
 #include <iostream>
 #include <memory>
-#include <oleauto.h>
 #include <string>
 #include <vector>
+// clang-format off
 #include <windows.h>
+#include <oleauto.h>
+#include <gdiplus.h>
+// clang-format on
 
 #include <lui/gdi.hpp>
 #include <lui/graphics.hpp>
 #include <lui/widget.hpp>
 
 #include "pugl/src/stub.h"
+
+#include "Roboto-Regular.h"
 
 extern "C" {
 const PuglBackend* puglGdiBackend();
