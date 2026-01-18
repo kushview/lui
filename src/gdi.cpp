@@ -15,13 +15,13 @@
 #include "Roboto-Regular.h"
 #include <cassert>
 #include <cmath>
-#include <windows.h>
-#include <oleauto.h>
 #include <gdiplus.h>
 #include <iostream>
 #include <memory>
+#include <oleauto.h>
 #include <string>
 #include <vector>
+#include <windows.h>
 
 #include <lui/gdi.hpp>
 #include <lui/graphics.hpp>
@@ -47,11 +47,11 @@ public:
         Gdiplus::GdiplusStartup (&gdiplusToken, &gdiplusStartupInput, nullptr);
 
         // Load embedded Roboto font from memory using GDI+ PrivateFontCollection
-        fontCollection = std::make_unique<Gdiplus::PrivateFontCollection>();
+        fontCollection         = std::make_unique<Gdiplus::PrivateFontCollection>();
         Gdiplus::Status status = fontCollection->AddMemoryFont (
             (void*) Roboto_Regular_ttf,
             sizeof (Roboto_Regular_ttf));
-        
+
         if (status != Gdiplus::Ok) {
             std::cerr << "Failed to load Roboto font, status: " << status << std::endl;
         }
@@ -82,7 +82,7 @@ public:
         graphics->SetInterpolationMode (Gdiplus::InterpolationModeHighQualityBicubic);
 
         // Create path and reset position
-        path = std::make_unique<Gdiplus::GraphicsPath>();
+        path        = std::make_unique<Gdiplus::GraphicsPath>();
         current_pos = Gdiplus::PointF (0, 0);
 
         this->clip (bounds);
@@ -175,6 +175,7 @@ public:
 
         auto c = state.color;
         Gdiplus::Pen pen (Gdiplus::Color (c.alpha(), c.red(), c.green(), c.blue()), state.line_width);
+        pen.SetLineCap (Gdiplus::LineCapRound, Gdiplus::LineCapRound, Gdiplus::DashCapRound);
         graphics->DrawPath (&pen, path.get());
     }
 
@@ -309,16 +310,16 @@ public:
             return false;
 
         std::wstring wtext (text.begin(), text.end());
-        
+
         // Get the font family from our private collection
         int numFamilies = fontCollection->GetFamilyCount();
         if (numFamilies == 0)
             return false;
-            
+
         Gdiplus::FontFamily fontFamily;
         int found = 0;
         fontCollection->GetFamilies (1, &fontFamily, &found);
-        
+
         if (found == 0)
             return false;
 
