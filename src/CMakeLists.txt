@@ -26,6 +26,7 @@ endforeach()
 # Main library sources
 set(LIBLUI_SOURCES
     button.cpp
+    dial.cpp
     embed.cpp
     entry.cpp
     font.cpp

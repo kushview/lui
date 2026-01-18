@@ -1,17 +1,16 @@
 // Copyright 2019 Kushview, LLC
 // SPDX-License-Identifier: ISC
 
-#include <lui/slider.hpp>
+#include <lui/dial.hpp>
 
 #include "demo.hpp"
 #include "utils.hpp"
 
-namespace lui {
-namespace demo {
+namespace lui::demo {
 
 class Dials : public DemoWidget {
 public:
-    enum { total_dials = 10 };
+    enum : uint8_t { total_dials = 10 };
     Dials() {
         for (int i = 0; i < total_dials; ++i) {
             dials.push_back (new Dial());
@@ -22,7 +21,7 @@ public:
         }
 
         add (reset_button);
-        reset_button.on_clicked = std::bind (&Dials::reset_values, this);
+        reset_button.on_clicked = [this]() { reset_values(); };
         update_button_text();
         update_text (*dials.front());
 
@@ -38,11 +37,18 @@ public:
     void reset_values() {
         for (auto dial : dials) {
             auto& span = dial->range();
-            dial->set_value (span.min + span.diff() * 0.64, Notify::NONE);
+            dial->set_value (span.min + (span.diff() * 0.64), Notify::NONE);
         }
     }
 
 private:
+    std::vector<Dial*> dials;
+    TextButton reset_button {};
+    double last_value = 0.0;
+    std::string value_str { "VALUE: N/A" };
+    std::string min_str { "MIN: N/A" };
+    std::string max_str { "MAX: N/A" };
+
     void update_button_text() {
         reset_button.set_text ("Reset");
     }
@@ -62,7 +68,7 @@ private:
 
         int dial_width = 100;
         int pad        = 2;
-        int box_size   = pad * 2 + dial_width;
+        int box_size   = (pad * 2) + dial_width;
 
         Bounds r2;
         for (auto s : dials) {
@@ -75,7 +81,7 @@ private:
 
         const int nbw = 120;
         reset_button.set_bounds (
-            width() / 2 - nbw / 2,
+            (width() / 2) - (nbw / 2),
             tr.y + (tr.height / 2) - 15,
             nbw,
             30);
@@ -103,19 +109,10 @@ private:
         r.slice_right (8);
         g.draw_text (value_str, r.as<float>(), Justify::BOTTOM_RIGHT);
     }
-
-private:
-    std::vector<Dial*> dials;
-    TextButton reset_button {};
-    double last_value = 0.0;
-    std::string value_str { "VALUE: N/A" };
-    std::string min_str { "MIN: N/A" };
-    std::string max_str { "MAX: N/A" };
 };
 
 std::unique_ptr<Widget> create_dials_demo() {
     return std::make_unique<Dials>();
 }
 
-} // namespace demo
-} // namespace lui
+} // namespace lui::demo
