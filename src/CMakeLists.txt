@@ -67,6 +67,7 @@ endif()
 # Create the main library
 add_library(lui-${LUI_ABI_VERSION}
     ${LIBLUI_SOURCES}
+    ${RES_GENERATED}
 )
 
 # Set properties
@@ -95,7 +96,8 @@ target_include_directories(lui-${LUI_ABI_VERSION} PUBLIC
 
 # Include pugl from subproject and nanovg sources
 target_include_directories(lui-${LUI_ABI_VERSION} PRIVATE
-    ${PROJECT_SOURCE_DIR}/src/pugl/include)
+    ${PROJECT_SOURCE_DIR}/src/pugl/include
+    ${CMAKE_CURRENT_BINARY_DIR})
 
 # Link dependencies
 target_include_directories(lui-${LUI_ABI_VERSION} PRIVATE)

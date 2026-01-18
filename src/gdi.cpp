@@ -12,12 +12,12 @@
     coordinate flipping is needed for text operations.
 */
 
+#include "Roboto-Regular.h"
 #include <cassert>
 #include <cmath>
 #include <iostream>
 #include <string>
 #include <vector>
-
 #include <windows.h>
 #include <wingdi.h>
 
@@ -39,15 +39,30 @@ public:
     explicit Context (HDC hdc = nullptr)
         : dc (hdc) {
         stack.reserve (64);
+
+        // Load embedded Roboto font from memory
+        DWORD numFonts       = 0;
+        embedded_font_handle = AddFontMemResourceEx (
+            (void*) Roboto_Regular_ttf,
+            sizeof (Roboto_Regular_ttf),
+            0,
+            &numFonts);
     }
 
     ~Context() {
         release_resources();
+
+        // Unload embedded font
+        if (embedded_font_handle) {
+            RemoveFontMemResourceEx (embedded_font_handle);
+            embedded_font_handle = nullptr;
+        }
     }
 
     bool begin_frame (HDC _dc, lui::Bounds bounds) {
-        dc    = _dc;
-        state = {};
+        dc         = _dc;
+        state      = {};
+        state.font = Font (14.0f);
         stack.clear();
         release_resources();
 
@@ -59,6 +74,7 @@ public:
         SetBrushOrgEx (dc, 0, 0, NULL);
 
         this->clip (bounds);
+        font_dirty = true;
         return true;
     }
 
@@ -281,6 +297,7 @@ public:
         apply_pending_state();
 
         SetBkMode (dc, TRANSPARENT);
+        SetTextAlign (dc, TA_LEFT | TA_BASELINE);
         auto c = state.color;
         SetTextColor (dc, RGB (c.red(), c.green(), c.blue()));
 
@@ -376,7 +393,7 @@ private:
                 CLIP_DEFAULT_PRECIS,
                 ANTIALIASED_QUALITY,
                 DEFAULT_PITCH | FF_DONTCARE,
-                "Arial");
+                "Roboto");
 
             if (current_font) {
                 SelectObject (dc, current_font);
@@ -424,6 +441,7 @@ private:
     bool pen_dirty { false };
     bool font_dirty { false };
     int last_line_width { 1 };
+    HANDLE embedded_font_handle { nullptr };
 };
 
 class View : public lui::View {

@@ -1,7 +1,6 @@
 // Copyright 2022 Michael Fisher <mfisher@lvtk.org>
 // SPDX-License-Identifier: ISC
 
-#include <iostream>
 #include <unordered_map>
 #include <vector>
 
@@ -16,8 +15,7 @@
 #include "Roboto-Regular.h"
 #include "nanovg.hpp"
 
-namespace lui {
-namespace nvg {
+namespace lui::nvg {
 namespace detail {
 
 static constexpr const char* default_font_face      = "Roboto-Normal";
@@ -464,5 +462,4 @@ void Context::draw_image (Image i, Transform matrix) {
     fill();
 }
 
-} // namespace nvg
-} // namespace lui
+} // namespace lui::nvg
