@@ -11,9 +11,9 @@
 #include <lui/widget.hpp>
 
 // clang-format off
-namespace lui { namespace detail { class Ranged; } }
-namespace lui { namespace detail { class Slider; } }
-namespace lui { namespace detail { class Dial; } }
+namespace lui::detail { class Ranged; }
+namespace lui::detail { class Slider; }
+namespace lui::detail { class Dial; }
 // clang-format on
 
 namespace lui {

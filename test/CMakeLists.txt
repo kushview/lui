@@ -1,5 +1,7 @@
 # Unit tests
-# Fetch Google Test
+# SPDX-FileCopyrightText: 2026 Kushview, LLC
+# SPDX-License-Identifier: ISC
+
 FetchContent_Declare(
     googletest
     GIT_REPOSITORY https://github.com/google/googletest.git

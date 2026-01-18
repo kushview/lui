@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Kushview, LLC
+# SPDX-License-Identifier: ISC
+
 set(LUI_LUA_VERSION "${LUA_VERSION}" CACHE STRING "Lua version to use")
 
 add_library (lui-luamod MODULE

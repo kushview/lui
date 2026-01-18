@@ -1,4 +1,8 @@
+
 # Generate font resources using bin2c.py
+# SPDX-FileCopyrightText: 2026 Kushview, LLC
+# SPDX-License-Identifier: ISC
+
 set(RES_FONTS
     res/Roboto-Regular.ttf
     res/Roboto-Bold.ttf

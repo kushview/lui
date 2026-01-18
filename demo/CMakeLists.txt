@@ -1,4 +1,7 @@
 # Demo resources
+# SPDX-FileCopyrightText: 2026 Kushview, LLC
+# SPDX-License-Identifier: ISC
+
 set(demo_res_files
     res/lv2_logo.png
 )

@@ -98,13 +98,11 @@ Graphics/UI/Hosting classes utilize these libraries internally:
 
 | What         | For?              | License |
 |--------------|-------------------|---------|
-| Cairo        | Graphics backend  | [MPL-1.1](https://www.mozilla.org/en-US/MPL/1.1/annotated/) |
 | STB Image    | Images            | [MIT](LICENSES/MIT.txt) |
 | STB Truetype | Font Loading      | [MIT](LICENSES/MIT.txt) |
 | Roboto       | Built-in font     | [Apache-2.0](LICENSES/Apache-2.0.txt) |
 | Lua          | Lua Bindings      | [MIT](LICENSES/MIT.txt) |
 | Sol2         | Lua Bindings      | [MIT](LICENSES/MIT.txt) |
-| Boost        | Tests/Signals     | [BSL-1.0](https://www.boost.org/LICENSE_1_0.txt) |
 
 ## Issue Tracking
 

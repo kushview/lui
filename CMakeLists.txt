@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Kushview, LLC
+# SPDX-License-Identifier: ISC
+
 cmake_minimum_required(VERSION 3.20)
 
 project(lui

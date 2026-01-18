@@ -10,13 +10,6 @@ Files: *.clang* *.clang* *meson.build *.gitignore *.gitlab-ci.yml meson/*ini AUT
 Copyright: Kushview LLC
 License: CC0-1.0 OR ISC
 
-Files: subprojects/cairo*/*/*.h subprojects/cairo*/**/*.c subprojects/cairo*/**/*.png
-  subprojects/cairo*/**/*.sh subprojects/cairo*/**/*.svg subprojects/cairo*/**/*.js
-  subprojects/cairo*/**/README *.txt subprojects/cairo*/**/* meson_options.txt
-  subprojects/cairo*/**/*.cpp
-Copyright:  Copyright (C) 2008 Chris Wilson <chris@chris-wilson.co.uk>
-License: MPL-1.1
-
 Files: resources/*
 Copyright: 2022 Kushview, LLC
 License: ISC
