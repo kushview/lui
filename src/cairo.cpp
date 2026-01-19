@@ -52,7 +52,7 @@ public:
         double x_scale = 1.0, y_scale = 1.0;
         if (auto s = cairo_get_target (cr))
             cairo_surface_get_device_scale (s, &x_scale, &y_scale);
-        return static_cast<double> (y_scale);
+        return y_scale;
     }
 
     void save() override {
