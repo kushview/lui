@@ -14,6 +14,7 @@
 namespace lui {
 
 class Button;
+class Dial;
 class Graphics;
 class Slider;
 class TextButton;
@@ -65,7 +66,7 @@ public:
         @param ID the ColorID to look for
         @returns The Color.  Will be 0 if not found
     */
-    Color find_color (int ID) const noexcept;
+    [[nodiscard]] Color find_color (int ID) const noexcept;
 
     // clang-format off
 
@@ -88,6 +89,8 @@ public:
     virtual void draw_slider (Graphics& g, Slider& slider, Bounds bounds, float pos) =0;
     virtual void draw_slider_background (Graphics& g, Slider& slider, Bounds bounds, float pos) =0;
     virtual void draw_slider_thumb (Graphics& g, Slider& slider, Bounds bounds, float pos) =0;
+
+    virtual void draw_dial (Graphics& g, Dial& dial, Bounds bounds) =0;
     // clang-format on
 
 private:

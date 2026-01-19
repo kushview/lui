@@ -74,42 +74,42 @@ public:
     /** Return the int red value 
         @returns The red value
     */
-    uint8_t red() const noexcept { return pixel.component.r; }
+    [[nodiscard]] uint8_t red() const noexcept { return pixel.component.r; }
 
     /** Return the int green value
         @returns The green value
     */
-    uint8_t green() const noexcept { return pixel.component.g; }
+    [[nodiscard]] uint8_t green() const noexcept { return pixel.component.g; }
 
     /** Return the int blue value
         @returns the int blue value
     */
-    uint8_t blue() const noexcept { return pixel.component.b; }
+    [[nodiscard]] uint8_t blue() const noexcept { return pixel.component.b; }
 
     /** Return the int alpha value
         @returns the int alpha value
     */
-    uint8_t alpha() const noexcept { return pixel.component.a; }
+    [[nodiscard]] uint8_t alpha() const noexcept { return pixel.component.a; }
 
     /** Return the float red value
         @returns the float red value
     */
-    float fred() const noexcept { return (float) pixel.component.r / 255.f; }
+    [[nodiscard]] float fred() const noexcept { return (float) pixel.component.r / 255.f; }
 
     /** Return the float green value
         @returns the float green value
     */
-    float fgreen() const noexcept { return (float) pixel.component.g / 255.f; }
+    [[nodiscard]] float fgreen() const noexcept { return (float) pixel.component.g / 255.f; }
 
     /** Return the float blue value
         @returns the float blue value
     */
-    float fblue() const noexcept { return (float) pixel.component.b / 255.f; }
+    [[nodiscard]] float fblue() const noexcept { return (float) pixel.component.b / 255.f; }
 
     /** Return the float alpha value
         @returns the float alpha value
     */
-    float falpha() const noexcept { return (float) pixel.component.a / 255.f; }
+    [[nodiscard]] float falpha() const noexcept { return (float) pixel.component.a / 255.f; }
 
     //=========================================================================
     bool operator== (const Color& o) const noexcept { return pixel.value == o.pixel.value; }
@@ -123,7 +123,7 @@ public:
         @param amount How much brighter?
         @returns The brightened color
     */
-    Color brighter (float amount = 0.4f) const noexcept {
+    [[nodiscard]] Color brighter (float amount = 0.4f) const noexcept {
         amount = 1.0f / (1.0f + amount);
         return Color ((uint8_t) (255 - (amount * (255.f - (float) red()))),
                       (uint8_t) (255 - (amount * (255.f - (float) green()))),
@@ -132,22 +132,22 @@ public:
     }
 
     /** Get a copy of this Color, but brighter
-        @param amount How much brighter?
+        @param amount How much darker?
         @returns The brightened color
     */
-    Color darker (float amount = 0.4f) const noexcept {
+    [[nodiscard]] Color darker (float amount = 0.4f) const noexcept {
         amount = 1.0f / (1.0f + amount);
-        return Color ((uint8_t) (amount * red()),
-                      (uint8_t) (amount * green()),
-                      (uint8_t) (amount * blue()),
+        return Color ((uint8_t) (amount * static_cast<float> (red())),
+                      (uint8_t) (amount * static_cast<float> (green())),
+                      (uint8_t) (amount * static_cast<float> (blue())),
                       alpha());
     }
 
-    Color with_alpha (float a) const noexcept {
+    [[nodiscard]] Color with_alpha (float a) const noexcept {
         return Color (fred(), fgreen(), fblue(), a);
     }
 
-    Color with_alpha (int a) const noexcept {
+    [[nodiscard]] Color with_alpha (int a) const noexcept {
         return Color (red(), green(), blue(), a);
     }
 
@@ -169,7 +169,7 @@ private:
 #endif
 
     template <typename FT>
-    static inline uint8_t convert (FT v) {
+    static uint8_t convert (FT v) {
         return static_cast<uint8_t> (
             (FT) 255 * (std::max) (FT(), (std::min) (FT (1), v)));
     }

@@ -9,8 +9,6 @@
 
 #pragma once
 
-#include <vector>
-
 #include <lui/graphics.hpp>
 #include <lui/input.hpp>
 #include <lui/lui.h>
@@ -63,7 +61,7 @@ public:
     void remove (Widget& widget);
 
     /** Returns true if this widget is visible. */
-    bool visible() const noexcept;
+    [[nodiscard]] bool visible() const noexcept;
 
     /** Change this widget's visibility.
         @param visible True if it should be visible
@@ -77,7 +75,7 @@ public:
     void repaint();
 
     /** Returns true if this widget reports being opaque. */
-    bool opaque() const noexcept;
+    [[nodiscard]] bool opaque() const noexcept;
 
     /** Returns this widget's bounding box. */
     Bounds bounds() const noexcept;
@@ -171,9 +169,9 @@ public:
     bool elevated() const noexcept;
 
     /** Returns the Widget underneath the given coordinate.
-        @param coord The coordinate to check in local space
+        @param pos The coordinate to check in local space
      */
-    Widget* widget_at (Point<float> coord);
+    Widget* widget_at (Point<float> pos);
 
     /** Find the root widget in this tree */
     Widget* find_root() const noexcept;

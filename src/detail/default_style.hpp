@@ -3,12 +3,13 @@
 
 #pragma once
 
+#include <lui/dial.hpp>
 #include <lui/graphics.hpp>
+#include <lui/path.hpp>
 #include <lui/slider.hpp>
 #include <lui/style.hpp>
 
-namespace lui {
-namespace detail {
+namespace lui::detail {
 
 class DefaultStyle : public Style {
 public:
@@ -135,7 +136,68 @@ public:
         g.set_color (find_color (ColorID::SLIDER_THUMB));
         g.fill_rounded_rect (x, y, thumb_size, thumb_size, corner_size);
     }
+
+    void draw_dial (Graphics& g, Dial& dial, Bounds bounds) override {
+        const auto r         = bounds.as<double>();
+        const auto radius    = (float) std::min (r.width / 2, r.height / 2) - 2.0;
+        const float center_x = r.x + (r.width * 0.5f);
+        const float center_y = r.y + (r.height * 0.5f);
+        const float rx       = center_x - radius;
+        const float ry       = center_y - radius;
+        const float rw       = radius * 2.0f;
+
+        auto da0 = -2.356194; // -45 degrees.
+        auto da1 = 2.356194;  //  45 degrees.
+
+        Range<double> range (0.0, 1.0);
+        const auto sliderPos = (float) range.convert (dial.range(), dial.value());
+        const auto anchorPos = 0.0;
+
+        const float angle  = da0 + sliderPos * (da1 - da0);
+        const float anchor = da0 + anchorPos * (da1 - da0);
+        const float a1     = angle < anchor ? angle : anchor;
+        const float a2     = angle < anchor ? anchor : angle;
+        lui::ignore (a1, a2);
+
+        const bool is_mouse_over = false;
+
+        if (radius > 12.0f) {
+            int line_size = (int) std::max (2.0, std::min (20.0, radius * 0.085));
+            lui::ignore (line_size);
+            float line_trim       = radius > 32.f ? -3.0f : -2.f;
+            float line_offset     = radius > 32.f ? -4.f : -1.f;
+            const float thickness = 0.82f;
+            const float csf       = rw - (rw * thickness);
+            {
+                const float csf = rw - (rw * thickness);
+                Path filled;
+                filled.add_ellipse (Rectangle<float> (rx, ry, rw, rw).reduced (csf));
+                g.set_color (Color (0xffffffff).darker (1.f));
+                g.context().set_line_width (2.5);
+                g.fill_path (filled);
+
+                g.set_color (Color (0xff000000).brighter (0.17f));
+                g.stroke_path (filled);
+            }
+
+            if (true) // TODO(lui): enabled?
+                g.set_color (Color (0xffcc0000).with_alpha (is_mouse_over ? 1.0f : 0.88f));
+            else
+                g.set_color (Color (0x80808080));
+
+            {
+                ScopedSave save (g.context());
+                g.context().clear_path();
+                g.context().transform (Transform::rotation (angle).translated (center_x, center_y));
+                g.context().move_to (0.f, line_offset);
+                g.context().line_to (0.f, -radius + csf + std::abs (line_trim));
+                g.context().set_line_width (4);
+                g.context().set_fill (Color (0xff000000));
+                g.context().stroke();
+            }
+        } else {
+        }
+    }
 };
 
-} // namespace detail
-} // namespace lui
+} // namespace lui::detail

@@ -1,0 +1,82 @@
+version = 1
+SPDX-PackageName = "lui"
+SPDX-PackageSupplier = "Michael Fisher <mfisher@kushview.net>"
+SPDX-PackageDownloadLocation = "https://github.com/kushview/lui"
+
+[[annotations]]
+path = ["**.clang**", "**.clang**", "**meson.build", "**.gitignore", "**.gitlab-ci.yml", "meson/**ini", "AUTHORS", "**.wrap", ".vscode/**.json", "**README.md", "ChangeLog", "doc/**", "./meson_options.txt", "scripts/**.imp", "deploy/**.**", "demo/Info.plist**", ".editorconfig", ".github/**", "bindings/node/.npmignore", "bindings/node/binding.gyp", "bindings/node/package**.json", "**.pc.in", "cmake/**.**"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Kushview LLC"
+SPDX-License-Identifier = "CC0-1.0 OR ISC"
+
+[[annotations]]
+path = "resources/**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2022 Kushview, LLC"
+SPDX-License-Identifier = "ISC"
+
+[[annotations]]
+path = ["bindings/lua/5.**/lua**.h", "bindings/lua/**/lua**.hpp", "bindings/lua/**/laux**.h"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Copyright (C) 1994-2022 Lua.org, PUC-Rio."
+SPDX-License-Identifier = "MIT"
+
+[[annotations]]
+path = "bindings/lua/sol/**.hpp"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Copyright (c) 2013-2020 Rapptz, ThePhD and contributors"
+SPDX-License-Identifier = "MIT"
+
+[[annotations]]
+path = "include/lvtk/detail/dynmanifest.h"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Copyright 2008-2011 Stefano D'Angelo <zanga.mail@gmail.com>"
+SPDX-License-Identifier = "ISC"
+
+[[annotations]]
+path = ["src/nanovg/KHR/khrplatform.h", "subprojects/pugl/examples/glad/khrplatform.h"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2008-2018 The Khronos Group Inc."
+SPDX-License-Identifier = "MIT"
+
+[[annotations]]
+path = "**Roboto**.ttf"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2022 Christian Robertson"
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+path = "src/stb/stb_**.h"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2022 Sean T. Barrett."
+SPDX-License-Identifier = "CC0-1.0 or MIT"
+
+[[annotations]]
+path = "src/nanovg/**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2013 Mikko Mononen <memon@inside.org>"
+SPDX-License-Identifier = "Zlib"
+
+[[annotations]]
+path = ["src/pugl/**/**", "src/pugl/.**", "src/pugl/AUTHORS"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2012-2023 David Robillard <d@drobilla.net>"
+SPDX-License-Identifier = "0BSD"
+
+[[annotations]]
+path = ["src/pugl.cpp", "src/pugl.mm", "src/nanovglib.cpp"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2022 Kushview, LLC"
+SPDX-License-Identifier = "ISC"
+
+[[annotations]]
+path = "scripts/bin2c.py"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2016 by Dmitry Alimov"
+SPDX-License-Identifier = "MIT"
+
+[[annotations]]
+path = "demo/res/lv2_logo.png"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Copyright 2010-2024 David Robillard <d@drobilla.net>"
+SPDX-License-Identifier = "ISC"
