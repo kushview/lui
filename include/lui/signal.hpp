@@ -16,7 +16,7 @@ class ScopedConnection;
 
 namespace detail {
 
-/// Base connection state shared between Signal and Connection handles
+/** Base connection state shared between Signal and Connection handles. */
 struct ConnectionState {
     bool connected = true;
     uint64_t id    = 0;
@@ -24,17 +24,20 @@ struct ConnectionState {
 
 } // namespace detail
 
-/// Handle to a signal connection. Can be used to disconnect.
+/** Handle to a signal connection. Can be used to disconnect. */
 class Connection {
 public:
     Connection() = default;
 
-    /// Check if this connection is still active
+    /** Check if this connection is still active.
+        
+        @return true if the connection is active, false otherwise
+    */
     [[nodiscard]] bool connected() const {
         return state && state->connected;
     }
 
-    /// Disconnect this connection
+    /** Disconnect this connection. */
     void disconnect() {
         if (state) {
             state->connected = false;
@@ -42,12 +45,15 @@ public:
         }
     }
 
-    /// Release ownership without disconnecting
+    /** Release ownership without disconnecting. */
     void release() {
         state.reset();
     }
 
-    /// Check if this connection is valid
+    /** Check if this connection is valid.
+        
+        @return true if the connection is valid, false otherwise
+    */
     [[nodiscard]] explicit operator bool() const {
         return connected();
     }
@@ -63,7 +69,7 @@ private:
     std::shared_ptr<detail::ConnectionState> state;
 };
 
-/// RAII connection handle that automatically disconnects on destruction
+/** RAII connection handle that automatically disconnects on destruction. */
 class ScopedConnection {
 public:
     ScopedConnection() = default;
@@ -91,24 +97,33 @@ public:
         return *this;
     }
 
-    /// Check if this connection is still active
+    /** Check if this connection is still active.
+        
+        @return true if the connection is active, false otherwise
+    */
     [[nodiscard]] bool connected() const {
         return connection.connected();
     }
 
-    /// Disconnect this connection
+    /** Disconnect this connection. */
     void disconnect() {
         connection.disconnect();
     }
 
-    /// Release ownership without disconnecting
+    /** Release ownership without disconnecting.
+        
+        @return the Connection that was being managed by this scope
+    */
     [[nodiscard]] Connection release() {
         Connection conn = std::move (connection);
         connection      = Connection();
         return conn;
     }
 
-    /// Check if this connection is valid
+    /** Check if this connection is valid.
+        
+        @return true if the connection is valid, false otherwise
+    */
     [[nodiscard]] explicit operator bool() const {
         return connected();
     }
@@ -117,7 +132,7 @@ private:
     Connection connection;
 };
 
-/// Type-safe signal/slot implementation
+/** Type-safe signal/slot implementation. */
 template <typename Signature>
 class Signal;
 
@@ -148,7 +163,11 @@ public:
         return *this;
     }
 
-    /// Connect a slot to this signal
+    /** Connect a slot to this signal.
+        
+        @param slot The slot function to connect
+        @return a Connection handle that can be used to disconnect
+    */
     Connection connect (Slot slot) {
         auto state = std::make_shared<detail::ConnectionState>();
         state->id  = _next_id++;
@@ -156,7 +175,7 @@ public:
         return Connection (state);
     }
 
-    /// Disconnect all slots
+    /** Disconnect all slots. */
     void disconnect_all() {
         for (auto& entry : _slots) {
             if (entry.state) {
@@ -168,7 +187,10 @@ public:
         }
     }
 
-    /// Emit the signal, calling all connected slots
+    /** Emit the signal, calling all connected slots.
+        
+        @param args The arguments to pass to all connected slots
+    */
     void operator() (Args... args) const {
         // Prevent recursive modifications during emission
         _emitting = true;
@@ -185,13 +207,19 @@ public:
         cleanup();
     }
 
-    /// Get number of connected slots
+    /** Get number of connected slots.
+        
+        @return the number of currently connected slots
+    */
     [[nodiscard]] size_t size() const {
         cleanup();
         return _slots.size();
     }
 
-    /// Check if any slots are connected
+    /** Check if any slots are connected.
+        
+        @return true if no slots are connected, false otherwise
+    */
     [[nodiscard]] bool empty() const {
         cleanup();
         return _slots.empty();
