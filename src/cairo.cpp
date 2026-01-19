@@ -312,6 +312,7 @@ public:
         auto cr = (cairo_t*) puglGetContext (_view);
         assert (cr != nullptr);
 
+        // FIXME: always resolves true to force setting scale every frame.
         if (true || ! _scale_set || _last_scale != scale_factor()) {
             _scale_set         = true;
             const auto scale_x = scale_factor();
@@ -323,20 +324,6 @@ public:
         }
 
         cairo_save (cr);
-
-#if 0
-        // cairo_set_source_rgb (cr, 1.0, 0.0, 0.0);
-        // cairo_rectangle (cr, 0, 0, bounds().width, bounds().height);
-        // cairo_fill(cr);
-        // cairo_restore (cr);
-        // return;
-#endif
-
-#if __APPLE__ || 0
-        // FIXME: needed on macOS until lvtk.Widget clipping problems
-        // can be resolved.
-        frame = bounds().at (0);
-#endif
 
         if (_context->begin_frame (cr, frame)) {
             render (*_context);
