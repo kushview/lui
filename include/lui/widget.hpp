@@ -9,9 +9,10 @@
 
 #pragma once
 
+#include <lui/lui.h>
+
 #include <lui/graphics.hpp>
 #include <lui/input.hpp>
-#include <lui/lui.h>
 #include <lui/view.hpp>
 #include <lui/weak_ref.hpp>
 

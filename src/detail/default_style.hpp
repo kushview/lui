@@ -210,8 +210,8 @@ public:
     void draw_entry_outline (Graphics& g, Entry& entry, Bounds bounds) override {
         lui::ignore (entry);
         g.set_color (Color (0xff000000).brighter());
-        // FIXME: Graphics needs `draw_rect(...)`
-        g.draw_rounded_rect (bounds, 0.0f);
+        g.context().set_line_width (3.0);
+        g.draw_rect (bounds);
     }
 };
 

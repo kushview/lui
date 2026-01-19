@@ -276,7 +276,7 @@ inline static Pth&& rounded_rect (Pth&& path, const float x, const float y,
     }
 
     path.close_path();
-    return path;
+    return std::forward<Pth> (path);
 }
 
 /** Rounded rect from x,y,w,h, and corner_size.
@@ -297,8 +297,19 @@ template <class Pth>
 inline static Pth&& rounded_rect (Pth&& po, const float x, const float y,
                                   const float width, const float height,
                                   float corner_size) {
-    return rounded_rect (
-        po, x, y, width, height, corner_size, corner_size, true, true, true, true);
+    return std::forward<Pth> (rounded_rect (
+        po, x, y, width, height, corner_size, corner_size, true, true, true, true));
+}
+
+template <class Pth>
+inline static Pth&& rect (Pth&& po, const float x, const float y,
+                          const float width, const float height) {
+    po.move_to (x, y);
+    po.line_to (x, y + height);
+    po.line_to (x + width, y + height);
+    po.line_to (x + width, y);
+    po.close_path();
+    return std::forward<Pth> (po);
 }
 
 } // namespace graphics

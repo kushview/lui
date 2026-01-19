@@ -39,3 +39,22 @@ When reviewing code:
 - Don't hunt for optimizations without profiling data
 - The compiler already optimizes simple inline operations well
 - Only optimize when there's measured evidence of a bottleneck
+
+## Code Documentation
+### C++ Doxygen
+- Use Doxygen comments
+- Ensure a space is between description text and first `@param` or other tag.
+**Example**
+```c++
+/** Checks if a rectangular region is obscured or hidden.
+    This method tests whether the specified area intersects with any
+    obscuring elements in the current view hierarchy.
+        
+    @param x The x-coordinate of the region's top-left corner
+    @param y The y-coordinate of the region's top-left corner
+    @param width The width of the region to test
+    @param height The height of the region to test
+    @return true if any part of the region is obscured, false otherwise
+*/
+bool obscructed (int x, int y, int width, int height);
+```

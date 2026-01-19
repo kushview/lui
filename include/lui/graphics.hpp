@@ -171,90 +171,249 @@ public:
     @ingroup graphics
     @headerfile lui/graphics.hpp
  */
+/**
+ * @class Graphics
+ * @brief A graphics rendering context for drawing shapes, text, and images.
+ * 
+ * The Graphics class provides a high-level API for 2D drawing operations
+ * including rectangles, paths, text, and images. It manages drawing state
+ * through a stack-based save/restore mechanism and supports clipping regions.
+ * 
+ * @note This class cannot be instantiated without a DrawingContext.
+ * @note Instances are non-copyable.
+ */
 class LUI_API Graphics final {
 public:
     Graphics (DrawingContext& d);
     Graphics()  = delete;
     ~Graphics() = default;
 
-    /** Returns the context used by this Graphics instance. */
+    /** Returns the underlying DrawingContext used by this Graphics instance.
+        
+        @return A reference to the DrawingContext
+    */
     DrawingContext& context();
 
-    /** Save the graphics state */
+    /** Saves the current graphics state (font, color, line width, etc.)
+        to the internal stack. Pairs with restore().
+    */
     void save();
 
-    /** Restore the graphics state */
+    /** Restores the graphics state from the internal stack.
+        Restores all settings saved by the most recent save() call.
+    */
     void restore();
 
-    /** Translate origin by delta pixels from current origin.
-        @param delta delta xy to move by
-     */
+    /** Translates the origin by the specified delta from the current origin.
+        
+        @param delta The offset to move the origin by (x and y components)
+    */
     void translate (Point<int> delta);
 
-    /** Set the clip bounds
-        @param c Bounds to set
-     */
+    /** Sets the clip bounds to restrict drawing to a specific region.
+        
+        @param c The bounds to set as the clip region
+    */
     void clip (Bounds c);
 
-    /** Exclude a rectangle from the clip region.
-        @param c Region to exclude
-     */
+    /** Excludes a rectangle from the current clip region.
+        
+        @param c The region to exclude from clipping
+    */
     void exclude_clip (Bounds c);
 
-    /** Return the last clip bounds set with clip */
-    Bounds last_clip() const noexcept;
+    /** Returns the current clip bounds that were last set with clip().
+        
+        @return The current clip bounds
+    */
+    [[nodiscard]] Bounds last_clip() const noexcept;
 
-    /** Returns true if the current clip region is empty
-        @returns bool
-     */
-    bool clip_empty() const noexcept;
+    /** Returns whether the current clip region is empty.
+        
+        @return true if the clip region is empty, false otherwise
+    */
+    [[nodiscard]] bool clip_empty() const noexcept;
 
-    /** Set the current font */
+    /** Sets the current font for text operations.
+        
+        @param font The font to use for subsequent text drawing
+    */
     void set_font (const Font& font);
-    void set_font (double height);
 
-    /** Set the current fill to solid color */
+    /** Sets the current font with a specified height.
+        
+        @param height The height of the font in pixels
+    */
+
+    /** Sets the current fill to a solid color.
+        
+        @param color The color to use for fill operations
+    */
     void set_color (Color color);
 
+    /** Fills the current path with the current fill color.
+        
+        @param path The path to fill
+    */
     void fill_path (const Path& path);
 
-    /** Fill a rectangle with current color */
+    /** Fills a rectangle with the current color at the specified position and size.
+        
+        @param x The x-coordinate of the top-left corner of the rectangle
+        @param y The y-coordinate of the top-left corner of the rectangle
+        @param width The width of the rectangle in pixels
+        @param height The height of the rectangle in pixels
+    */
     void fill_rect (float x, float y, float width, float height);
+
+    /** Fills a rectangle with the current color using integer coordinates.
+        
+        @param x The x-coordinate of the top-left corner of the rectangle
+        @param y The y-coordinate of the top-left corner of the rectangle
+        @param width The width of the rectangle in pixels
+        @param height The height of the rectangle in pixels
+    */
     void fill_rect (int x, int y, int width, int height);
+
+    /** Fills a rectangle from floating-point bounds.
+        
+        @param r The rectangular bounds to fill
+    */
     void fill_rect (const Rectangle<float>& r);
+
+    /** Fills a rectangle from integer bounds.
+        
+        @param r The rectangular bounds to fill
+    */
     void fill_rect (const Rectangle<int>& r);
 
-    /** Draw a rounded rectangle outline with current settings
-        @param x
-        @param y
-        @param width
-        @param height
-        @param corner_size
+    /** Draws a rectangle outline at the specified position and size using
+        the current stroke settings. The rectangle is drawn with no fill,
+        only the outline is rendered.
+        
+        @param x The x-coordinate of the top-left corner of the rectangle
+        @param y The y-coordinate of the top-left corner of the rectangle
+        @param width The width of the rectangle in pixels
+        @param height The height of the rectangle in pixels
+    */
+    void draw_rect (float x, float y, float width, float height);
+
+    /** Draws a rectangle outline using integer coordinates.
+        
+        @param x The x-coordinate of the top-left corner of the rectangle
+        @param y The y-coordinate of the top-left corner of the rectangle
+        @param width The width of the rectangle in pixels
+        @param height The height of the rectangle in pixels
+    */
+    void draw_rect (int x, int y, int width, int height);
+
+    /** Draws a rectangle outline from floating-point bounds.
+        
+        @param r The rectangular bounds to draw
+    */
+    void draw_rect (const Rectangle<float>& r);
+
+    /** Draws a rectangle outline from integer bounds.
+        
+        @param r The rectangular bounds to draw
+    */
+    void draw_rect (const Rectangle<int>& r);
+
+    /** Draws a rounded rectangle outline with the current stroke settings.
+        
+        @param x The x-coordinate of the top-left corner of the rectangle
+        @param y The y-coordinate of the top-left corner of the rectangle
+        @param width The width of the rectangle in pixels
+        @param height The height of the rectangle in pixels
+        @param corner_size The radius of the rounded corners in pixels
     */
     void draw_rounded_rect (float x, float y, float width, float height, float corner_size);
+
+    /** Draws a rounded rectangle outline using integer coordinates.
+        
+        @param x The x-coordinate of the top-left corner of the rectangle
+        @param y The y-coordinate of the top-left corner of the rectangle
+        @param width The width of the rectangle in pixels
+        @param height The height of the rectangle in pixels
+        @param corner_size The radius of the rounded corners in pixels
+    */
     void draw_rounded_rect (int x, int y, int width, int height, float corner_size);
+
+    /** Draws a rounded rectangle outline from floating-point bounds.
+        
+        @param r The rectangular bounds to draw
+        @param corner_size The radius of the rounded corners in pixels
+    */
     void draw_rounded_rect (const Rectangle<float>&, float corner_size);
+
+    /** Draws a rounded rectangle outline from integer bounds.
+        
+        @param r The rectangular bounds to draw
+        @param corner_size The radius of the rounded corners in pixels
+    */
     void draw_rounded_rect (const Rectangle<int>& r, float corner_size);
 
-    /** Fill a rounded rectangle outline with current settings
-        @param x
-        @param y
-        @param width
-        @param height
-        @param corner_size
+    /** Fills a rounded rectangle with the current color.
+        
+        @param x The x-coordinate of the top-left corner of the rectangle
+        @param y The y-coordinate of the top-left corner of the rectangle
+        @param width The width of the rectangle in pixels
+        @param height The height of the rectangle in pixels
+        @param corner_size The radius of the rounded corners in pixels
     */
     void fill_rounded_rect (float x, float y, float width, float height, float corner_size);
+
+    /** Fills a rounded rectangle using integer coordinates.
+        
+        @param x The x-coordinate of the top-left corner of the rectangle
+        @param y The y-coordinate of the top-left corner of the rectangle
+        @param width The width of the rectangle in pixels
+        @param height The height of the rectangle in pixels
+        @param corner_size The radius of the rounded corners in pixels
+    */
     void fill_rounded_rect (int x, int y, int width, int height, float corner_size);
+
+    /** Fills a rounded rectangle from floating-point bounds.
+        
+        @param r The rectangular bounds to fill
+        @param corner_size The radius of the rounded corners in pixels
+    */
     void fill_rounded_rect (const Rectangle<float>&, float corner_size);
+
+    /** Fills a rounded rectangle from integer bounds.
+        
+        @param r The rectangular bounds to fill
+        @param corner_size The radius of the rounded corners in pixels
+    */
     void fill_rounded_rect (const Rectangle<int>& r, float corner_size);
 
+    /** Strokes the current path with the current stroke settings.
+        
+        @param path The path to stroke
+    */
     void stroke_path (const Path& path);
 
-    /** Draw some text */
+    /** Draws text within a rectangle with the specified alignment.
+        
+        @param text The text string to draw
+        @param area The rectangular area for the text
+        @param align The justification mode for positioning the text
+    */
     void draw_text (const std::string& text, Rectangle<float> area, Justify align);
 
-    /** Draw an image. */
+    /** Draws an image within a target rectangle with the specified fitment.
+        
+        @param image The image to draw
+        @param target The target rectangle where the image will be drawn
+        @param align The fitment mode for positioning and scaling the image
+    */
     void draw_image (Image image, Rectangle<double> target, Fitment align);
+
+    /** Draws an image using a transformation matrix.
+        
+        @param image The image to draw
+        @param transform The transformation to apply to the image
+    */
     void draw_image (Image image, Transform transform);
 
 private:

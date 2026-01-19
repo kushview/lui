@@ -69,6 +69,28 @@ void Graphics::fill_rect (const Rectangle<int>& r) {
     _context.fill_rect (r.as<double>());
 }
 
+void Graphics::draw_rect (float x, float y, float width, float height) {
+    _context.clear_path();
+    graphics::rect (_context, x, y, width, height)
+        .stroke();
+}
+
+void Graphics::draw_rect (int x, int y, int width, int height) {
+    draw_rect (static_cast<float> (x),
+               static_cast<float> (y),
+               static_cast<float> (width),
+               static_cast<float> (height));
+}
+
+void Graphics::draw_rect (const Rectangle<float>& r) {
+    graphics::rect (_context, r.x, r.y, r.width, r.height)
+        .stroke();
+}
+
+void Graphics::draw_rect (const Rectangle<int>& r) {
+    draw_rect (r.as<float>());
+}
+
 void Graphics::draw_rounded_rect (float x, float y, float width, float height, float corner_size) {
     _context.clear_path();
     graphics::rounded_rect (_context, x, y, width, height, corner_size)
