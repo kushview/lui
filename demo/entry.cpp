@@ -17,6 +17,8 @@ public:
         add (entry);
         show_all();
         set_size (640, 360);
+        entry.grab_focus();
+        entry.repaint();
     }
 
     ~EntryDemo() {}

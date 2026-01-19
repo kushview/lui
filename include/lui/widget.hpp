@@ -78,22 +78,36 @@ public:
     /** Returns true if this widget reports being opaque. */
     [[nodiscard]] bool opaque() const noexcept;
 
-    /** Returns this widget's bounding box. */
-    Bounds bounds() const noexcept;
+    /** Returns this widget's bounding box in parent coordinates.
+        The position (x, y) is relative to the parent frame.
+        Use this when you need to position or query the widget relative to its parent.
+        
+        @return The widget's bounds in parent coordinate space
+    */
+    [[nodiscard]] Bounds bounds() const noexcept;
+
+    /** Returns this widget's local frame with origin at the top-left corner.
+        This is equivalent to bounds().at(0) and represents the drawable area
+        in the widget's own local coordinate space. The position (x, y) will
+        typically be (0, 0), making this convenient for drawing operations.
+        
+        @return The widget's local frame with origin at (0, 0)
+    */
+    [[nodiscard]] Bounds frame() const noexcept;
 
     /** Returns the xy position of this widget.
         Same as calling widget.bounds().pos()
     */
-    Point<int> pos() const noexcept;
+    [[nodiscard]] Point<int> pos() const noexcept;
 
     /** Returns the x-coordinate of this widget parent space. */
-    int x() const noexcept;
+    [[nodiscard]] int x() const noexcept;
     /** Returns the y-coordinate of this widget parent space. */
-    int y() const noexcept;
+    [[nodiscard]] int y() const noexcept;
     /** Returns the width of this widget. */
-    int width() const noexcept;
+    [[nodiscard]] int width() const noexcept;
     /** Returns the height of this widget. */
-    int height() const noexcept;
+    [[nodiscard]] int height() const noexcept;
 
     /** Change this widget's bounds.
         
@@ -127,35 +141,61 @@ public:
     */
     bool contains (const Widget& widget, bool deep = false) const;
 
-    /** True if xy falls within this Widget's local bounds */
+    /** Checks if a coordinate falls within this widget's local bounds.
+        
+        @param x The x-coordinate to test
+        @param y The y-coordinate to test
+        @return true if the coordinate is within the widget's local bounds
+    */
     bool contains (int x, int y) const noexcept;
-    /** True if pt falls within this Widget's local bounds */
+
+    /** Checks if a point falls within this widget's local bounds.
+        
+        @param coord The integer coordinate to test
+        @return true if the coordinate is within the widget's local bounds
+    */
     bool contains (Point<int> coord) const noexcept;
-    /** True if pt falls within this Widget's local bounds */
+
+    /** Checks if a point falls within this widget's local bounds.
+        
+        @param coord The floating-point coordinate to test
+        @return true if the coordinate is within the widget's local bounds
+    */
     bool contains (Point<float> coord) const noexcept;
 
     /** Convert a coordinate from one widget's space to another.
-        @param source The Widget to convert from.
-        @param coord  A coordinate in the source.
+
+        @param source The Widget to convert from
+        @param coord A coordinate in the source widget's space
+        @return The coordinate converted to this widget's space
      */
     Point<float> convert (const Widget* source, Point<float> coord) const;
 
-    /** Convert a coordnate to view space.
-        @param coord The coordnate in local space to convert
+    /** Converts a coordinate from local space to view space.
+        
+        @param coord The coordinate in local space to convert
+        @return The coordinate in view space
      */
     Point<int> to_view_space (Point<int> coord);
 
-    /** Convert a coordnate to view space.
-        @param coord The coordnate in local space to convert
+    /** Converts a coordinate from local space to view space.
+        
+        @param coord The coordinate in local space to convert
+        @return The coordinate in view space
      */
     Point<float> to_view_space (Point<float> coord);
 
     /** Called by the View to render this Widget.
-        Invokes Widget::paint on this and all children recursively
+        Invokes Widget::paint on this and all children recursively.
+        
+        @param g The graphics context to render into
      */
     void render (Graphics& g);
 
-    /** Is currently focused */
+    /** Returns whether this widget is currently focused.
+        
+        @return true if the widget has focus, false otherwise
+     */
     bool focused() const noexcept;
 
     /** Grab focus. */

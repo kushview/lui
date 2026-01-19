@@ -216,6 +216,7 @@ void Widget::repaint() {
 bool Widget::opaque() const noexcept { return impl->opaque; }
 
 Bounds Widget::bounds() const noexcept { return impl->bounds; }
+Bounds Widget::frame() const noexcept { return impl->bounds.at (0); }
 
 Point<int> Widget::pos() const noexcept { return { impl->bounds.x, impl->bounds.y }; }
 

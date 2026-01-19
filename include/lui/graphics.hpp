@@ -244,6 +244,7 @@ public:
         
         @param height The height of the font in pixels
     */
+    void set_font (double height);
 
     /** Sets the current fill to a solid color.
         
