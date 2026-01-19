@@ -1,11 +1,9 @@
 // Copyright 2022 Kushview, LLC
 // SPDX-License-Identifier: ISC
 
-#include <iostream>
+#include <lui/lui.h>
 
 #include <lui/entry.hpp>
-
-#include "detail/pugl.hpp"
 
 namespace lui {
 namespace detail {
@@ -14,8 +12,7 @@ public:
     Entry (lui::Entry& o) : owner (o) {}
 
     void paint (Graphics& g) {
-        g.set_color (0xff000000);
-        g.fill_rect (owner.bounds().at (0));
+        owner.style().draw_entry_background (g, owner, owner.bounds().at (0));
 
         auto bounds = owner.bounds().at (0).smaller (2).as<float>();
 
@@ -38,6 +35,8 @@ public:
             g.set_color (0xffffffff);
             g.fill_rect (Rectangle<float> { caret_x, caret_y, 2.f, caret_height });
         }
+
+        owner.style().draw_entry_outline (g, owner, owner.bounds().at (0));
     }
 
     bool key_down (const KeyEvent& ev) {
@@ -87,6 +86,8 @@ private:
     std::string current_text;
     uint32_t cursor = 0;
     lui::Font font;
+
+    LUI_DISABLE_COPY (Entry)
 };
 
 } // namespace detail

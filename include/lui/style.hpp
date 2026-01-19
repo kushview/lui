@@ -15,6 +15,7 @@ namespace lui {
 
 class Button;
 class Dial;
+class Entry;
 class Graphics;
 class Slider;
 class TextButton;
@@ -91,6 +92,9 @@ public:
     virtual void draw_slider_thumb (Graphics& g, Slider& slider, Bounds bounds, float pos) =0;
 
     virtual void draw_dial (Graphics& g, Dial& dial, Bounds bounds) =0;
+
+    virtual void draw_entry_background (Graphics& g, Entry& entry, Bounds bounds) =0;
+    virtual void draw_entry_outline (Graphics& g, Entry& entry, Bounds bounds) =0;
     // clang-format on
 
 private:

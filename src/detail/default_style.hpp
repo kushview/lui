@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <lui/lui.hpp>
+
 #include <lui/dial.hpp>
 #include <lui/graphics.hpp>
 #include <lui/path.hpp>
@@ -197,6 +199,19 @@ public:
             }
         } else {
         }
+    }
+
+    void draw_entry_background (Graphics& g, Entry& entry, Bounds bounds) override {
+        lui::ignore (entry);
+        g.set_color (0xff000000);
+        g.fill_rect (bounds);
+    }
+
+    void draw_entry_outline (Graphics& g, Entry& entry, Bounds bounds) override {
+        lui::ignore (entry);
+        g.set_color (Color (0xff000000).brighter());
+        // FIXME: Graphics needs `draw_rect(...)`
+        g.draw_rounded_rect (bounds, 0.0f);
     }
 };
 
