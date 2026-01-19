@@ -1,8 +1,6 @@
 // Copyright 2022 Kushview, LLC
 // SPDX-License-Identifier: ISC
 
-#include <iostream>
-
 #include <lui/button.hpp>
 #include <lui/main.hpp>
 #include <lui/style.hpp>

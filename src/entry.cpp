@@ -5,6 +5,9 @@
 
 #include <lui/entry.hpp>
 
+#define PUGL_DISABLE_DEPRECATED
+#include <pugl/pugl.h>
+
 namespace lui {
 namespace detail {
 class Entry {
@@ -21,7 +24,7 @@ public:
         g.set_font (font);
 
         const auto fm = g.context().font_metrics();
-        auto text_y   = bounds.y + (bounds.height - static_cast<float> (fm.height)) * 0.5f;
+        auto text_y   = bounds.y + ((bounds.height - static_cast<float> (fm.height)) * 0.5f);
         g.draw_text (current_text, Rectangle<float> { bounds.x, text_y, bounds.width, static_cast<float> (fm.height) }, Justify::TOP_LEFT);
 
         // Draw caret
