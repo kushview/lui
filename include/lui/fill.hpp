@@ -21,8 +21,8 @@ public:
         _color = c;
     }
 
-    Color color() const noexcept { return _color; }
-    bool is_color() const noexcept { return true; }
+    [[nodiscard]] Color color() const noexcept { return _color; }
+    [[nodiscard]] bool is_color() const noexcept { return true; }
 
     Fill (const Color& color) {
         set_color (color);

@@ -100,6 +100,7 @@ void Entry::pressed (const Event& ev) {
 }
 
 void Entry::paint (Graphics& g) { impl->paint (g); }
+bool Entry::obstructed (int x, int y) { return true; }
 bool Entry::key_down (const KeyEvent& ev) { return impl->key_down (ev); }
 bool Entry::text_entry (const TextEvent& ev) { return impl->text_entry (ev); }
 

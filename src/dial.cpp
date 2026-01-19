@@ -23,6 +23,8 @@ Dial::~Dial() {
     impl.reset();
 }
 
+bool Dial::obstructed (int x, int y) { return true; }
+
 void Dial::paint (Graphics& g) {
     style().draw_dial (g, *this, bounds().at (0));
 }

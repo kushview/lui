@@ -5,11 +5,11 @@
 
 #include <lui/widget.hpp>
 
-namespace lui {
+// clang-format off
+namespace lui::detail { class Entry; }
+// clang-format on
 
-namespace detail {
-class Entry;
-}
+namespace lui {
 
 /** Single line text entry widget 
     @ingroup widgets
@@ -21,10 +21,11 @@ public:
     virtual ~Entry();
 
 private:
-    bool obstructed (int x, int y) override {
-        return true;
-    }
+    friend class detail::Entry;
+    std::unique_ptr<detail::Entry> impl;
 
+    /** @private */
+    bool obstructed (int x, int y) override;
     /** @private */
     bool key_down (const KeyEvent& ev) override;
     /** @private */
@@ -33,9 +34,6 @@ private:
     void paint (Graphics& g) override;
     /** @private */
     void pressed (const Event& ev) override;
-
-    friend class detail::Entry;
-    std::unique_ptr<detail::Entry> impl;
 };
 
 } // namespace lui

@@ -62,8 +62,8 @@ public:
     }
 
     /** Move a path */
-    Path (Path&& o) : _data (std::move (o._data)) {}
-    Path& operator= (Path&& o) {
+    Path (Path&& o) noexcept : _data (std::move (o._data)) {}
+    Path& operator= (Path&& o) noexcept {
         this->_data = std::move (o._data);
         return *this;
     }

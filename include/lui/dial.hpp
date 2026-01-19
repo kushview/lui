@@ -19,7 +19,7 @@ private:
     std::unique_ptr<Impl> impl;
 
     /** @private */
-    bool obstructed (int x, int y) override { return true; }
+    bool obstructed (int x, int y) override;
     /** @private */
     void paint (Graphics& g) override;
     /** @private */

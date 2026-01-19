@@ -53,7 +53,7 @@ struct Rectangle {
     /** Empty test.
         @returns true if width or height <= 0
     */
-    bool empty() const noexcept { return width <= Val() || height <= Val(); }
+    [[nodiscard]] bool empty() const noexcept { return width <= Val() || height <= Val(); }
 
     /** convert to a differnt value type
         @tparam T the other value type to convert to
