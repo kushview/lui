@@ -363,7 +363,7 @@ public:
 
         IDWriteTextFormat* textFormat = nullptr;
         HRESULT hr                    = writeFactory->CreateTextFormat (
-            L"Roboto",
+            L"Segoe UI",
             nullptr,
             DWRITE_FONT_WEIGHT_NORMAL,
             DWRITE_FONT_STYLE_NORMAL,
@@ -381,7 +381,7 @@ public:
         UINT32 familyIndex = 0;
         BOOL exists        = FALSE;
         if (fontCollection) {
-            fontCollection->FindFamilyName (L"Roboto", &familyIndex, &exists);
+            fontCollection->FindFamilyName (L"Segoe UI", &familyIndex, &exists);
         }
 
         IDWriteFontFamily* fontFamily = nullptr;
@@ -399,8 +399,10 @@ public:
         }
 
         DWRITE_FONT_METRICS fontMetrics;
+        bool gotMetrics = false;
         if (font) {
             font->GetMetrics (&fontMetrics);
+            gotMetrics = true;
         }
 
         SafeRelease (&font);
@@ -408,7 +410,7 @@ public:
         SafeRelease (&fontCollection);
         SafeRelease (&textFormat);
 
-        if (! font) {
+        if (! gotMetrics) {
             // Return approximate values if we couldn't get font
             const float height = state.font.height();
             return {
@@ -443,7 +445,7 @@ public:
 
         IDWriteTextFormat* textFormat = nullptr;
         HRESULT hr                    = writeFactory->CreateTextFormat (
-            L"Roboto",
+            L"Segoe UI",
             nullptr,
             DWRITE_FONT_WEIGHT_NORMAL,
             DWRITE_FONT_STYLE_NORMAL,
@@ -491,7 +493,7 @@ public:
 
         IDWriteTextFormat* textFormat = nullptr;
         HRESULT hr                    = writeFactory->CreateTextFormat (
-            L"Roboto",
+            L"Segoe UI",
             nullptr,
             DWRITE_FONT_WEIGHT_NORMAL,
             DWRITE_FONT_STYLE_NORMAL,
@@ -499,6 +501,21 @@ public:
             state.font.height(),
             L"en-us",
             &textFormat);
+
+        if (FAILED (hr))
+            return false;
+
+        // Create a text layout to measure and draw
+        IDWriteTextLayout* textLayout = nullptr;
+        hr                            = writeFactory->CreateTextLayout (
+            wtext.c_str(),
+            static_cast<UINT32> (wtext.length()),
+            textFormat,
+            10000.0f,
+            10000.0f,
+            &textLayout);
+
+        SafeRelease (&textFormat);
 
         if (FAILED (hr))
             return false;
@@ -513,25 +530,26 @@ public:
             &brush);
 
         if (SUCCEEDED (hr)) {
-            // DirectWrite uses top-left positioning, current_pos represents baseline
-            // Adjust Y coordinate by subtracting ascent
-            D2D1_RECT_F layoutRect = D2D1::RectF (
+            // Get font metrics to calculate baseline adjustment (same as GDI approach)
+            auto fm = font_metrics();
+            
+            // DirectWrite DrawTextLayout uses top-left positioning
+            // current_pos is the baseline position from Graphics layer
+            // So subtract ascent to convert baseline to top-left
+            D2D1_POINT_2F origin = D2D1::Point2F (
                 current_pos.x,
-                current_pos.y - static_cast<float> (metrics.ascent),
-                10000.0f,
-                10000.0f);
+                current_pos.y - static_cast<float> (fm.ascent));
 
-            rt->DrawText (
-                wtext.c_str(),
-                static_cast<UINT32> (wtext.length()),
-                textFormat,
-                layoutRect,
-                brush);
+            rt->DrawTextLayout (
+                origin,
+                textLayout,
+                brush,
+                D2D1_DRAW_TEXT_OPTIONS_NONE);
 
             SafeRelease (&brush);
         }
 
-        SafeRelease (&textFormat);
+        SafeRelease (&textLayout);
         return SUCCEEDED (hr);
     }
 
