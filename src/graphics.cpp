@@ -129,8 +129,8 @@ void Graphics::fill_rounded_rect (int x, int y, int width, int height, float cor
         corner_size);
 }
 
-void Graphics::fill_rounded_rect (const Rectangle<int>& r, float cs) {
-    fill_rounded_rect (r.as<float>(), cs);
+void Graphics::fill_rounded_rect (const Rectangle<int>& r, float corner_size) {
+    fill_rounded_rect (r.as<float>(), corner_size);
 }
 
 void Graphics::fill_rounded_rect (const Rectangle<float>& r, float corner_size) {
@@ -168,8 +168,8 @@ void Graphics::draw_text (const std::string& text, Rectangle<float> area, Justif
 
     const auto fe = _context.font_metrics();
     const auto te = _context.text_metrics (text);
-    float x       = area.x;
-    float y       = area.y;
+    double x       = area.x;
+    double y       = area.y;
 
     if (align.flags() & Justify::MID_X)
         x = (area.x + te.x_offset) + (area.width * 0.5f) - (te.width * 0.5f);

@@ -297,8 +297,11 @@ template <class Pth>
 inline static Pth&& rounded_rect (Pth&& po, const float x, const float y,
                                   const float width, const float height,
                                   float corner_size) {
-    return std::forward<Pth> (rounded_rect (
-        po, x, y, width, height, corner_size, corner_size, true, true, true, true));
+    return rounded_rect (
+        std::forward<Pth> (po), 
+        x, y, width, height, 
+        corner_size, corner_size,
+        true, true, true, true);
 }
 
 template <class Pth>
