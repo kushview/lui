@@ -26,20 +26,29 @@ puglWinDirect2DCreateDeviceResources (PuglView* view) {
     PuglWinDirect2DSurface* const surface = (PuglWinDirect2DSurface*) impl->surface;
 
     if (surface->renderTarget) {
+        // Just resize if it already exists
+        D2D1_SIZE_U size = D2D1::SizeU (
+            (UINT32) view->lastConfigure.width,
+            (UINT32) view->lastConfigure.height);
+        surface->renderTarget->Resize (size);
         return PUGL_SUCCESS;
     }
 
-    // Get window client area size
-    RECT rc;
-    GetClientRect (impl->hwnd, &rc);
-
     D2D1_SIZE_U size = D2D1::SizeU (
-        rc.right - rc.left,
-        rc.bottom - rc.top);
+        (UINT32) view->lastConfigure.width,
+        (UINT32) view->lastConfigure.height);
 
-    // Create a Direct2D render target
+    // Create render target with 96 DPI (identity DPI) so coordinates match 1:1 with pixels
+    // This matches how pugl reports window size and mouse coordinates
+    D2D1_RENDER_TARGET_PROPERTIES rtProps = D2D1::RenderTargetProperties();
+    rtProps.dpiX = 96.0f;
+    rtProps.dpiY = 96.0f;
+    rtProps.pixelFormat = D2D1::PixelFormat (
+        DXGI_FORMAT_B8G8R8A8_UNORM,
+        D2D1_ALPHA_MODE_PREMULTIPLIED);
+
     HRESULT hr = surface->d2dFactory->CreateHwndRenderTarget (
-        D2D1::RenderTargetProperties(),
+        rtProps,
         D2D1::HwndRenderTargetProperties (impl->hwnd, size),
         &surface->renderTarget);
 

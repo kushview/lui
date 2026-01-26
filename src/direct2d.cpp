@@ -678,12 +678,6 @@ public:
         auto rt = surface->renderTarget;
         auto writeFactory = surface->writeFactory;
 
-        const auto scale = scale_factor();
-        if (scale != 1.0 && scale != _last_scale) {
-            rt->SetDpi (static_cast<float> (scale * 96.0), static_cast<float> (scale * 96.0));
-            _last_scale  = scale;
-        }
-
         if (_context->begin_frame (rt, writeFactory, frame)) {
             render (*_context);
             _context->end_frame();
@@ -705,7 +699,6 @@ private:
     using Parent = lui::View;
     PuglView* _view { nullptr };
     std::unique_ptr<Context> _context;
-    double _last_scale { 1.0 };
 };
 
 } // namespace d2d
