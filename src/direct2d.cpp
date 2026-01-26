@@ -156,6 +156,9 @@ public:
     }
 
     void move_to (double x1, double y1) override {
+        // Always update current position (needed for text rendering)
+        current_pos = D2D1::Point2F (static_cast<float> (x1), static_cast<float> (y1));
+        
         if (! geometrySink)
             return;
 
@@ -164,7 +167,6 @@ public:
             figure_active = false;
         }
 
-        current_pos = D2D1::Point2F (static_cast<float> (x1), static_cast<float> (y1));
         geometrySink->BeginFigure (current_pos, D2D1_FIGURE_BEGIN_FILLED);
         figure_active = true;
     }
