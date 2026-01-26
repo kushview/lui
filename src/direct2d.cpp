@@ -119,6 +119,10 @@ public:
     }
 
     void save() override {
+        // Save the current transform matrix in state
+        if (rt) {
+            rt->GetTransform (&state.transform);
+        }
         stack.push_back (state);
     }
 
@@ -130,6 +134,11 @@ public:
         while (state.clip_depth > stack.back().clip_depth) {
             rt->PopAxisAlignedClip();
             state.clip_depth--;
+        }
+        
+        // Restore the transform matrix from saved state
+        if (rt) {
+            rt->SetTransform (stack.back().transform);
         }
         
         std::swap (state, stack.back());
@@ -635,6 +644,7 @@ private:
         Rectangle<double> clip;
         float line_width { 1.0f };
         int clip_depth { 0 };
+        D2D1_MATRIX_3X2_F transform;
     };
 
     ID2D1RenderTarget* rt { nullptr };
