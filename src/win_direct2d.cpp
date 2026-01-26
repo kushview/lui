@@ -2,7 +2,6 @@
 // Copyright 2026 Kushview, LLC
 // SPDX-License-Identifier: ISC
 
-#include "pugl/src/stub.h"
 #include "pugl/src/types.h"
 
 extern "C" {
@@ -10,6 +9,7 @@ extern "C" {
 }
 
 #include <d2d1.h>
+#include <d2d1helper.h>
 #include <dwrite.h>
 
 #include <stdlib.h>
@@ -21,185 +21,164 @@ typedef struct {
 } PuglWinDirect2DSurface;
 
 static PuglStatus
-    puglWinDirect2DCreateDrawContext (PuglView* view) {
-    PuglInternals* const impl             = view->impl;
+puglWinDirect2DCreateDeviceResources (PuglView* view) {
+    PuglInternals* const impl        = view->impl;
     PuglWinDirect2DSurface* const surface = (PuglWinDirect2DSurface*) impl->surface;
 
-    if (! surface->d2dFactory) {
-        return PUGL_CREATE_CONTEXT_FAILED;
+    if (surface->renderTarget) {
+        return PUGL_SUCCESS;
     }
 
-    // Create render target properties
-    D2D1_RENDER_TARGET_PROPERTIES props = {
-        D2D1_RENDER_TARGET_TYPE_DEFAULT,
-        { DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED },
-        0.0f,
-        0.0f,
-        D2D1_RENDER_TARGET_USAGE_NONE,
-        D2D1_FEATURE_LEVEL_DEFAULT
-    };
+    // Get window client area size
+    RECT rc;
+    GetClientRect (impl->hwnd, &rc);
 
-    // Create HWND render target properties
-    D2D1_HWND_RENDER_TARGET_PROPERTIES hwndProps = {
-        impl->hwnd,
-        { (UINT32) view->lastConfigure.width, (UINT32) view->lastConfigure.height },
-        D2D1_PRESENT_OPTIONS_NONE
-    };
+    D2D1_SIZE_U size = D2D1::SizeU (
+        rc.right - rc.left,
+        rc.bottom - rc.top);
 
+    // Create a Direct2D render target
     HRESULT hr = surface->d2dFactory->CreateHwndRenderTarget (
-        &props,
-        &hwndProps,
+        D2D1::RenderTargetProperties(),
+        D2D1::HwndRenderTargetProperties (impl->hwnd, size),
         &surface->renderTarget);
 
-    return (SUCCEEDED (hr)) ? PUGL_SUCCESS : PUGL_CREATE_CONTEXT_FAILED;
+    return SUCCEEDED (hr) ? PUGL_SUCCESS : PUGL_CREATE_CONTEXT_FAILED;
 }
 
-static PuglStatus
-    puglWinDirect2DDestroyDrawContext (PuglView* view) {
-    PuglInternals* const impl             = view->impl;
+static void
+puglWinDirect2DDiscardDeviceResources (PuglView* view) {
+    PuglInternals* const impl        = view->impl;
     PuglWinDirect2DSurface* const surface = (PuglWinDirect2DSurface*) impl->surface;
 
     if (surface->renderTarget) {
         surface->renderTarget->Release();
-        surface->renderTarget = NULL;
+        surface->renderTarget = nullptr;
     }
-
-    return PUGL_SUCCESS;
 }
 
 static PuglStatus
-    puglWinDirect2DConfigure (PuglView* view) {
+puglWinDirect2DConfigure (PuglView* view) {
     const PuglStatus st = puglWinConfigure (view);
 
-    if (! st) {
-        PuglWinDirect2DSurface* surface =
-            (PuglWinDirect2DSurface*) calloc (1, sizeof (PuglWinDirect2DSurface));
-
-        view->impl->surface = surface;
-
-        // Create D2D factory
-        HRESULT hr = D2D1CreateFactory (
-            D2D1_FACTORY_TYPE_SINGLE_THREADED,
-            &surface->d2dFactory);
-
-        if (FAILED (hr)) {
-            free (surface);
-            view->impl->surface = NULL;
-            return PUGL_CREATE_CONTEXT_FAILED;
-        }
-
-        // Create DWrite factory
-        hr = DWriteCreateFactory (
-            DWRITE_FACTORY_TYPE_SHARED,
-            __uuidof (IDWriteFactory),
-            reinterpret_cast<IUnknown**> (&surface->writeFactory));
-
-        if (FAILED (hr)) {
-            surface->d2dFactory->Release();
-            free (surface);
-            view->impl->surface = NULL;
-            return PUGL_CREATE_CONTEXT_FAILED;
-        }
+    if (st != PUGL_SUCCESS) {
+        return st;
     }
 
-    return st;
-}
+    // Allocate surface structure
+    view->impl->surface = (PuglWinDirect2DSurface*) calloc (1, sizeof (PuglWinDirect2DSurface));
+    if (! view->impl->surface) {
+        return PUGL_FAILURE;
+    }
 
-static void
-    puglWinDirect2DClose (PuglView* view) {
-    // Direct2D doesn't need explicit close per frame
-    (void) view;
+    PuglWinDirect2DSurface* surface = (PuglWinDirect2DSurface*) view->impl->surface;
+
+    // Create Direct2D factory (device-independent)
+    HRESULT hr = D2D1CreateFactory (
+        D2D1_FACTORY_TYPE_SINGLE_THREADED,
+        &surface->d2dFactory);
+
+    if (FAILED (hr)) {
+        free (view->impl->surface);
+        view->impl->surface = nullptr;
+        return PUGL_CREATE_CONTEXT_FAILED;
+    }
+
+    // Create DirectWrite factory (device-independent)
+    hr = DWriteCreateFactory (
+        DWRITE_FACTORY_TYPE_SHARED,
+        __uuidof(IDWriteFactory),
+        reinterpret_cast<IUnknown**> (&surface->writeFactory));
+
+    if (FAILED (hr)) {
+        surface->d2dFactory->Release();
+        free (view->impl->surface);
+        view->impl->surface = nullptr;
+        return PUGL_CREATE_CONTEXT_FAILED;
+    }
+
+    return PUGL_SUCCESS;
 }
 
 static PuglStatus
-    puglWinDirect2DOpen (PuglView* view) {
-    // Direct2D doesn't need explicit open per frame
+puglWinDirect2DCreate (PuglView* view) {
     (void) view;
     return PUGL_SUCCESS;
 }
 
 static void
-    puglWinDirect2DDestroy (PuglView* view) {
-    PuglInternals* const impl             = view->impl;
+puglWinDirect2DDestroy (PuglView* view) {
+    PuglInternals* const impl        = view->impl;
     PuglWinDirect2DSurface* const surface = (PuglWinDirect2DSurface*) impl->surface;
 
     if (surface) {
-        puglWinDirect2DClose (view);
-        puglWinDirect2DDestroyDrawContext (view);
+        puglWinDirect2DDiscardDeviceResources (view);
 
         if (surface->writeFactory) {
             surface->writeFactory->Release();
+            surface->writeFactory = nullptr;
         }
 
         if (surface->d2dFactory) {
             surface->d2dFactory->Release();
+            surface->d2dFactory = nullptr;
         }
 
         free (surface);
-        impl->surface = NULL;
+        impl->surface = nullptr;
     }
 }
 
 static PuglStatus
-    puglWinDirect2DEnter (PuglView* view, const PuglExposeEvent* expose) {
+puglWinDirect2DEnter (PuglView* view, const PuglExposeEvent* expose) {
     PuglStatus st = PUGL_SUCCESS;
 
     if (expose) {
-        if (! st) {
-            st = puglWinDirect2DCreateDrawContext (view);
-        }
-        if (! st) {
-            st = puglWinDirect2DOpen (view);
-        }
-        if (! st) {
-            st = puglWinEnter (view, expose);
+        // Create device resources if needed
+        st = puglWinDirect2DCreateDeviceResources (view);
+        if (st != PUGL_SUCCESS) {
+            return st;
         }
 
+        PuglWinDirect2DSurface* surface = (PuglWinDirect2DSurface*) view->impl->surface;
+        
         // Begin drawing
-        if (! st) {
-            PuglWinDirect2DSurface* const surface =
-                (PuglWinDirect2DSurface*) view->impl->surface;
-            if (surface->renderTarget) {
-                surface->renderTarget->BeginDraw();
-            }
-        }
+        surface->renderTarget->BeginDraw();
+        surface->renderTarget->SetTransform (D2D1::Matrix3x2F::Identity());
     }
 
     return st;
 }
 
 static PuglStatus
-    puglWinDirect2DLeave (PuglView* view, const PuglExposeEvent* expose) {
-    PuglInternals* const impl             = view->impl;
-    PuglWinDirect2DSurface* const surface = (PuglWinDirect2DSurface*) impl->surface;
+puglWinDirect2DLeave (PuglView* view, const PuglExposeEvent* expose) {
+    PuglWinDirect2DSurface* surface = (PuglWinDirect2DSurface*) view->impl->surface;
 
     if (expose && surface->renderTarget) {
         // End drawing
         HRESULT hr = surface->renderTarget->EndDraw();
 
+        // Check if we need to recreate device resources
         if (hr == D2DERR_RECREATE_TARGET) {
-            // Need to recreate render target
-            puglWinDirect2DDestroyDrawContext (view);
+            puglWinDirect2DDiscardDeviceResources (view);
         }
-
-        puglWinDirect2DClose (view);
     }
 
-    return puglWinLeave (view, expose);
+    return PUGL_SUCCESS;
 }
 
 static void*
-    puglWinDirect2DGetContext (PuglView* view) {
-    return ((PuglWinDirect2DSurface*) view->impl->surface)->renderTarget;
+puglWinDirect2DGetContext (PuglView* view) {
+    return view->impl->surface;
 }
 
 extern "C" {
 
 const PuglBackend*
-    puglDirect2DBackend (void) {
+puglDirect2DBackend (void) {
     static const PuglBackend backend = {
         puglWinDirect2DConfigure,
-        puglStubCreate,
+        puglWinDirect2DCreate,
         puglWinDirect2DDestroy,
         puglWinDirect2DEnter,
         puglWinDirect2DLeave,
