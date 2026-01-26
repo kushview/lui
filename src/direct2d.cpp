@@ -172,8 +172,11 @@ public:
     }
 
     void line_to (double x1, double y1) override {
-        if (! geometrySink || ! figure_active)
+        if (! geometrySink || ! figure_active) {
+            // DEBUG: Check why this fails
+            // OutputDebugStringA (geometrySink ? "line_to: no active figure\n" : "line_to: no geometry sink\n");
             return;
+        }
 
         D2D1_POINT_2F pt = D2D1::Point2F (static_cast<float> (x1), static_cast<float> (y1));
         geometrySink->AddLine (pt);
@@ -283,8 +286,8 @@ public:
         if (! rt)
             return;
 
-        D2D1_MATRIX_3X2_F transform;
-        rt->GetTransform (&transform);
+        D2D1_MATRIX_3X2_F currentTransform;
+        rt->GetTransform (&currentTransform);
 
         D2D1_MATRIX_3X2_F newTransform = D2D1::Matrix3x2F (
             static_cast<float> (mat.m00),
@@ -294,7 +297,9 @@ public:
             static_cast<float> (mat.m02),
             static_cast<float> (mat.m12));
 
-        rt->SetTransform (transform * newTransform);
+        // Matrix multiplication order: newTransform * currentTransform
+        // This applies current transform first, then new transform
+        rt->SetTransform (newTransform * currentTransform);
     }
 
     void clip (const Rectangle<int>& r) override {
