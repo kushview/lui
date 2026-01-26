@@ -593,7 +593,9 @@ public:
                 static_cast<float> (matrix.m02),
                 static_cast<float> (matrix.m12));
 
-            rt->SetTransform (oldTransform * newTransform);
+            // Matrix multiplication order: newTransform * oldTransform
+            // This applies old transform first, then image transform
+            rt->SetTransform (newTransform * oldTransform);
 
             // Draw the bitmap
             D2D1_RECT_F destRect = D2D1::RectF (
