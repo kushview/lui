@@ -83,6 +83,7 @@ void Graphics::draw_rect (int x, int y, int width, int height) {
 }
 
 void Graphics::draw_rect (const Rectangle<float>& r) {
+    _context.clear_path();
     graphics::rect (_context, r.x, r.y, r.width, r.height)
         .stroke();
 }
